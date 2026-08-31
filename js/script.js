@@ -1,366 +1,716 @@
-const QUESTION_REGISTRY = {
-            USAF: {
-                branchName: "US Air Force / Space Force",
-                manual: "AFMAN 36-2203",
-                questions: [
-                    {
-                        q: "What is the standard cadence rate for Quick Time in USAF drill?",
-                        options: ["100 to 110 steps per minute", "100 to 120 steps per minute", "120 to 130 steps per minute", "180 steps per minute"],
-                        answer: 1,
-                        explanation: "AFMAN 36-2203 Ch. 1 defines Quick Time cadence as 100 to 120 steps per minute."
-                    },
-                    {
-                        q: "In USAF drill, on which foot is the command 'TO THE REAR, MARCH' called?",
-                        options: ["Left foot", "Right foot", "Either foot", "Standing position only"],
-                        answer: 1,
-                        explanation: "In AFMAN 36-2203, 'TO THE REAR, MARCH' is issued as the right foot strikes the ground."
-                    },
-                    {
-                        q: "What is the standard step length for Quick Time marching in USAF drill?",
-                        options: ["12 inches", "18 inches", "24 inches", "30 inches"],
-                        answer: 2,
-                        explanation: "Standard step length for USAF Quick Time is 24 inches (measured heel to heel)."
-                    },
-                    {
-                        q: "Which command allows formation members to break position but remain in the immediate area?",
-                        options: ["DISMISSED", "FALL OUT", "AT EASE", "REST"],
-                        answer: 1,
-                        explanation: "'FALL OUT' permits personnel to relax and leave their position while staying nearby."
-                    },
-                    {
-                        q: "In a flight line formation, what is the distance between ranks?",
-                        options: ["30 inches", "40 inches", "36 inches", "48 inches"],
-                        answer: 1,
-                        explanation: "Distance between ranks (measured from chest of rear airman to back of front airman) is 40 inches."
-                    }
-                ]
-            },
-            USA: {
-                branchName: "US Army",
-                manual: "TC 3-21.5",
-                questions: [
-                    {
-                        q: "According to Army TC 3-21.5, what are the two main parts of a standard drill command?",
-                        options: ["Action and Directives", "Preparatory command and Command of execution", "Warning and Execution", "Primary and Secondary"],
-                        answer: 1,
-                        explanation: "Commands consist of a Preparatory Command (what to do) and Command of Execution (when to do it)."
-                    },
-                    {
-                        q: "In Army drill, on which foot is the command 'Rear, MARCH' given while marching?",
-                        options: ["Left foot", "Right foot", "Either foot", "Both feet simultaneously"],
-                        answer: 1,
-                        explanation: "Under TC 3-21.5, 'Rear, MARCH' is called on the right foot."
-                    },
-                    {
-                        q: "What is the march cadence rate for 'Double Time' in Army drill?",
-                        options: ["120 steps/min", "140 steps/min", "180 steps/min", "200 steps/min"],
-                        answer: 2,
-                        explanation: "Army Double Time cadence is exactly 180 steps per minute."
-                    },
-                    {
-                        q: "What is the step length taken during normal Quick Time in Army drill?",
-                        options: ["15 inches", "24 inches", "30 inches", "36 inches"],
-                        answer: 2,
-                        explanation: "Army Quick Time step length is 30 inches."
-                    },
-                    {
-                        q: "What is the correct position of hands at Attention under Army drill standards?",
-                        options: ["Fists clenched firmly", "Cupped with thumbs along trouser seams", "Flat against thighs", "Relaxed open palm"],
-                        answer: 1,
-                        explanation: "Hands are cupped with thumbs along the trouser seam line."
-                    }
-                ]
-            },
-            USMC: {
-                branchName: "US Marine Corps / US Navy",
-                manual: "MCO 5060.2M",
-                questions: [
-                    {
-                        q: "Under MCO 5060.2M, what distance is maintained between ranks in column formation?",
-                        options: ["30 inches", "36 inches", "40 inches", "48 inches"],
-                        answer: 2,
-                        explanation: "Distance between ranks in USMC drill is 40 inches."
-                    },
-                    {
-                        q: "What is the step length for Half Step in Marine Corps drill?",
-                        options: ["12 inches", "15 inches", "18 inches", "20 inches"],
-                        answer: 1,
-                        explanation: "Half Step in Marine Corps drill is 15 inches."
-                    },
-                    {
-                        q: "On which foot is the command for 'Right Flank, MARCH' given while marching?",
-                        options: ["Right foot", "Left foot", "Either foot", "Command of Execution on both"],
-                        answer: 1,
-                        explanation: "Right flank execution commands are called on the left foot."
-                    },
-                    {
-                        q: "What command aligns a Marine squad at normal interval?",
-                        options: ["COVER", "DRESS RIGHT, DRESS", "ALIGNMENT, MARCH", "SQUAD, DRESS"],
-                        answer: 1,
-                        explanation: "'DRESS RIGHT, DRESS' aligns elements with left arm extended horizontally."
-                    }
-                ]
-            },
-            CAP: {
-                branchName: "Civil Air Patrol",
-                manual: "CAPP 60-33",
-                questions: [
-                    {
-                        q: "Which official publication governs Civil Air Patrol Drill & Ceremonies?",
-                        options: ["CAPR 52-16", "CAPP 60-33", "CAPM 39-1", "AFMAN 36-2203"],
-                        answer: 1,
-                        explanation: "CAPP 60-33 is the official Civil Air Patrol Drill and Ceremonies Pamphlet."
-                    },
-                    {
-                        q: "What USAF manual does Civil Air Patrol drill primarily model its standards after?",
-                        options: ["AFMAN 36-2203", "AFI 36-2903", "AFMAN 36-2606", "AFPAM 34-1202"],
-                        answer: 0,
-                        explanation: "CAP Drill standards mirror USAF AFMAN 36-2203."
-                    },
-                    {
-                        q: "Which position of rest permits cadets to talk unless instructed otherwise?",
-                        options: ["AT EASE", "REST", "PARADE REST", "FALL OUT"],
-                        answer: 1,
-                        explanation: "On 'REST', members may talk while keeping their right foot fixed in position."
-                    }
-                ]
-            }
-        };
+// ==========================================
+// 1. GLOBAL STATE & FIREBASE INITIALIZATION
+// ==========================================
+let QUESTION_REGISTRY = {};
+let activeBranchKey = "";
+let activeName = "";
+let activeQuestions = [];
+let currentIdx = 0;
+let score = 0;
 
-        let activeBranchKey = "USAF";
-        let activeName = "";
-        let activeQuestions = [];
-        let currentIdx = 0;
-        let score = 0;
+const firebaseConfig = {
+    apiKey: "AIzaSyBr9AkWSSW7_qesMsj3nBwluLWjfjOULVY",
+    authDomain: "cap-evaluator.firebaseapp.com",
+    databaseURL: "https://cap-evaluator-default-rtdb.firebaseio.com",
+    projectId: "cap-evaluator",
+    storageBucket: "cap-evaluator.firebasestorage.app",
+    messagingSenderId: "320253213583",
+    appId: "1:320253213583:web:4ade28e5e88f8f3b03e9fa",
+    measurementId: "G-RZDRVYD6TC"
+};
 
-        document.addEventListener("DOMContentLoaded", () => {
-            updateDashboardMetrics();
-            renderLeaderboard();
+// Initialize Firebase App & Database
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
+// ==========================================
+// 2. FETCH EVERYTHING FROM FIREBASE ON LOAD
+// ==========================================
+document.addEventListener("DOMContentLoaded", () => {
+    database.ref("quizModules").on("value", (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            QUESTION_REGISTRY = data;
+            populateBranchDropdowns();
+            renderHomepageManuals();
             renderBankInspector();
+        } else {
+            const treeEl = document.getElementById("dynamic-manuals-tree");
+            if (treeEl) {
+                treeEl.innerHTML = `<div style="color: var(--alert-color); padding: 0.5em; border: 1px dashed var(--alert-color);">
+                    ❌ No quiz modules found in database under 'quizModules/'. Use Section 1 below to register one!
+                </div>`;
+            }
+        }
+    });
+
+    updateDashboardMetrics();
+    renderLeaderboard();
+});
+
+// ==========================================
+// 3. DYNAMICALLY BUILD DROPDOWNS & HOMEPAGE
+// ==========================================
+function populateBranchDropdowns() {
+    const setupSelect = document.getElementById("quiz-select");
+    const builderTargetSelect = document.getElementById("builder-target-quiz");
+    const inspectSelect = document.getElementById("bank-inspect-select");
+    const leaderboardSelect = document.getElementById("filter-leaderboard");
+
+    const moduleKeys = Object.keys(QUESTION_REGISTRY);
+
+    if (setupSelect) setupSelect.innerHTML = "";
+    if (builderTargetSelect) builderTargetSelect.innerHTML = "";
+    if (inspectSelect) inspectSelect.innerHTML = "";
+
+    const currentFilter = leaderboardSelect ? leaderboardSelect.value : "ALL";
+    if (leaderboardSelect) {
+        leaderboardSelect.innerHTML = `<option value="ALL">All Modules</option>`;
+    }
+
+    if (moduleKeys.length === 0) {
+        if (setupSelect) setupSelect.innerHTML = `<option value="">No Modules Available</option>`;
+        if (builderTargetSelect) builderTargetSelect.innerHTML = `<option value="">No Modules Available</option>`;
+        if (inspectSelect) inspectSelect.innerHTML = `<option value="">No Modules Available</option>`;
+        return;
+    }
+
+    moduleKeys.forEach((key) => {
+        const item = QUESTION_REGISTRY[key];
+        const label = `${item.branchName || key} (${item.manual || 'Standard'})`;
+
+        if (setupSelect) setupSelect.innerHTML += `<option value="${key}">${label}</option>`;
+        if (builderTargetSelect) builderTargetSelect.innerHTML += `<option value="${key}">${label}</option>`;
+        if (inspectSelect) inspectSelect.innerHTML += `<option value="${key}">${label}</option>`;
+        if (leaderboardSelect) leaderboardSelect.innerHTML += `<option value="${key}">${item.branchName || key}</option>`;
+    });
+
+    if (leaderboardSelect) leaderboardSelect.value = currentFilter;
+    if (setupSelect && setupSelect.value) activeBranchKey = setupSelect.value;
+}
+
+function renderHomepageManuals() {
+    const treeContainer = document.getElementById("dynamic-manuals-tree");
+    if (!treeContainer) return;
+
+    const moduleKeys = Object.keys(QUESTION_REGISTRY);
+
+    if (moduleKeys.length === 0) {
+        treeContainer.innerHTML = `<span style="color: var(--light-text-color);">No modules registered in database yet.</span>`;
+        return;
+    }
+
+    let html = `<ul class="tree">`;
+    moduleKeys.forEach((key) => {
+        const item = QUESTION_REGISTRY[key];
+        const rawQs = item.questions;
+        const count = rawQs ? (Array.isArray(rawQs) ? rawQs.length : Object.keys(rawQs).length) : 0;
+
+        html += `
+            <li><strong>${item.branchName || key} — ${item.manual || 'N/A'}</strong>
+                <ul>
+                    <li>Category: ${item.category || 'General'}</li>
+                    <li>Registered Questions: ${count}</li>
+                </ul>
+            </li>
+        `;
+    });
+    html += `</ul>`;
+
+    treeContainer.innerHTML = html;
+}
+
+// ==========================================
+// 4. NAVIGATION ROUTER
+// ==========================================
+function showView(viewId) {
+    const views = ['home-view', 'setup-view', 'quiz-view', 'results-view', 'leaderboard-view', 'builder-view', 'admin-view'];
+    views.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('hidden', id !== viewId);
+    });
+
+    const navMap = {
+        'home-view': 'nav-home',
+        'setup-view': 'nav-setup',
+        'leaderboard-view': 'nav-leaderboard',
+        'builder-view': 'nav-builder',
+        'admin-view': 'nav-admin'
+    };
+
+    document.querySelectorAll('#navbar a').forEach(a => a.classList.remove('active-nav'));
+    if (navMap[viewId] && document.getElementById(navMap[viewId])) {
+        document.getElementById(navMap[viewId]).classList.add('active-nav');
+    }
+
+    if (viewId === 'home-view') updateDashboardMetrics();
+    if (viewId === 'leaderboard-view') renderLeaderboard();
+    if (viewId === 'builder-view') renderBankInspector();
+    if (viewId === 'admin-view' && isAdminAuthenticated) renderAdminEditor();
+}
+
+function sanitizeInput(str) {
+    return String(str).replace(/[&<>"']/g, (m) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+    })[m]);
+}
+
+function toggleTheme() {
+    const root = document.documentElement;
+    const current = root.getAttribute("data-theme");
+    root.setAttribute("data-theme", current === "dark" ? "light" : "dark");
+}
+
+function toggleAccordion(id) {
+    const content = document.getElementById(id);
+    const icon = document.getElementById(id + "-icon");
+    
+    if (content) {
+        // Toggle the CSS animation class
+        const isExpanded = content.classList.toggle("expanded");
+        
+        // Find the trigger button directly preceding the accordion content to toggle active styling
+        const trigger = content.previousElementSibling;
+        if (trigger && trigger.classList.contains("accordion-trigger")) {
+            trigger.classList.toggle("active-trigger", isExpanded);
+        }
+        
+        // Rotate arrow icon if present
+        if (icon) {
+            icon.innerText = isExpanded ? "▲" : "▼";
+        }
+    }
+}
+
+// ==========================================
+// 5. DASHBOARD METRICS & HOME TOP HONOR ROLL
+// ==========================================
+function updateDashboardMetrics() {
+    database.ref("scores").once("value", (snapshot) => {
+        let logs = [];
+        snapshot.forEach((childSnapshot) => {
+            logs.push(childSnapshot.val());
         });
 
-        function showView(viewId) {
-            const views = ['home-view', 'setup-view', 'quiz-view', 'results-view', 'leaderboard-view', 'builder-view'];
-            views.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.classList.toggle('hidden', id !== viewId);
-            });
+        const totalEl = document.getElementById("stat-total-evals");
+        if (totalEl) totalEl.innerText = logs.length;
 
-            const navMap = {
-                'home-view': 'nav-home',
-                'setup-view': 'nav-setup',
-                'leaderboard-view': 'nav-leaderboard',
-                'builder-view': 'nav-builder'
-            };
+        const modulesCountEl = document.getElementById("stat-modules-count");
+        if (modulesCountEl) modulesCountEl.innerText = Object.keys(QUESTION_REGISTRY).length;
 
-            document.querySelectorAll('#navbar a').forEach(a => a.classList.remove('active-nav'));
-            if (navMap[viewId]) {
-                const activeNavEl = document.getElementById(navMap[viewId]);
-                if (activeNavEl) activeNavEl.classList.add('active-nav');
-            }
+        const homeTopBody = document.getElementById("home-top-scores-body");
+        if (homeTopBody) {
+            logs.sort((a, b) => b.pct - a.pct);
+            const topPerformers = logs.slice(0, 5);
 
-            if (viewId === 'home-view') updateDashboardMetrics();
-            if (viewId === 'leaderboard-view') renderLeaderboard();
-            if (viewId === 'builder-view') renderBankInspector();
-        }
-
-        function toggleTheme() {
-            const root = document.documentElement;
-            const current = root.getAttribute("data-theme");
-            root.setAttribute("data-theme", current === "dark" ? "light" : "dark");
-        }
-
-        function updateDashboardMetrics() {
-            const logs = JSON.parse(localStorage.getItem("drill_eval_scores") || "[]");
-            document.getElementById("stat-total").innerText = logs.length;
-
-            const getTopScore = (branch) => {
-                const branchLogs = logs.filter(l => l.branch === branch);
-                if (branchLogs.length === 0) return "--";
-                const maxPct = Math.max(...branchLogs.map(l => l.pct));
-                return `${maxPct}%`;
-            };
-
-            document.getElementById("stat-usaf").innerText = getTopScore("USAF");
-            document.getElementById("stat-usa").innerText = getTopScore("USA");
-            document.getElementById("stat-usmc").innerText = getTopScore("USMC");
-            document.getElementById("stat-cap").innerText = getTopScore("CAP");
-        }
-
-        function startQuiz() {
-            const nameInput = document.getElementById("name").value.trim();
-            activeName = nameInput || "Anonymous";
-            activeBranchKey = document.getElementById("branch-select").value;
-
-            const registryEntry = QUESTION_REGISTRY[activeBranchKey];
-            if (!registryEntry) return;
-
-            activeQuestions = [...registryEntry.questions];
-            currentIdx = 0;
-            score = 0;
-
-            document.getElementById("quiz-standard-badge").innerText = `[STANDARD: ${activeBranchKey}]`;
-            showView('quiz-view');
-            loadQuestion();
-        }
-
-        function loadQuestion() {
-            const q = activeQuestions[currentIdx];
-            document.getElementById("question-tracker").innerText = `Question ${currentIdx + 1} of ${activeQuestions.length}`;
-            document.getElementById("question-text").innerText = q.q;
-
-            const container = document.getElementById("options-container");
-            container.innerHTML = "";
-
-            const feedbackPanel = document.getElementById("feedback-panel");
-            feedbackPanel.className = "hidden";
-
-            document.getElementById("next-question-btn").classList.add("hidden");
-
-            q.options.forEach((opt, idx) => {
-                const btn = document.createElement("button");
-                btn.className = "option-btn";
-                btn.innerText = `${idx + 1}. ${opt}`;
-                btn.onclick = () => selectOption(idx);
-                container.appendChild(btn);
-            });
-        }
-
-        function selectOption(selectedIdx) {
-            const q = activeQuestions[currentIdx];
-            const buttons = document.querySelectorAll("#options-container .option-btn");
-
-            buttons.forEach(btn => btn.disabled = true);
-
-            const feedbackPanel = document.getElementById("feedback-panel");
-            feedbackPanel.classList.remove("hidden");
-
-            if (selectedIdx === q.answer) {
-                score++;
-                buttons[selectedIdx].classList.add("correct");
-                feedbackPanel.className = "correct-panel";
-                feedbackPanel.innerHTML = `<strong>[CORRECT]</strong> ${q.explanation}`;
+            if (topPerformers.length === 0) {
+                homeTopBody.innerHTML = `<tr><td colspan="4" class="text-center" style="color: var(--light-text-color);">No scores logged yet. Be the first!</td></tr>`;
             } else {
-                buttons[selectedIdx].classList.add("incorrect");
-                buttons[q.answer].classList.add("correct");
-                feedbackPanel.className = "incorrect-panel";
-                feedbackPanel.innerHTML = `<strong>[INCORRECT]</strong> ${q.explanation}`;
-            }
-
-            document.getElementById("next-question-btn").classList.remove("hidden");
-        }
-
-        function advanceQuestion() {
-            currentIdx++;
-            if (currentIdx < activeQuestions.length) {
-                loadQuestion();
-            } else {
-                finishQuiz();
+                homeTopBody.innerHTML = topPerformers.map((entry, idx) => `
+                    <tr>
+                        <td><strong>#${idx + 1} ${entry.name}</strong></td>
+                        <td>${entry.branch}</td>
+                        <td style="color: var(--alert-color); font-weight: bold;">${entry.score} (${entry.pct}%)</td>
+                        <td style="color: var(--light-text-color); font-size: 0.85rem;">${entry.date}</td>
+                    </tr>
+                `).join('');
             }
         }
+    });
+}
 
-        function finishQuiz() {
-            const total = activeQuestions.length;
-            const pct = Math.round((score / total) * 100);
+// ==========================================
+// 6. QUIZ RUNNER ENGINE
+// ==========================================
+function startQuiz() {
+    const nameInput = document.getElementById("cadet-name").value.trim();
+    activeName = nameInput || "Anonymous";
+    
+    const selectEl = document.getElementById("quiz-select");
+    if (!selectEl || !selectEl.value) {
+        alert("Please select a quiz module first!");
+        return;
+    }
+    
+    activeBranchKey = selectEl.value;
+    const registryEntry = QUESTION_REGISTRY[activeBranchKey];
 
-            document.getElementById("results-title").innerText = `${activeName} — Score: ${pct}%`;
-            document.getElementById("score-summary").innerText = `Evaluetee scored ${score} out of ${total} correct under ${QUESTION_REGISTRY[activeBranchKey].branchName} regulations.`;
+    if (!registryEntry || !registryEntry.questions) {
+        alert("No questions found for this module in Firebase.");
+        return;
+    }
 
-            const logs = JSON.parse(localStorage.getItem("drill_eval_scores") || "[]");
-            logs.push({
-                name: activeName,
-                branch: activeBranchKey,
-                score: `${score}/${total}`,
-                pct: pct,
-                date: new Date().toLocaleDateString()
-            });
-            localStorage.setItem("drill_eval_scores", JSON.stringify(logs));
+    const rawQuestions = registryEntry.questions;
+    activeQuestions = Array.isArray(rawQuestions) 
+        ? [...rawQuestions] 
+        : Object.values(rawQuestions);
 
-            showView('results-view');
+    if (activeQuestions.length === 0) {
+        alert("This module does not have any questions added yet!");
+        return;
+    }
+
+    currentIdx = 0;
+    score = 0;
+
+    document.getElementById("quiz-standard-badge").innerText = `[MODULE: ${activeBranchKey}]`;
+    showView('quiz-view');
+    loadQuestion();
+}
+
+function loadQuestion() {
+    const q = activeQuestions[currentIdx];
+    document.getElementById("question-tracker").innerText = `Question ${currentIdx + 1} of ${activeQuestions.length}`;
+    document.getElementById("question-text").innerText = q.q;
+
+    const container = document.getElementById("options-container");
+    container.innerHTML = "";
+
+    const feedbackPanel = document.getElementById("feedback-panel");
+    feedbackPanel.className = "hidden";
+    document.getElementById("next-question-btn").classList.add("hidden");
+
+    q.options.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerText = `${idx + 1}. ${opt}`;
+        btn.onclick = () => selectOption(idx);
+        container.appendChild(btn);
+    });
+}
+
+function selectOption(selectedIdx) {
+    const q = activeQuestions[currentIdx];
+    const buttons = document.querySelectorAll("#options-container .option-btn");
+
+    buttons.forEach(btn => btn.disabled = true);
+
+    const feedbackPanel = document.getElementById("feedback-panel");
+    feedbackPanel.classList.remove("hidden");
+
+    if (selectedIdx === q.answer) {
+        score++;
+        buttons[selectedIdx].classList.add("correct");
+        feedbackPanel.className = "correct-panel";
+        feedbackPanel.innerHTML = `<strong>[CORRECT]</strong> ${q.explanation || ''}`;
+    } else {
+        buttons[selectedIdx].classList.add("incorrect");
+        if (buttons[q.answer]) buttons[q.answer].classList.add("correct");
+        feedbackPanel.className = "incorrect-panel";
+        feedbackPanel.innerHTML = `<strong>[INCORRECT]</strong> ${q.explanation || ''}`;
+    }
+
+    document.getElementById("next-question-btn").classList.remove("hidden");
+}
+
+function advanceQuestion() {
+    currentIdx++;
+    if (currentIdx < activeQuestions.length) {
+        loadQuestion();
+    } else {
+        finishQuiz();
+    }
+}
+
+function finishQuiz() {
+    const total = activeQuestions.length;
+    const pct = Math.round((score / total) * 100);
+    const cleanName = sanitizeInput(activeName);
+
+    document.getElementById("results-title").innerText = `${cleanName} — Score: ${pct}%`;
+    const branchName = QUESTION_REGISTRY[activeBranchKey] ? QUESTION_REGISTRY[activeBranchKey].branchName : activeBranchKey;
+    document.getElementById("score-summary").innerText = `Evaluatee scored ${score} out of ${total} correct under ${branchName} regulations.`;
+
+    database.ref("scores").push({
+        name: cleanName,
+        branch: activeBranchKey,
+        score: `${score}/${total}`,
+        pct: pct,
+        date: new Date().toLocaleDateString()
+    }).then(() => {
+        updateDashboardMetrics();
+    });
+
+    showView('results-view');
+}
+
+// ==========================================
+// 7. FULL UNIVERSAL LEADERBOARD VIEW
+// ==========================================
+function renderLeaderboard() {
+    const filterSelect = document.getElementById("filter-leaderboard");
+    const filter = filterSelect ? filterSelect.value : "ALL";
+    const tbody = document.getElementById("leaderboard-body");
+    if (!tbody) return;
+
+    tbody.innerHTML = `<tr><td colspan="4" class="text-center">Loading universal scores from Firebase...</td></tr>`;
+
+    database.ref("scores").orderByChild("pct").once("value", (snapshot) => {
+        tbody.innerHTML = "";
+        let logs = [];
+
+        snapshot.forEach((childSnapshot) => {
+            logs.push(childSnapshot.val());
+        });
+
+        logs.reverse();
+
+        const filtered = logs.filter(item => filter === "ALL" || item.branch === filter);
+
+        if (filtered.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center" style="color: var(--light-text-color);">No scores logged yet for this filter.</td></tr>`;
+            return;
         }
 
-        function renderLeaderboard() {
-            const filter = document.getElementById("filter-branch").value;
-            const logs = JSON.parse(localStorage.getItem("drill_eval_scores") || "[]");
-            const tbody = document.getElementById("leaderboard-body");
-            tbody.innerHTML = "";
+        filtered.forEach(entry => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td><strong>${entry.name}</strong></td>
+                <td>${entry.branch}</td>
+                <td><strong>${entry.score} (${entry.pct}%)</strong></td>
+                <td class="timestamp">${entry.date}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    });
+}
 
-            const filtered = logs.filter(item => filter === "ALL" || item.branch === filter);
-            filtered.sort((a, b) => b.pct - a.pct);
+// ==========================================
+// 8. INSPECTOR, VOTING & QUIZ BUILDER
+// ==========================================
+function renderBankInspector() {
+    const inspectSelect = document.getElementById("bank-inspect-select");
+    if (!inspectSelect || !inspectSelect.value) return;
+    
+    const branch = inspectSelect.value;
+    const data = QUESTION_REGISTRY[branch];
+    const container = document.getElementById("bank-inspector-list");
 
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="text-center" style="color: var(--light-text-color);">No score logs found in browser memory.</td></tr>`;
-                return;
-            }
+    if (!data || !container) return;
 
-            filtered.forEach(entry => {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td><strong>${entry.name}</strong></td>
-                    <td style="color: var(--light-text-color);">${entry.branch}</td>
-                    <td style="color: var(--alert-color); font-weight: bold;">${entry.score} (${entry.pct}%)</td>
-                    <td style="color: var(--light-text-color);">${entry.date}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
+    const rawQs = data.questions || {};
+    const questionsList = Array.isArray(rawQs) 
+        ? rawQs.map((q, idx) => ({ id: idx, ...q }))
+        : Object.keys(rawQs).map(k => ({ id: k, ...rawQs[k] }));
 
-        function clearScores() {
-            if (confirm("Permanently clear score history log from this browser?")) {
-                localStorage.removeItem("drill_eval_scores");
-                renderLeaderboard();
-                updateDashboardMetrics();
-            }
-        }
+    if (questionsList.length === 0) {
+        container.innerHTML = `<div style="padding: 0.8em; color: var(--light-text-color); border: 1px dashed var(--primary-color);">
+            No questions exist in module '${branch}' yet. Use Section 2 above to add one!
+        </div>`;
+        return;
+    }
 
-        function renderBankInspector() {
-            const branch = document.getElementById("bank-inspect-select").value;
-            const data = QUESTION_REGISTRY[branch];
-            const container = document.getElementById("bank-inspector-list");
+    container.innerHTML = questionsList.map((q, idx) => {
+        const upvotes = q.upvotes || 0;
+        const downvotes = q.downvotes || 0;
+        
+        const optsArray = Array.isArray(q.options) 
+            ? q.options 
+            : (q.options ? Object.values(q.options) : []);
 
-            if (!data || !container) return;
+        const correctAnswerText = optsArray[q.answer] !== undefined 
+            ? optsArray[q.answer] 
+            : "Unknown Index (" + q.answer + ")";
 
-            container.innerHTML = data.questions.map((q, idx) => `
-                <div style="padding: 0.6em; border-radius: 4px; margin-bottom: 0.5em; background: rgba(0,0,0,0.05); font-size: 0.8rem;">
-                    <div style="font-weight: bold; margin-bottom: 0.2em;">Q${idx + 1}: ${q.q}</div>
-                    <div style="color: var(--primary-color);">Answer: ${q.options[q.answer]}</div>
-                    <div style="color: var(--light-text-color); font-size: 0.75rem; margin-top: 0.2em;">${q.explanation}</div>
+        return `
+            <div style="padding: 0.8em; border-radius: 4px; margin-bottom: 0.6em; background: rgba(0,0,0,0.05); border: 1px solid var(--primary-color);">
+                <div style="font-weight: bold; margin-bottom: 0.3em;">Q${idx + 1}: ${q.q}</div>
+                <div style="color: var(--primary-color);"><strong>Correct Answer:</strong> ${correctAnswerText}</div>
+                
+                <div style="margin: 0.4em 0; font-size: 0.8rem; color: var(--light-text-color);">
+                    <strong>Options:</strong> ${optsArray.map((opt, i) => `${i + 1}. ${opt}`).join(' | ')}
                 </div>
-            `).join('');
+
+                <div style="color: var(--light-text-color); font-size: 0.8rem; margin-top: 0.2em;">
+                    <em>Citation:</em> ${q.explanation || 'N/A'}
+                </div>
+                
+                <div style="margin-top: 0.5em; display: flex; gap: 0.8em; align-items: center; font-size: 0.85rem;">
+                    <span>Community Rating:</span>
+                    <button onclick="voteQuestion('${branch}', '${q.id}', 'up')" style="padding: 2px 8px; cursor: pointer;">
+                        👍 ${upvotes}
+                    </button>
+                    <button onclick="voteQuestion('${branch}', '${q.id}', 'down')" style="padding: 2px 8px; cursor: pointer;">
+                        👎 ${downvotes}
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function voteQuestion(branchKey, questionId, voteType) {
+    const field = voteType === 'up' ? 'upvotes' : 'downvotes';
+    const voteRef = database.ref(`quizModules/${branchKey}/questions/${questionId}/${field}`);
+    
+    voteRef.transaction((currentValue) => {
+        return (currentValue || 0) + 1;
+    }, (error, committed) => {
+        if (error) {
+            console.error("Voting failed:", error);
+        } else if (committed) {
+            renderBankInspector();
         }
+    });
+}
 
-        function addCustomQuestion() {
-            const branch = document.getElementById("bank-inspect-select").value;
-            const prompt = document.getElementById("builder-q-prompt").value.trim();
-            const opt0 = document.getElementById("builder-opt-0").value.trim();
-            const opt1 = document.getElementById("builder-opt-1").value.trim();
-            const opt2 = document.getElementById("builder-opt-2").value.trim();
-            const opt3 = document.getElementById("builder-opt-3").value.trim();
-            const explanation = document.getElementById("builder-explanation").value.trim();
+function createNewQuizModule() {
+    const keyInput = document.getElementById("new-quiz-key").value.trim();
+    const titleInput = document.getElementById("new-quiz-title").value.trim();
+    const catInput = document.getElementById("new-quiz-category").value.trim();
+    const manualInput = document.getElementById("new-quiz-manual").value.trim();
 
-            if (!prompt || !opt0 || !opt1) {
-                alert("Please fill in at least the question prompt and Options 1 & 2.");
-                return;
-            }
+    const cleanKey = keyInput.toUpperCase().replace(/[^A-Z0-9_]/g, '');
 
-            const options = [opt0, opt1];
-            if (opt2) options.push(opt2);
-            if (opt3) options.push(opt3);
+    if (!cleanKey || !titleInput) {
+        alert("Please provide at least a Module Key and Quiz Title.");
+        return;
+    }
 
-            QUESTION_REGISTRY[branch].questions.push({
-                q: prompt,
-                options: options,
-                answer: 0,
-                explanation: explanation || "Custom user-added regulation question."
-            });
+    database.ref(`quizModules/${cleanKey}`).set({
+        branchName: titleInput,
+        category: catInput || "General",
+        manual: manualInput || "Standard Regulation",
+        questions: {}
+    }).then(() => {
+        document.getElementById("new-quiz-key").value = "";
+        document.getElementById("new-quiz-title").value = "";
+        document.getElementById("new-quiz-category").value = "";
+        document.getElementById("new-quiz-manual").value = "";
+        toggleAccordion('module-form-accordion');
+        alert(`Module '${cleanKey}' created successfully in cloud database!`);
+    }).catch((err) => {
+        alert("Error creating module: " + err.message);
+    });
+}
 
+function addCustomQuestion() {
+    const selectEl = document.getElementById("builder-target-quiz");
+    if (!selectEl || !selectEl.value) {
+        alert("Please select a target module first.");
+        return;
+    }
+
+    const branch = selectEl.value;
+    const prompt = document.getElementById("builder-q-prompt").value.trim();
+    const opt0 = document.getElementById("builder-opt-0").value.trim();
+    const opt1 = document.getElementById("builder-opt-1").value.trim();
+    const opt2 = document.getElementById("builder-opt-2").value.trim();
+    const opt3 = document.getElementById("builder-opt-3").value.trim();
+    const explanation = document.getElementById("builder-explanation").value.trim();
+    
+    const correctIdx = parseInt(document.getElementById("builder-correct-opt").value, 10);
+
+    if (!prompt || !opt0 || !opt1) {
+        alert("Please provide a question prompt and at least Options 1 & 2.");
+        return;
+    }
+
+    const rawOptions = [opt0, opt1, opt2, opt3];
+    const options = rawOptions.filter(opt => opt !== "");
+
+    if (correctIdx >= options.length) {
+        alert("Selected correct answer option is empty! Please choose a valid option.");
+        return;
+    }
+
+    const newQuestion = {
+        q: prompt,
+        options: options,
+        answer: correctIdx,
+        explanation: explanation || "Custom user-added regulation question.",
+        upvotes: 0,
+        downvotes: 0
+    };
+
+    database.ref(`quizModules/${branch}/questions`).push(newQuestion)
+        .then(() => {
             document.getElementById("builder-q-prompt").value = "";
             document.getElementById("builder-opt-0").value = "";
             document.getElementById("builder-opt-1").value = "";
             document.getElementById("builder-opt-2").value = "";
             document.getElementById("builder-opt-3").value = "";
             document.getElementById("builder-explanation").value = "";
+            document.getElementById("builder-correct-opt").value = "0";
 
+            toggleAccordion('question-form-accordion');
+            alert("Question added directly to Cloud Database!");
             renderBankInspector();
-            alert("Question added to session question bank!");
-        }
+        })
+        .catch(err => alert("Error saving question: " + err.message));
+}
+// ==========================================
+// 9. ADMIN PANEL & DATABASE MANAGEMENT
+// ==========================================
+
+// Change your secret admin passcode here:
+const ADMIN_PASSCODE = "1232"; 
+let isAdminAuthenticated = false;
+
+function authenticateAdmin() {
+    const input = document.getElementById("admin-passcode-input").value;
+    
+    if (input === ADMIN_PASSCODE) {
+        isAdminAuthenticated = true;
+        document.getElementById("admin-auth-panel").classList.add("hidden");
+        document.getElementById("admin-dashboard-panel").classList.remove("hidden");
+        document.getElementById("admin-passcode-input").value = "";
+        
+        populateAdminDropdown();
+        renderAdminEditor();
+    } else {
+        alert("Access Denied: Incorrect Admin Passcode.");
+        document.getElementById("admin-passcode-input").value = "";
+    }
+}
+
+function lockAdminPanel() {
+    isAdminAuthenticated = false;
+    document.getElementById("admin-auth-panel").classList.remove("hidden");
+    document.getElementById("admin-dashboard-panel").classList.add("hidden");
+    showView('home-view');
+}
+
+function populateAdminDropdown() {
+    const adminSelect = document.getElementById("admin-module-select");
+    if (!adminSelect) return;
+
+    const moduleKeys = Object.keys(QUESTION_REGISTRY);
+    adminSelect.innerHTML = "";
+
+    if (moduleKeys.length === 0) {
+        adminSelect.innerHTML = `<option value="">No Modules Found</option>`;
+        return;
+    }
+
+    moduleKeys.forEach((key) => {
+        const item = QUESTION_REGISTRY[key];
+        adminSelect.innerHTML += `<option value="${key}">${item.branchName || key} (${key})</option>`;
+    });
+}
+
+function renderAdminEditor() {
+    if (!isAdminAuthenticated) return;
+
+    const selectEl = document.getElementById("admin-module-select");
+    const container = document.getElementById("admin-questions-editor-list");
+    if (!selectEl || !selectEl.value || !container) return;
+
+    const branch = selectEl.value;
+    const data = QUESTION_REGISTRY[branch];
+
+    if (!data || !data.questions) {
+        container.innerHTML = `<div style="padding: 1em; color: var(--light-text-color);">No questions found in this module.</div>`;
+        return;
+    }
+
+    const rawQs = data.questions;
+    const questionsList = Array.isArray(rawQs) 
+        ? rawQs.map((q, idx) => ({ id: idx, ...q }))
+        : Object.keys(rawQs).map(k => ({ id: k, ...rawQs[k] }));
+
+    container.innerHTML = questionsList.map((q, idx) => {
+        const opts = Array.isArray(q.options) ? q.options : Object.values(q.options || []);
+        
+        return `
+            <div style="padding: 1em; border-radius: 4px; margin-bottom: 1em; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5em;">
+                    <strong>#${idx + 1} Question, ID: ${q.id}</strong>
+                    <button onclick="deleteQuestion('${branch}', '${q.id}')" class="btn-tactical btn-clear" style="padding: 0.2em 0.6em; font-size: 0.75rem; border-color: var(--alert-color); color: var(--alert-color);">
+                        🗑️ Delete Question
+                    </button>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 0.5em;">
+                    <label>Prompt:</label>
+                    <input type="text" id="edit-q-${q.id}" value="${q.q ? q.q.replace(/"/g, '&quot;') : ''}">
+
+                    <label>Option 1:</label>
+                    <input type="text" id="edit-opt0-${q.id}" value="${opts[0] ? opts[0].replace(/"/g, '&quot;') : ''}">
+
+                    <label>Option 2:</label>
+                    <input type="text" id="edit-opt1-${q.id}" value="${opts[1] ? opts[1].replace(/"/g, '&quot;') : ''}">
+
+                    <label>Option 3:</label>
+                    <input type="text" id="edit-opt2-${q.id}" value="${opts[2] ? opts[2].replace(/"/g, '&quot;') : ''}">
+
+                    <label>Option 4:</label>
+                    <input type="text" id="edit-opt3-${q.id}" value="${opts[3] ? opts[3].replace(/"/g, '&quot;') : ''}">
+
+                    <label>Correct Option Index (0 = Opt 1, 1 = Opt 2, etc.):</label>
+                    <select id="edit-ans-${q.id}">
+                        <option value="0" ${q.answer == 0 ? 'selected' : ''}>ID:0 (Option 1)</option>
+                        <option value="1" ${q.answer == 1 ? 'selected' : ''}>ID:1 (Option 2)</option>
+                        <option value="2" ${q.answer == 2 ? 'selected' : ''}>ID:2 (Option 3)</option>
+                        <option value="3" ${q.answer == 3 ? 'selected' : ''}>ID:3 (Option 4)</option>
+                    </select>
+
+                    <label>Citation / Explanation:</label>
+                    <input type="text" id="edit-exp-${q.id}" value="${q.explanation ? q.explanation.replace(/"/g, '&quot;') : ''}">
+
+                    <button onclick="saveQuestionEdit('${branch}', '${q.id}')" class="btn-tactical" style="margin-top: 0.5em;">
+                        💾 Save Changes to Firebase
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Save edited question to Firebase
+function saveQuestionEdit(branchKey, questionId) {
+    const prompt = document.getElementById(`edit-q-${questionId}`).value.trim();
+    const opt0 = document.getElementById(`edit-opt0-${questionId}`).value.trim();
+    const opt1 = document.getElementById(`edit-opt1-${questionId}`).value.trim();
+    const opt2 = document.getElementById(`edit-opt2-${questionId}`).value.trim();
+    const opt3 = document.getElementById(`edit-opt3-${questionId}`).value.trim();
+    const answer = parseInt(document.getElementById(`edit-ans-${questionId}`).value, 10);
+    const explanation = document.getElementById(`edit-exp-${questionId}`).value.trim();
+
+    const rawOptions = [opt0, opt1, opt2, opt3];
+    const options = rawOptions.filter(o => o !== "");
+
+    if (!prompt || options.length < 2) {
+        alert("Question must have a prompt and at least 2 options.");
+        return;
+    }
+
+    database.ref(`quizModules/${branchKey}/questions/${questionId}`).update({
+        q: prompt,
+        options: options,
+        answer: answer,
+        explanation: explanation
+    }).then(() => {
+        alert("Question updated successfully!");
+    }).catch(err => alert("Update failed: " + err.message));
+}
+
+// Delete single question from Firebase
+function deleteQuestion(branchKey, questionId) {
+    if (confirm("Are you sure you want to permanently delete this question?")) {
+        database.ref(`quizModules/${branchKey}/questions/${questionId}`).remove()
+            .then(() => {
+                alert("Question deleted successfully!");
+                renderAdminEditor();
+            })
+            .catch(err => alert("Delete failed: " + err.message));
+    }
+}
+
+// Delete whole module from Firebase
+function deleteQuizModule() {
+    const selectEl = document.getElementById("admin-module-select");
+    if (!selectEl || !selectEl.value) return;
+
+    const branchKey = selectEl.value;
+
+    if (confirm(`CRITICAL WARNING: Permanently delete module '${branchKey}' and ALL its questions from Firebase?`)) {
+        database.ref(`quizModules/${branchKey}`).remove()
+            .then(() => {
+                alert(`Module '${branchKey}' deleted!`);
+                populateAdminDropdown();
+                renderAdminEditor();
+            })
+            .catch(err => alert("Module delete failed: " + err.message));
+    }
+}
