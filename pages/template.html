@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Terminal Showcase</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <nav id="navbar">
+        <div class="nav-links">
+            <a href="/index.html">home</a>
+            <a href="/Test.html">tests</a>
+            <a href="#logs">logs</a>
+            <a href="#config">config</a>
+        </div>
+        <div class="nav-controls">
+            <button class="theme-toggle-btn" onclick="toggleTheme()">Toggle Theme</button>
+        </div>
+    </nav>
+
+    <h1 id="fancyboi">system.init --mode=interactive --test</h1>
+
+    <div class="advisory">
+        [SYSTEM ADVISORY] Scheduled maintenance window active. Node synchronization running at 85% capacity.
+    </div>
+
+    <div class="notice-message">
+        *** NOTICE: Protocol v2.4 upgrade required for all peer sockets by midnight. ***
+    </div>
+
+    <div class="grid">
+        <div class="col">
+            <h2>SYSTEM_STATUS</h2>
+            <p>Host: <code>apollo-01.localnet</code></p>
+            <p>Uptime: <code>104 days, 12:44:02</code></p>
+            <p>Load Average: <span class="sourceCode">0.14 0.08 0.02</span></p>
+        </div>
+        <div class="col">
+            <h2>NETWORK_STATS</h2>
+            <p>Inbound: <span class="sourceCode">42.8 MB/s</span></p>
+            <p>Outbound: <span class="sourceCode">12.1 MB/s</span></p>
+            <p>Active Sockets: <code class="fl">1,024</code></p>
+        </div>
+    </div>
+
+    <div class="alert-warning">
+        WARNING: High latency detected on gateway 192.168.1.254 [RTT: 450ms]
+    </div>
+
+    <div class="alert-success">
+        SUCCESS: Backup cluster verified successfully. Integrity check passed.
+    </div>
+
+    <div class="row">
+        <div style="flex: 1;">
+            <div class="article-headers">
+                <h3>/var/log/syslog excerpt</h3>
+                <p>Latest event logs from core routing kernel:</p>
+                <pre><code>[2026-08-31 08:30:12] kernel: [eth0] link up, 1000Mbps, full duplex
+[2026-08-31 08:31:05] daemon: starting ping-monitor v1.0.4
+<span class="sourceCode">[2026-08-31 08:32:00] auth: user 'admin' authenticated via SSH key</span>
+[2026-08-31 08:35:42] cron: execute task --job=cleanup_tmp</code></pre>
+            </div>
+
+            <blockquote>
+                "Perfection is achieved, not when there is nothing more to add, but when there is nothing left to take away."
+                <span class="timestamp">- System Manifesto</span>
+            </blockquote>
+        </div>
+
+        <div style="flex: 1;">
+            <h3>DIRECTORY_TREE</h3>
+            <ul class="tree">
+                <li>/root
+                    <ul>
+                        <li>bin
+                            <ul>
+                                <li>deploy.sh <span class="timestamp">08:12</span></li>
+                                <li>clean.sh <span class="timestamp">07:55</span></li>
+                            </ul>
+                        </li>
+                        <li>etc
+                            <ul>
+                                <li class="highlighted">sysconfig.conf <span class="timestamp">MODIFIED</span></li>
+                            </ul>
+                        </li>
+                        <li>var
+                            <ul>
+                                <li>log</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2>USER_REGISTRY (Activity Spectrum)</h2>
+    <p>Displays node peers styled using custom <code>data-op</code> opacity attributes:</p>
+    <ul class="user-list">
+        <li><a href="#" data-op="100"><b>root</b>_master</a></li>
+        <li><a href="#" data-op="90">sys_admin</a></li>
+        <li><a href="#" data-op="80">neo_matrix</a></li>
+        <li><a href="#" data-op="70">cyber_punk</a></li>
+        <li><a href="#" data-op="60">ghost_shell</a></li>
+        <li><a href="#" data-op="50">tracer_01</a></li>
+        <li><a href="#" data-op="40">data_miner</a></li>
+        <li><a href="#" data-op="30">net_runner</a></li>
+        <li><a href="#" data-op="20">idle_user</a></li>
+        <li><a href="#" data-op="10">ghost_daemon</a></li>
+    </ul>
+
+    <hr>
+
+    <h2>CONSOLE_INPUT</h2>
+    <form onsubmit="event.preventDefault();">
+        <p>
+            <label for="cmd">Execute Command:</label><br>
+            <input type="text" id="cmd" placeholder="e.g. systemctl restart nginx">
+        </p>
+        <p>
+            <label for="script">Script Buffer:</label><br>
+            <textarea id="script" rows="4" placeholder="# Write shell commands here..."></textarea>
+        </p>
+    </form>
+
+    <hr>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+        }
+    </script>
+</body>
+</html>

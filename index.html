@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drill & Ceremonies Evaluator v2.0</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <header>
+        <div id="navbar">
+            <div class="nav-links">
+                <a onclick="showView('home-view')" id="nav-home" class="active-nav">Home</a>
+                <a onclick="showView('setup-view')" id="nav-setup">Quiz Setup</a>
+                <a onclick="showView('leaderboard-view')" id="nav-leaderboard">Leaderboard</a>
+                <a onclick="showView('builder-view')" id="nav-builder">Question Builder</a>
+            </div>
+            <div class="nav-controls">
+                <button class="theme-toggle-btn" onclick="toggleTheme()">[THEME]</button>
+            </div>
+        </div>
+
+        <h1>DRILL & CEREMONIES EVALUATOR v2.0</h1>
+        <hr>
+    </header>
+
+    <main>
+        <section id="home-view" class="col">
+            <h1>Overview</h1>
+            <p>Welcome to the Drill & Ceremonies Evaluator. Test your mastery of marching regulations, command structures, cadences, and formations across military and cadet manuals.</p>
+            <div class="stat-card">
+                <span class="stat-number" id="stat-total">0</span>
+                <span class="stat-label">Evaluations Logged</span>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number" id="stat-usaf">--</span>
+                    <span class="stat-label">Top U.S. Air Force Score</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="stat-cap">--</span>
+                    <span class="stat-label">Top Civil Air Patrol Score</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="stat-usa">--</span>
+                    <span class="stat-label">Top U.S. Army Score</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="stat-usmc">--</span>
+                    <span class="stat-label">Top U.S. Marine Corps Score</span>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button onclick="showView('setup-view')" class="btn-tactical">
+                    Launch New Evaluation
+                </button>
+            </div>
+
+            <hr>
+
+            <h1>Supported Service Manuals</h1>
+            <ul class="tree">
+                <li><strong>USAF / USSF — AFMAN 36-2203</strong>
+                    <ul>
+                        <li>Quick Time: 100-120 steps/min</li>
+                        <li>Double Time: 180 steps/min</li>
+                        <li>Step Length: 24 in</li>
+                    </ul>
+                </li>
+                <li><strong>US Army — TC 3-21.5</strong>
+                    <ul>
+                        <li>Quick Time: 120 steps/min</li>
+                        <li>Double Time: 180 steps/min</li>
+                        <li>Step Length: 30 in</li>
+                    </ul>
+                </li>
+                <li><strong>USMC / US Navy — MCO 5060.2M</strong>
+                    <ul>
+                        <li>Quick Time: 120 steps/min</li>
+                        <li>Column Distance: 40 in</li>
+                    </ul>
+                </li>
+                <li><strong>Civil Air Patrol — CAPP 60-33</strong>
+                    <ul>
+                        <li>CAP Drill & Ceremonies Pamphlet (Mirrors USAF AFMAN 36-2203 standards)</li>
+                        <li>Slow Time: 60 steps/min</li>
+                        <li>Step Length: 24 in</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <section id="setup-view" class="col hidden">
+            <h1>EVALUATION REGISTRATION</h1>
+
+            <label for="branch-select">Target Branch Standard:</label>
+            <select id="branch-select">
+                <option value="USAF">US Air Force / Space Force (AFMAN 36-2203)</option>
+                <option value="USA">US Army (TC 3-21.5)</option>
+                <option value="USMC">US Marine Corps / Navy (MCO 5060.2M)</option>
+                <option value="CAP">Civil Air Patrol (CAPP 60-33)</option>
+            </select>
+
+            <label for="name">Evaluetee Name (Leaderboard):</label>
+            <input type="text" id="name" placeholder="e.g., SrA Smith or Cadet Davis">
+
+            <button onclick="startQuiz()" class="btn-tactical" style="width: 100%; margin-top: 0.5em;">
+                Initiate Assessment Quiz
+            </button>
+        </section>
+
+        <section id="quiz-view" class="col hidden">
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.8em;">
+                <span id="quiz-standard-badge">[STANDARD: USAF]</span>
+                <span id="question-tracker" class="timestamp">Question 1 of 5</span>
+            </div>
+
+            <h2 id="question-text" style="font-size: 1.05rem; line-height: 1.4; margin-bottom: 0.8em;">
+                Question text loading...
+            </h2>
+
+            <div id="options-container"></div>
+
+            <div id="feedback-panel" class="hidden"></div>
+
+            <button id="next-question-btn" onclick="advanceQuestion()" class="btn-tactical hidden" style="width: 100%; margin-top: 1em;">
+                Next Question
+            </button>
+        </section>
+
+        <section id="results-view" class="col text-center hidden">
+            <div class="advisory">
+                [EVALUATION COMPLETE] Assessment logged to browser memory history.
+            </div>
+
+            <h2 id="results-title" style="color: var(--alert-color); font-size: 1.4rem;">Score Summary</h2>
+            <p id="score-summary" style="font-size: 0.9rem; line-height: 1.5; margin: 1em 0;"></p>
+
+            <div style="display: flex; justify-content: center; gap: 0.8em; flex-wrap: wrap;">
+                <button onclick="showView('setup-view')" class="btn-tactical">Retake Quiz</button>
+                <button onclick="showView('leaderboard-view')" class="btn-tactical btn-blue">View Leaderboard</button>
+                <button onclick="showView('home-view')" class="btn-tactical btn-clear">Return Home</button>
+            </div>
+        </section>
+
+        <section id="leaderboard-view" class="col hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5em;">
+                <h1>Service-Wide Leaderboard</h1>
+                <div>
+                    <label for="filter-branch">Filter:</label>
+                    <select id="filter-branch" onchange="renderLeaderboard()" style="width: auto; padding: 0.3em; margin: 0;">
+                        <option value="ALL">All Branches</option>
+                        <option value="USAF">USAF / USSF</option>
+                        <option value="USA">US Army</option>
+                        <option value="USMC">USMC / USN</option>
+                        <option value="CAP">CAP</option>
+                    </select>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Evaluetee Name</th>
+                        <th>Branch</th>
+                        <th>Score</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body"></tbody>
+            </table>
+
+            <div style="text-align: right; margin-top: 1em;">
+                <button onclick="clearScores()" class="btn-tactical btn-clear">
+                    Clear Score Log
+                </button>
+            </div>
+        </section>
+
+        <section id="builder-view" class="col hidden">
+            <h1>QUESTION BANK INSPECTOR & BUILDER</h1>
+            <p>Inspect registered service manual questions or add new entries to this session.</p>
+
+            <label for="bank-inspect-select">Inspect Branch Registry:</label>
+            <select id="bank-inspect-select" onchange="renderBankInspector()">
+                <option value="USAF">US Air Force / Space Force (AFMAN 36-2203)</option>
+                <option value="USA">US Army (TC 3-21.5)</option>
+                <option value="USMC">US Marine Corps / Navy (MCO 5060.2M)</option>
+                <option value="CAP">Civil Air Patrol (CAPP 60-33)</option>
+            </select>
+
+            <div id="bank-inspector-list"></div>
+
+            <hr>
+
+            <h3>PROPOSE NEW QUESTION ITEM</h3>
+            <div>
+                <input type="text" id="builder-q-prompt" placeholder="Question Prompt (e.g., What foot is 'FLANK LEFT' called on?)">
+                <input type="text" id="builder-opt-0" placeholder="Option 1 (Correct Answer)">
+                <input type="text" id="builder-opt-1" placeholder="Option 2">
+                <input type="text" id="builder-opt-2" placeholder="Option 3">
+                <input type="text" id="builder-opt-3" placeholder="Option 4">
+                <input type="text" id="builder-explanation" placeholder="Manual Regulation Explanation / Chapter Reference">
+                <button onclick="addCustomQuestion()" class="btn-tactical">Add Question To Session</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
