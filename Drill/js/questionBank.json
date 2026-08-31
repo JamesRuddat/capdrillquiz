@@ -1,0 +1,250 @@
+{
+  "quizModules": {
+    "USAF": {
+      "branchName": "US Air Force / Space Force",
+      "manual": "AFMAN 36-2203",
+      "questions": [
+        {
+          "q": "What is the standard cadence rate for Quick Time in USAF drill?",
+          "options": [
+            "100 to 110 steps per minute",
+            "100 to 120 steps per minute",
+            "120 to 130 steps per minute",
+            "180 steps per minute"
+          ],
+          "answer": 1,
+          "explanation": "AFMAN 36-2203 Ch. 1 defines Quick Time cadence as 100 to 120 steps per minute.",
+          "upvotes": 0,
+          "downvotes": 0
+        },
+        {
+          "q": "In USAF drill, on which foot is the command 'TO THE REAR, MARCH' called?",
+          "options": [
+            "Left foot",
+            "Right foot",
+            "Either foot",
+            "Standing position only"
+          ],
+          "answer": 1,
+          "explanation": "In AFMAN 36-2203, 'TO THE REAR, MARCH' is issued as the right foot strikes the ground.",
+          "upvotes": 0,
+          "downvotes": 0
+        },
+        {
+          "q": "What is the standard step length for Quick Time marching in USAF drill?",
+          "options": [
+            "12 inches",
+            "18 inches",
+            "24 inches",
+            "30 inches"
+          ],
+          "answer": 2,
+          "explanation": "Standard step length for USAF Quick Time is 24 inches (measured heel to heel).",
+          "upvotes": 0,
+          "downvotes": 0
+        },
+        {
+          "q": "Which command allows formation members to break position but remain in the immediate area?",
+          "options": [
+            "DISMISSED",
+            "FALL OUT",
+            "AT EASE",
+            "REST"
+          ],
+          "answer": 1,
+          "explanation": "'FALL OUT' permits personnel to relax and leave their position while staying nearby.",
+          "upvotes": 0,
+          "downvotes": 0
+        },
+        {
+          "q": "In a flight line formation, what is the distance between ranks?",
+          "options": [
+            "30 inches",
+            "40 inches",
+            "36 inches",
+            "48 inches"
+          ],
+          "answer": 1,
+          "explanation": "Distance between ranks (measured from chest of rear airman to back of front airman) is 40 inches.",
+          "upvotes": 0,
+          "downvotes": 0
+        }
+      ]
+    },
+    "USA": {
+      "branchName": "US Army",
+      "manual": "TC 3-21.5",
+      "questions": [
+        {
+          "q": "According to Army TC 3-21.5, what are the two main parts of a standard drill command?",
+          "options": [
+            "Action and Directives",
+            "Preparatory command and Command of execution",
+            "Warning and Execution",
+            "Primary and Secondary"
+          ],
+          "answer": 1,
+          "explanation": "Commands consist of a Preparatory Command (what to do) and Command of Execution (when to do it).",
+          "upvotes": 0,
+          "downvotes": 0
+        },
+        {
+          "q": "In Army drill, on which foot is the command 'Rear, MARCH' given while marching?",
+          "options": [
+            "Left foot",
+            "Right foot",
+            "Either foot",
+            "Both feet simultaneously"
+          ],
+          "answer": 1,
+          "explanation": "Under TC 3-21.5, 'Rear, MARCH' is called on the right foot.",
+          "upvotes": 0,
+          "downvotes": 0
+        },
+        {
+          "q": "What is the march cadence rate for 'Double Time' in Army drill?",
+          "options": [
+            "120 steps/min",
+            "140 steps/min",
+            "180 steps/min",
+            "200 steps/min"
+          ],
+          "answer": 2,
+          "explanation": "Army Double Time cadence is exactly 180 steps per minute.",
+          "upvotes": 0,
+          "downvotes": 0
+        },
+        {
+          "q": "What is the step length taken during normal Quick Time in Army drill?",
+          "options": [
+            "15 inches",
+            "24 inches",
+            "30 inches",
+            "36 inches"
+          ],
+          "answer": 2,
+          "explanation": "Army Quick Time step length is 30 inches.",
+          "upvotes": 0,
+          "downvotes": 0
+        },
+        {
+          "q": "What is the correct position of hands at Attention under Army drill standards?",
+          "options": [
+            "Fists clenched firmly",
+            "Cupped with thumbs along trouser seams",
+            "Flat against thighs",
+            "Relaxed open palm"
+          ],
+          "answer": 1,
+          "explanation": "Hands are cupped with thumbs along the trouser seam line.",
+          "upvotes": 0,
+          "downvotes": 0
+        }
+      ]
+    },
+    "USMC": {
+      "branchName": "US Marine Corps / US Navy",
+      "manual": "MCO 5060.2M",
+      "questions": [
+        {
+          "q": "Under MCO 5060.2M, what distance is maintained between ranks in column formation?",
+          "options": [
+            "30 inches",
+            "36 inches",
+            "40 inches",
+            "48 inches"
+          ],
+          "answer": 2,
+          "explanation": "Distance between ranks in USMC drill is 40 inches.",
+          "upvotes": 0,
+          "downvotes": 0
+        },
+        {
+          "q": "What is the step length for Half Step in Marine Corps drill?",
+          "options": [
+            "12 inches",
+            "15 inches",
+            "18 inches",
+            "20 inches"
+          ],
+          "answer": 1,
+          "explanation": "Half Step in Marine Corps drill is 15 inches.",
+          "upvotes": 0,
+          "downvotes": 0
+        },
+        {
+          "q": "On which foot is the command for 'Right Flank, MARCH' given while marching?",
+          "options": [
+            "Right foot",
+            "Left foot",
+            "Either foot",
+            "Command of Execution on both"
+          ],
+          "answer": 1,
+          "explanation": "Right flank execution commands are called on the left foot.",
+          "upvotes": 0,
+          "downvotes": 0
+        },
+        {
+          "q": "What command aligns a Marine squad at normal interval?",
+          "options": [
+            "COVER",
+            "DRESS RIGHT, DRESS",
+            "ALIGNMENT, MARCH",
+            "SQUAD, DRESS"
+          ],
+          "answer": 1,
+          "explanation": "'DRESS RIGHT, DRESS' aligns elements with left arm extended horizontally.",
+          "upvotes": 0,
+          "downvotes": 0
+        }
+      ]
+    },
+    "CAP": {
+      "branchName": "Civil Air Patrol",
+      "manual": "CAPP 60-33",
+      "questions": [
+        {
+          "q": "Which official publication governs Civil Air Patrol Drill & Ceremonies?",
+          "options": [
+            "CAPR 52-16",
+            "CAPP 60-33",
+            "CAPM 39-1",
+            "AFMAN 36-2203"
+          ],
+          "answer": 1,
+          "explanation": "CAPP 60-33 is the official Civil Air Patrol Drill and Ceremonies Pamphlet.",
+          "upvotes": 0,
+          "downvotes": 0
+        },
+        {
+          "q": "What USAF manual does Civil Air Patrol drill primarily model its standards after?",
+          "options": [
+            "AFMAN 36-2203",
+            "AFI 36-2903",
+            "AFMAN 36-2606",
+            "AFPAM 34-1202"
+          ],
+          "answer": 0,
+          "explanation": "CAP Drill standards mirror USAF AFMAN 36-2203.",
+          "upvotes": 0,
+          "downvotes": 0
+        },
+        {
+          "q": "Which position of rest permits cadets to talk unless instructed otherwise?",
+          "options": [
+            "AT EASE",
+            "REST",
+            "PARADE REST",
+            "FALL OUT"
+          ],
+          "answer": 1,
+          "explanation": "On 'REST', members may talk while keeping their right foot fixed in position.",
+          "upvotes": 0,
+          "downvotes": 0
+        }
+      ]
+    }
+  },
+  "scores": {}
+}
