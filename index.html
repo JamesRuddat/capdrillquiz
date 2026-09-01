@@ -23,7 +23,7 @@
             </div>
         </div>
 
-        <h1><span>DYNAMIC EVALUATOR ENGINE v3.0 (The Quizlet)</span></h1>
+        <h1><span>Study ENGINE v3.5 (Foxcore)</span></h1>
         <hr>
     </header>
 
@@ -32,17 +32,23 @@
         <section id="home-view" class="col">
             <h1>Overview</h1>
             <p>
-                The Drill & Ceremonies Evaluator is a dynamic learning portal designed to help service members and cadets master official marching regulations, command structures, and ceremony procedures.
+                Whether you are preparing for test evaluations, studying manual & regulations, or brushing up on leadership concepts, test your knowledge here with interactive quizzes built by the community.
             </p>
+
+            <h3>100% Free Access</h3>
+            <p>No paywalls or premium tiers. Practice all study modules and test your recall as often as you need.</p>
+
+            <h3>Community-Powered</h3>
+            <p>Add your own practice questions, rate community items, and earn author reputation stars.</p>
 
             <div class="stats-grid" id="home-stats-grid">
                 <div class="stat-card">
                     <span class="stat-number" id="stat-total-evals">0</span>
-                    <span class="stat-label">Total Evals Logged</span>
+                    <span class="stat-label">Total Tests Taken</span>
                 </div>
                 <div class="stat-card">
                     <span class="stat-number" id="stat-modules-count">0</span>
-                    <span class="stat-label">Active Modules</span>
+                    <span class="stat-label">Active Modules & Quizes</span>
                 </div>
             </div>
 
@@ -88,6 +94,15 @@
 
             <label for="cadet-name">Name & Rank (Leaderboard):</label>
             <input type="text" id="cadet-name" placeholder="e.g., C/SrA Smith or Sgt Davis">
+
+            <!-- DYNAMIC QUESTION COUNT SLIDER -->
+            <div style="margin: 1em 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3em;">
+                    <label for="quiz-question-count-slider">Question Count:</label>
+                    <span id="quiz-question-count-label" style="font-weight: bold; color: var(--primary-color);">0 Questions</span>
+                </div>
+                <input type="range" id="quiz-question-count-slider" min="1" max="1" value="1" style="width: 100%; cursor: pointer;">
+            </div>
 
             <button id="btn-begin-assessment" class="btn-tactical" style="width: 100%; margin-top: 0.5em;">
                 Begin Assessment
@@ -239,7 +254,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <!-- Load Custom JavaScript File -->
-    <script src="js/script.js"></script>
+    <script type="module" src="js/app.js"></script>
 </body>
 
 <footer>

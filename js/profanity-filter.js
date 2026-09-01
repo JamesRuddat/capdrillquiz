@@ -56,7 +56,7 @@ function containsProfanity(text) {
  * @param {Array<string>} inputs - List of text strings to check.
  * @returns {boolean} - Returns true if ALL inputs are clean, false if any fail.
  */
-function validateInputsClean(inputs) {
+export function validateInputsClean(inputs) {
   for (const input of inputs) {
     if (containsProfanity(input)) {
       return false;
