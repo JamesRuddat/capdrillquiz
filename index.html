@@ -9,18 +9,17 @@
 </head>
 
 <body>
-
     <header>
         <div id="navbar">
             <div class="nav-links">
-                <a onclick="showView('home-view')" id="nav-home" class="active-nav">Home</a>
-                <a onclick="showView('setup-view')" id="nav-setup">Quizs</a>
-                <a onclick="showView('leaderboard-view')" id="nav-leaderboard">Leaderboard</a>
-                <a onclick="showView('builder-view')" id="nav-builder">Question Builder</a>
-                <a onclick="showView('admin-view')" id="nav-admin">Portal</a>
+                <a id="nav-home" class="active-nav">Home</a>
+                <a id="nav-setup">Start Quiz</a>
+                <a id="nav-leaderboard">Leaderboard</a>
+                <a id="nav-hub">Quiz Hub</a>
             </div>
             <div class="nav-controls">
-                <button class="theme-toggle-btn" onclick="toggleTheme()">THEME</button>
+                <button id="google-auth-btn" class="theme-toggle-btn">Sign in with Google</button>
+                <button id="theme-toggle-btn" class="theme-toggle-btn">THEME</button>
             </div>
         </div>
 
@@ -36,7 +35,6 @@
                 The Drill & Ceremonies Evaluator is a dynamic learning portal designed to help service members and cadets master official marching regulations, command structures, and ceremony procedures.
             </p>
 
-            <!-- Dynamic Stats Grid Generated From Database -->
             <div class="stats-grid" id="home-stats-grid">
                 <div class="stat-card">
                     <span class="stat-number" id="stat-total-evals">0</span>
@@ -54,7 +52,7 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>Evaluetee</th>
+                                <th>Participant</th>
                                 <th>Module</th>
                                 <th>Score</th>
                                 <th>Date</th>
@@ -68,14 +66,14 @@
             </div>
 
             <div class="text-center" style="margin-top: 1.2em;">
-                <button onclick="showView('setup-view')" class="btn-tactical">
+                <button id="btn-launch-eval" class="btn-tactical">
                     Launch Evaluation Module
                 </button>
             </div>
 
             <hr>
 
-            <h1>Registered Dynamic Quiz Modules</h1>
+            <h1>Registered Modules</h1>
             <div id="dynamic-manuals-tree">
                 <span>Loading modules from cloud database...</span>
             </div>
@@ -86,15 +84,12 @@
             <h1> EVALUATION CONFIGURATION</h1>
 
             <label for="quiz-select">Target Quiz Module:</label>
-            <select id="quiz-select">
-                <!-- Dynamically populated from Firebase -->
-            </select>
+            <select id="quiz-select"></select>
 
-            <label for="cadet-name">Name & Rank
-                (Leaderboard):</label>
+            <label for="cadet-name">Name & Rank (Leaderboard):</label>
             <input type="text" id="cadet-name" placeholder="e.g., C/SrA Smith or Sgt Davis">
 
-            <button onclick="startQuiz()" class="btn-tactical" style="width: 100%; margin-top: 0.5em;">
+            <button id="btn-begin-assessment" class="btn-tactical" style="width: 100%; margin-top: 0.5em;">
                 Begin Assessment
             </button>
         </section>
@@ -102,8 +97,7 @@
         <!-- QUIZ RUNNER VIEW -->
         <section id="quiz-view" class="col hidden">
             <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.8em;">
-                <span id="quiz-standard-badge" style="font-weight: bold;">[MODULE:
-                    UNSET]</span>
+                <span id="quiz-standard-badge" style="font-weight: bold;">[MODULE: UNSET]</span>
                 <span id="question-tracker">Question 1 of X</span>
             </div>
 
@@ -114,36 +108,32 @@
             <div id="options-container"></div>
             <div id="feedback-panel" class="hidden"></div>
 
-            <button id="next-question-btn" onclick="advanceQuestion()" class="btn-tactical hidden"
-                style="width: 100%; margin-top: 1em;">
+            <button id="next-question-btn" class="btn-tactical hidden" style="width: 100%; margin-top: 1em;">
                 Next Item
             </button>
         </section>
 
         <!-- RESULTS VIEW -->
         <section id="results-view" class="col text-center hidden">
-            <div class="advisory">[EVALUATION COMPLETE] Assessment recorded to Universal Cloud DB.</div>
+            <div class="advisory">[EVALUATION COMPLETE] Assessment recorded to leaderboard.</div>
 
             <h1 id="results-title" style="font-size: 1.4rem;">Score Summary</h1>
             <p id="score-summary" style="font-size: 0.9rem; line-height: 1.5; margin: 1em 0;"></p>
 
             <div style="display: flex; justify-content: center; gap: 0.8em; flex-wrap: wrap;">
-                <button onclick="showView('setup-view')" class="btn-tactical">Take Another Quiz</button>
-                <button onclick="showView('leaderboard-view')" class="btn-tactical btn-blue"
-                    style="padding: 0.7em 1.2em;">View Leaderboard</button>
-                <button onclick="showView('home-view')" class="btn-tactical btn-clear">Return Home</button>
+                <button id="btn-res-another" class="btn-tactical">Take Another Quiz</button>
+                <button id="btn-res-leaderboard" class="btn-tactical btn-blue">View Leaderboard</button>
+                <button id="btn-res-home" class="btn-tactical btn-clear">Return Home</button>
             </div>
         </section>
 
         <!-- LEADERBOARD VIEW -->
         <section id="leaderboard-view" class="col hidden">
-            <div
-                style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5em;">
-                <h1>Universal Cloud Leaderboard</h1>
+            <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+                <h1>Leaderboard</h1>
                 <div>
                     <label for="filter-leaderboard" style="font-size: 0.8rem;">Filter Module:</label>
-                    <select id="filter-leaderboard" onchange="renderLeaderboard()"
-                        style="width: auto; padding: 0.3em; margin: 0;">
+                    <select id="filter-leaderboard" style="width: auto; padding: 0.3em; margin: 0;">
                         <option value="ALL">All Modules</option>
                     </select>
                 </div>
@@ -152,33 +142,34 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Evaluetee</th>
-                        <th>Quiz Module</th>
+                        <th>Participant</th>
+                        <th>Module</th>
                         <th>Score</th>
                         <th>Date</th>
                     </tr>
                 </thead>
                 <tbody id="leaderboard-body">
                     <tr>
-                        <td colspan="4" class="text-center" style="color: var(--light-text-color);">Connecting to cloud
-                            database...</td>
+                        <td colspan="4" class="text-center" style="color: var(--light-text-color);">Connecting to cloud database...</td>
                     </tr>
                 </tbody>
             </table>
         </section>
 
-        <!-- QUIZ CREATOR & QUESTION VETTING VIEW -->
-        <section id="builder-view" class="col hidden">
-            <h1> QUIZ BUILDER & COMMUNITY QUESTION VETTING</h1>
+        <!-- UNIFIED CREATOR & MANAGEMENT HUB -->
+        <section id="hub-view" class="col hidden">
+            <h1>QUIZ CREATOR & HUB</h1>
             <p style="font-size: 0.8rem; color: var(--light-text-color);">
-                Inspect registered questions, vote on items, or expand forms below to register new modules and
-                questions.
+                Create modules, append questions, inspect community items, or manage database records.
             </p>
 
-            <hr>
+            <!-- STATUS BAR / AUTH BADGE -->
+            <div id="hub-auth-status" class="advisory" style="margin-bottom: 1em;">
+                Status: Signed in as Guest
+            </div>
 
-            <!-- SECTION 1: COLLAPSIBLE FORM FOR REGISTERING A NEW MODULE -->
-            <button type="button" class="accordion-trigger" onclick="toggleAccordion('module-form-accordion')">
+            <!-- SECTION 1: REGISTER NEW MODULE -->
+            <button type="button" id="trig-module-form" class="accordion-trigger">
                 <span>REGISTER NEW QUIZ MODULE</span>
                 <span id="module-form-accordion-icon">▼</span>
             </button>
@@ -186,24 +177,21 @@
                 <div style="display: flex; flex-direction: column;">
                     <input type="text" id="new-quiz-key" placeholder="Unique Key Identifier (e.g., CAP_AERO_CH1)">
                     <input type="text" id="new-quiz-title" placeholder="Quiz Title (e.g., CAP Aerospace Chapter 1)">
-                    <input type="text" id="new-quiz-category"
-                        placeholder="Category (e.g., Aerospace, Leadership, Drill)">
-                    <input type="text" id="new-quiz-manual"
-                        placeholder="Reference Manual / Publication (e.g., CAPP 101)">
-                    <button onclick="createNewQuizModule()" class="btn-tactical" style="margin-top: 0.4em;">Publish
-                        Module</button>
+                    <input type="text" id="new-quiz-category" placeholder="Category (e.g., Aerospace, Leadership, Drill)">
+                    <input type="text" id="new-quiz-manual" placeholder="Reference Manual / Publication (e.g., CAPP 101)">
+                    <button id="btn-create-module" class="btn-tactical" style="margin-top: 0.4em;">Publish Module</button>
                 </div>
             </div>
 
-            <!-- SECTION 2: COLLAPSIBLE FORM FOR ADDING A QUESTION ITEM -->
-            <button type="button" class="accordion-trigger" onclick="toggleAccordion('question-form-accordion')">
+            <!-- SECTION 2: ADD QUESTION ITEM -->
+            <button type="button" id="trig-question-form" class="accordion-trigger">
                 <span>ADD QUESTION TO EXISTING MODULE</span>
                 <span id="question-form-accordion-icon">▼</span>
             </button>
             <div id="question-form-accordion" class="accordion-content">
                 <div style="display: flex; flex-direction: column;">
                     <label for="builder-target-quiz" style="font-size: 0.8rem;">Select Target Quiz Module:</label>
-                    <select id="builder-target-quiz" onchange="renderBankInspector()"></select>
+                    <select id="builder-target-quiz"></select>
 
                     <input type="text" id="builder-q-prompt" placeholder="Question Prompt">
                     <input type="text" id="builder-opt-0" placeholder="Option 1">
@@ -218,92 +206,45 @@
                         <option value="3">Option 4 is Correct</option>
                     </select>
                     <input type="text" id="builder-explanation" placeholder="Explanation Reference / Manual Citation">
-                    <button onclick="addCustomQuestion()" class="btn-tactical" style="margin-top: 0.4em;">Append
-                        Question</button>
+                    <button id="btn-add-question" class="btn-tactical" style="margin-top: 0.4em;">Add Question</button>
                 </div>
             </div>
 
-            <hr>
+            <hr style="margin: 1.5em 0;">
 
-            <!-- SECTION 3: INSPECTOR & COMMUNITY VOTING (ALWAYS VISIBLE) -->
-            <div
-                style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5em; margin-bottom: 0.8em;">
-                <h1>COMMUNITY QUESTION INSPECTOR</h1>
-                <div>
+            <!-- SECTION 3: UNIFIED INSPECTOR & ADMIN EDITOR -->
+            <div style="justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 0.8em;">
+                <h1>Module & questions</h1>
+                <div style="align-items: center;">
                     <label for="bank-inspect-select" style="font-size: 0.8rem;">Select Module:</label>
-                    <select id="bank-inspect-select" onchange="renderBankInspector()"
-                        style="width: auto; padding: 0.3em; margin: 0;"></select>
+                    <select id="bank-inspect-select" style="width: auto; padding: 0.3em; margin: 0;"></select>
+                    <button id="btn-delete-module" class="btn-tactical btn-clear hidden">
+                        Delete Module
+                    </button>
                 </div>
             </div>
 
+            <!-- QUESTIONS DISPLAY & EDITING CONTAINER -->
             <div id="bank-inspector-list">
-                <div style="color: var(--light-text-color); font-size: 0.8rem;">Select a module above to inspect
-                    questions and vote...</div>
+                <div style="color: var(--light-text-color); font-size: 0.8rem;">Select a module above to manage or inspect questions...</div>
             </div>
         </section>
-
-        <!-- ADMIN CONTROL PANEL VIEW -->
-<section id="admin-view" class="col hidden">
-    <h1>CONTROL PANEL</h1>
-    <p>
-        Administrative access. Authenticate to manage, edit, and purge database entries.
-    </p>
-
-    <!-- STEP 1: PASSCODE AUTHENTICATION FORM -->
-    <div id="admin-auth-panel">
-        <h3 style="font-size: 0.9rem; margin-bottom: 0.5em;">AUTHENTICATION</h3>
-        <input type="password" id="admin-passcode-input" placeholder="Enter">
-        <button onclick="authenticateAdmin()" class="btn-tactical">
-            Login
-        </button>
-    </div>
-
-    <!-- STEP 2: LOCKED ADMIN MANAGEMENT DASHBOARD -->
-    <div id="admin-dashboard-panel" class="hidden" style="margin-top: 1em;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
-            <span style="font-weight: bold;">ACCESS - ADMIN MODE</span>
-            <button onclick="lockAdminPanel()" class="btn-tactical btn-clear">
-                Logout
-            </button>
-        </div>
-
-        <hr>
-
-        <!-- MODULE MANAGEMENT -->
-        <h3 style="font-size: 0.95rem;">1. MODULE MANAGEMENT</h3>
-        <div style="display: flex; align-items: center; flex-wrap: wrap;">
-            <label for="admin-module-select" style="font-size: 0.8rem;">Select Target Module:</label>
-            <select id="admin-module-select" onchange="renderAdminEditor()" style="width: auto; flex-grow: 1;"></select>
-            <button onclick="deleteQuizModule()" class="btn-tactical btn-clear">
-                🗑️ Delete Entire Module
-            </button>
-        </div>
-
-        <hr style="margin: 1.5em 0;">
-
-        <!-- QUESTION EDITOR LIST -->
-        <h3 style="font-size: 0.95rem;">2. EDIT & DELETE QUESTIONS</h3>
-        <div id="admin-questions-editor-list" style="margin-top: 1em;">
-            <div>Select a module above to manage questions...</div>
-        </div>
-    </div>
-</section>
     </main>
 
-    <!-- Load Firebase Core App SDK -->
+    <script src="js/profanity-filter.js"></script>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <!-- Load Firebase Compat SDKs (Consistent for CDN usage) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-    <!-- Load YOUR custom script LAST -->
+    <!-- Load Custom JavaScript File -->
     <script src="js/script.js"></script>
-
 </body>
+
 <footer>
-    <p>Made by the Mr. Ruddat</p>
-    <!-- MID-PAGE ADSENSE SLOT -->
+    <p>Made by Mr. Ruddat</p>
     <div class="ad-container" style="margin: 1.5em 0; text-align: center; min-height: 90px; background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color); padding: 0.5em;">
-        <!-- Replace ca-pub-XXXXXXXXXXXXXXXX and slot ID with your AdSense Unit -->
         <ins class="adsbygoogle"
              style="display:block"
              data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"

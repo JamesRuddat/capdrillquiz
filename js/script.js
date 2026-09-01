@@ -7,6 +7,7 @@ let activeName = "";
 let activeQuestions = [];
 let currentIdx = 0;
 let score = 0;
+let currentUser = null;
 
 const firebaseConfig = {
     apiKey: "AIzaSyBr9AkWSSW7_qesMsj3nBwluLWjfjOULVY",
@@ -19,14 +20,67 @@ const firebaseConfig = {
     measurementId: "G-RZDRVYD6TC"
 };
 
-// Initialize Firebase App & Database
+// Initialize Firebase App, Database, & Auth
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
+const auth = firebase.auth();
+const googleProvider = new firebase.auth.GoogleAuthProvider();
 
 // ==========================================
-// 2. FETCH EVERYTHING FROM FIREBASE ON LOAD
+// 2. DOM INITIALIZATION & EVENT LISTENERS
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
+    // Register Nav Bar Event Listeners
+    document.getElementById("nav-home").addEventListener("click", () => showView('home-view'));
+    document.getElementById("nav-setup").addEventListener("click", () => showView('setup-view'));
+    document.getElementById("nav-leaderboard").addEventListener("click", () => showView('leaderboard-view'));
+    document.getElementById("nav-hub").addEventListener("click", () => { showView('hub-view'); renderUnifiedHub();});
+
+    // Controls & Buttons
+    document.getElementById("theme-toggle-btn").addEventListener("click", toggleTheme);
+    document.getElementById("google-auth-btn").addEventListener("click", handleGoogleAuth);
+    document.getElementById("btn-launch-eval").addEventListener("click", () => showView('setup-view'));
+    document.getElementById("btn-begin-assessment").addEventListener("click", startQuiz);
+    document.getElementById("next-question-btn").addEventListener("click", advanceQuestion);
+    
+    // Result View Navigation
+    document.getElementById("btn-res-another").addEventListener("click", () => showView('setup-view'));
+    document.getElementById("btn-res-leaderboard").addEventListener("click", () => showView('leaderboard-view'));
+    document.getElementById("btn-res-home").addEventListener("click", () => showView('home-view'));
+
+    // Leaderboard Filter
+    document.getElementById("filter-leaderboard").addEventListener("change", renderLeaderboard);
+
+    // Builder Views
+    document.getElementById("trig-module-form").addEventListener("click", () => toggleAccordion('module-form-accordion'));
+    document.getElementById("trig-question-form").addEventListener("click", () => toggleAccordion('question-form-accordion'));
+    document.getElementById("btn-create-module").addEventListener("click", createNewQuizModule);
+    document.getElementById("builder-target-quiz").addEventListener("change", renderBankInspector);
+    document.getElementById("btn-add-question").addEventListener("click", addCustomQuestion);
+    document.getElementById("bank-inspect-select").addEventListener("change", renderBankInspector);
+
+    // Admin Controls
+    document.getElementById("bank-inspect-select").addEventListener("change", renderUnifiedHub);
+    document.getElementById("btn-delete-module").addEventListener("click", deleteQuizModule);
+
+    // Setup Firebase Auth State Observer
+    auth.onAuthStateChanged((user) => {
+        const authBtn = document.getElementById("google-auth-btn");
+        const cadetInput = document.getElementById("cadet-name");
+        
+        if (user) {
+            currentUser = user;
+            authBtn.innerText = `Sign Out (${user.displayName || 'User'})`;
+            if (cadetInput && !cadetInput.value) {
+                cadetInput.value = user.displayName || "";
+            }
+        } else {
+            currentUser = null;
+            authBtn.innerText = "Sign in with Google";
+        }
+    });
+
+    // Real-Time Database Reader
     database.ref("quizModules").on("value", (snapshot) => {
         const data = snapshot.val();
         if (data) {
@@ -38,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const treeEl = document.getElementById("dynamic-manuals-tree");
             if (treeEl) {
                 treeEl.innerHTML = `<div style="color: var(--alert-color); padding: 0.5em; border: 1px dashed var(--alert-color);">
-                    ❌ No quiz modules found in database under 'quizModules/'. Use Section 1 below to register one!
+                    ❌ No quiz modules found in database under 'quizModules/'. Use Quiz Builder to create one!
                 </div>`;
             }
         }
@@ -49,7 +103,29 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ==========================================
-// 3. DYNAMICALLY BUILD DROPDOWNS & HOMEPAGE
+// 3. GOOGLE AUTHENTICATION (FIREBASE)
+// ==========================================
+async function handleGoogleAuth() {
+    if (currentUser) {
+        try {
+            await auth.signOut();
+            //alert("Signed out successfully.");
+        } catch (error) {
+            alert("Error signing out: " + error.message);
+        }
+    } else {
+        try {
+            const result = await auth.signInWithPopup(googleProvider);
+            console.log("Logged in user:", result.user);
+        } catch (error) {
+            console.error("Google Auth Error:", error);
+            alert("Authentication Failed: " + error.message);
+        }
+    }
+}
+
+// ==========================================
+// 4. DROPDOWNS & NAVIGATION ROUTER
 // ==========================================
 function populateBranchDropdowns() {
     const setupSelect = document.getElementById("quiz-select");
@@ -120,11 +196,8 @@ function renderHomepageManuals() {
     treeContainer.innerHTML = html;
 }
 
-// ==========================================
-// 4. NAVIGATION ROUTER
-// ==========================================
 function showView(viewId) {
-    const views = ['home-view', 'setup-view', 'quiz-view', 'results-view', 'leaderboard-view', 'builder-view', 'admin-view'];
+    const views = ['home-view', 'setup-view', 'quiz-view', 'results-view', 'leaderboard-view', 'builder-view', 'admin-view', 'hub-view'];
     views.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.toggle('hidden', id !== viewId);
@@ -135,7 +208,8 @@ function showView(viewId) {
         'setup-view': 'nav-setup',
         'leaderboard-view': 'nav-leaderboard',
         'builder-view': 'nav-builder',
-        'admin-view': 'nav-admin'
+        'hub-view': 'nav-hub'
+        
     };
 
     document.querySelectorAll('#navbar a').forEach(a => a.classList.remove('active-nav'));
@@ -146,7 +220,7 @@ function showView(viewId) {
     if (viewId === 'home-view') updateDashboardMetrics();
     if (viewId === 'leaderboard-view') renderLeaderboard();
     if (viewId === 'builder-view') renderBankInspector();
-    if (viewId === 'admin-view' && isAdminAuthenticated) renderAdminEditor();
+    if (viewId === 'hub-view' ) renderUnifiedHub();
 }
 
 function sanitizeInput(str) {
@@ -166,16 +240,11 @@ function toggleAccordion(id) {
     const icon = document.getElementById(id + "-icon");
     
     if (content) {
-        // Toggle the CSS animation class
         const isExpanded = content.classList.toggle("expanded");
-        
-        // Find the trigger button directly preceding the accordion content to toggle active styling
         const trigger = content.previousElementSibling;
         if (trigger && trigger.classList.contains("accordion-trigger")) {
             trigger.classList.toggle("active-trigger", isExpanded);
         }
-        
-        // Rotate arrow icon if present
         if (icon) {
             icon.innerText = isExpanded ? "▲" : "▼";
         }
@@ -183,7 +252,7 @@ function toggleAccordion(id) {
 }
 
 // ==========================================
-// 5. DASHBOARD METRICS & HOME TOP HONOR ROLL
+// 5. METRICS & TOP HONOR ROLL
 // ==========================================
 function updateDashboardMetrics() {
     database.ref("scores").once("value", (snapshot) => {
@@ -224,7 +293,7 @@ function updateDashboardMetrics() {
 // ==========================================
 function startQuiz() {
     const nameInput = document.getElementById("cadet-name").value.trim();
-    activeName = nameInput || "Anonymous";
+    activeName = nameInput || (currentUser ? currentUser.displayName : "Anonymous");
     
     const selectEl = document.getElementById("quiz-select");
     if (!selectEl || !selectEl.value) {
@@ -335,7 +404,7 @@ function finishQuiz() {
 }
 
 // ==========================================
-// 7. FULL UNIVERSAL LEADERBOARD VIEW
+// 7. LEADERBOARD VIEW
 // ==========================================
 function renderLeaderboard() {
     const filterSelect = document.getElementById("filter-leaderboard");
@@ -395,7 +464,7 @@ function renderBankInspector() {
 
     if (questionsList.length === 0) {
         container.innerHTML = `<div style="padding: 0.8em; color: var(--light-text-color); border: 1px dashed var(--primary-color);">
-            No questions exist in module '${branch}' yet. Use Section 2 above to add one!
+            No questions exist in module '${branch}' yet. Use Quiz Builder above to add one!
         </div>`;
         return;
     }
@@ -427,10 +496,10 @@ function renderBankInspector() {
                 
                 <div style="margin-top: 0.5em; display: flex; gap: 0.8em; align-items: center; font-size: 0.85rem;">
                     <span>Community Rating:</span>
-                    <button onclick="voteQuestion('${branch}', '${q.id}', 'up')" style="padding: 2px 8px; cursor: pointer;">
+                    <button onclick="window.voteQuestion('${branch}', '${q.id}', 'up')" style="padding: 2px 8px; cursor: pointer;">
                         👍 ${upvotes}
                     </button>
-                    <button onclick="voteQuestion('${branch}', '${q.id}', 'down')" style="padding: 2px 8px; cursor: pointer;">
+                    <button onclick="window.voteQuestion('${branch}', '${q.id}', 'down')" style="padding: 2px 8px; cursor: pointer;">
                         👎 ${downvotes}
                     </button>
                 </div>
@@ -439,19 +508,71 @@ function renderBankInspector() {
     }).join('');
 }
 
+// Map to track active cooldown timers per question ID
+const VOTE_COOLDOWNS = {}; 
+const COOLDOWN_SECONDS = 10;
+
 function voteQuestion(branchKey, questionId, voteType) {
-    const field = voteType === 'up' ? 'upvotes' : 'downvotes';
-    const voteRef = database.ref(`quizModules/${branchKey}/questions/${questionId}/${field}`);
-    
-    voteRef.transaction((currentValue) => {
-        return (currentValue || 0) + 1;
-    }, (error, committed) => {
-        if (error) {
-            console.error("Voting failed:", error);
-        } else if (committed) {
-            renderBankInspector();
+    if (!currentUser) {
+        alert("You must be logged in to vote!");
+        return;
+    }
+
+    const now = Date.now();
+    const lastVoteTime = VOTE_COOLDOWNS[questionId] || 0;
+    const timeElapsed = Math.floor((now - lastVoteTime) / 1000);
+
+    if (timeElapsed < COOLDOWN_SECONDS) {
+        const remaining = COOLDOWN_SECONDS - timeElapsed;
+        alert(`Please wait ${remaining} second(s) before voting on this item again.`);
+        return;
+    }
+
+    VOTE_COOLDOWNS[questionId] = now;
+
+    const userId = currentUser.uid;
+    const voteRef = database.ref(`quizModules/${branchKey}/questions/${questionId}/votes/${userId}`);
+
+    voteRef.once("value", (snapshot) => {
+        const existingVote = snapshot.val();
+        if (existingVote === voteType) {
+            voteRef.remove();
+        } else {
+            voteRef.set(voteType);
         }
+    }).catch((err) => {
+        console.error("Voting failed:", err);
+        delete VOTE_COOLDOWNS[questionId];
+        alert("Voting error: " + err.message);
     });
+
+    startVoteCooldownTimer(questionId);
+}
+
+function startVoteCooldownTimer(questionId) {
+    const upBtn = document.getElementById(`vote-up-btn-${questionId}`);
+    const downBtn = document.getElementById(`vote-down-btn-${questionId}`);
+
+    if (!upBtn || !downBtn) return;
+
+    upBtn.disabled = true;
+    downBtn.disabled = true;
+
+    let remaining = COOLDOWN_SECONDS;
+
+    const interval = setInterval(() => {
+        remaining--;
+
+        if (remaining > 0) {
+            if (upBtn) upBtn.innerText = `⏳ ${remaining}s`;
+            if (downBtn) downBtn.innerText = `⏳ ${remaining}s`;
+        } else {
+            clearInterval(interval);
+            delete VOTE_COOLDOWNS[questionId];
+            if (upBtn) upBtn.disabled = false;
+            if (downBtn) downBtn.disabled = false;
+        }
+    }, 1000);
 }
 
 function createNewQuizModule() {
@@ -467,10 +588,22 @@ function createNewQuizModule() {
         return;
     }
 
+    // Validate inputs for bad words
+    if (!window.validateInputsClean([keyInput, titleInput, catInput, manualInput])) {
+        alert("Inappropriate language detected in your module fields. Please revise your text.");
+        return;
+    }
+
+    if (!currentUser) {
+        alert("You must be logged in to create a module!");
+        return;
+    }
+
     database.ref(`quizModules/${cleanKey}`).set({
         branchName: titleInput,
         category: catInput || "General",
         manual: manualInput || "Standard Regulation",
+        createdBy: currentUser.uid,
         questions: {}
     }).then(() => {
         document.getElementById("new-quiz-key").value = "";
@@ -491,6 +624,11 @@ function addCustomQuestion() {
         return;
     }
 
+    if (!currentUser) {
+        alert("You must be logged in to create a module!");
+        return;
+    }
+
     const branch = selectEl.value;
     const prompt = document.getElementById("builder-q-prompt").value.trim();
     const opt0 = document.getElementById("builder-opt-0").value.trim();
@@ -499,6 +637,12 @@ function addCustomQuestion() {
     const opt3 = document.getElementById("builder-opt-3").value.trim();
     const explanation = document.getElementById("builder-explanation").value.trim();
     
+    // Validate all question fields at once
+    if (!window.validateInputsClean([prompt, opt0, opt1, opt2, opt3, explanation])) {
+        alert("Inappropriate language detected in your question. Please keep content professional.");
+        return;
+    }
+
     const correctIdx = parseInt(document.getElementById("builder-correct-opt").value, 10);
 
     if (!prompt || !opt0 || !opt1) {
@@ -519,6 +663,7 @@ function addCustomQuestion() {
         options: options,
         answer: correctIdx,
         explanation: explanation || "Custom user-added regulation question.",
+        createdBy: currentUser.uid,
         upvotes: 0,
         downvotes: 0
     };
@@ -539,37 +684,238 @@ function addCustomQuestion() {
         })
         .catch(err => alert("Error saving question: " + err.message));
 }
+
 // ==========================================
 // 9. ADMIN PANEL & DATABASE MANAGEMENT
 // ==========================================
+// Add your Firebase Auth UID here (Found in Firebase Console > Authentication > Users)
+const SUPER_UID = 'e8cCmxtEqMN4pr9i3DCkl2yo2iz2';
 
-// Change your secret admin passcode here:
-const ADMIN_PASSCODE = "1232"; 
-let isAdminAuthenticated = false;
+// Check if current user can edit a specific item
+function canUserEdit(itemCreatedByUid) {
+  if (!currentUser) return false;
+  // Super admin can edit everything; regular user can only edit their own
+  return currentUser.uid === SUPER_UID || currentUser.uid === itemCreatedByUid;
+}
 
-function authenticateAdmin() {
-    const input = document.getElementById("admin-passcode-input").value;
-    
-    if (input === ADMIN_PASSCODE) {
-        isAdminAuthenticated = true;
-        document.getElementById("admin-auth-panel").classList.add("hidden");
-        document.getElementById("admin-dashboard-panel").classList.remove("hidden");
-        document.getElementById("admin-passcode-input").value = "";
-        
-        populateAdminDropdown();
-        renderAdminEditor();
-    } else {
-        alert("Access Denied: Incorrect Admin Passcode.");
-        document.getElementById("admin-passcode-input").value = "";
+// Render My Quizzes / Management View
+function renderUserManagePanel() {
+  const container = document.getElementById("user-quizzes-list");
+  if (!container || !currentUser) return;
+
+  const isSuperAdmin = currentUser.uid === SUPER_UID;
+  const moduleKeys = Object.keys(QUESTION_REGISTRY);
+
+  // Filter modules: show ALL if Super Admin, or ONLY createdBy if regular user
+  const editableModules = moduleKeys.filter(key => {
+    const item = QUESTION_REGISTRY[key];
+    return isSuperAdmin || (item.createdBy && item.createdBy === currentUser.uid);
+  });
+
+  if (editableModules.length === 0) {
+    container.innerHTML = `<div>You have not created any quizzes yet.</div>`;
+    return;
+  }
+
+  container.innerHTML = editableModules.map(key => {
+    const item = QUESTION_REGISTRY[key];
+    return `
+      <div class="stat-card" style="margin-bottom: 1em;">
+        <h3>${item.branchName} (${key})</h3>
+        <p>Created By: ${item.createdBy === currentUser.uid ? "You" : item.createdBy}</p>
+        <button onclick="window.deleteUserModule('${key}')" class="btn-tactical btn-clear">
+          🗑️ Delete Module
+        </button>
+      </div>
+    `;
+  }).join('');
+}
+
+// Secure module deletion
+function deleteUserModule(branchKey) {
+  const item = QUESTION_REGISTRY[branchKey];
+  if (!item) return;
+
+  if (!canUserEdit(item.createdBy)) {
+    alert("Permission Denied: You do not own this module.");
+    return;
+  }
+
+  if (confirm(`Delete module '${branchKey}'?`)) {
+    database.ref(`quizModules/${branchKey}`).remove()
+      .then(() => alert("Module deleted!"))
+      .catch(err => alert("Error: " + err.message));
+  }
+}
+
+window.deleteUserModule = deleteUserModule;
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+// Keep track of active listener reference so we don't duplicate subscriptions
+let activeModuleListenerRef = null;
+
+function renderUnifiedHub() {
+    const inspectSelect = document.getElementById("bank-inspect-select");
+    const container = document.getElementById("bank-inspector-list");
+    const deleteModBtn = document.getElementById("btn-delete-module");
+    const authStatus = document.getElementById("hub-auth-status");
+
+    if (!inspectSelect || !inspectSelect.value || !container) return;
+
+    const branch = inspectSelect.value;
+    const data = QUESTION_REGISTRY[branch];
+    const userUid = currentUser ? currentUser.uid : null;
+    const isSuperAdmin = userUid === SUPER_UID;
+    const isModuleOwner = data && data.createdBy && data.createdBy === userUid;
+
+    // Update Status Badge
+    if (authStatus) {
+        if (isSuperAdmin) {
+            authStatus.innerHTML = `<strong>Mode: SUPER ADMIN</strong> (Full Control)`;
+        } else if (currentUser) {
+            authStatus.innerHTML = `Signed in as: <strong>${currentUser.displayName || currentUser.email}</strong>`;
+        } else {
+            authStatus.innerHTML = `Status: Guest (Read-Only Mode)`;
+        }
     }
+
+    if (!data) return;
+
+    // Show/Hide "Delete Module" button
+    if (deleteModBtn) {
+        deleteModBtn.classList.toggle("hidden", !(isSuperAdmin || isModuleOwner));
+    }
+
+    // Detach previous realtime listener if switching dropdown modules
+    if (activeModuleListenerRef) {
+        activeModuleListenerRef.off();
+    }
+
+    // Attach Realtime Listener to active module's questions
+    activeModuleListenerRef = database.ref(`quizModules/${branch}/questions`);
+    activeModuleListenerRef.on("value", (snapshot) => {
+        const rawQs = snapshot.val() || {};
+        const questionsList = Array.isArray(rawQs) 
+            ? rawQs.map((q, idx) => ({ id: idx, ...q }))
+            : Object.keys(rawQs).map(k => ({ id: k, ...rawQs[k] }));
+
+        if (questionsList.length === 0) {
+            container.innerHTML = `<div style="padding: 0.8em; color: var(--light-text-color); border: 1px dashed var(--primary-color);">
+                No questions exist in module '${branch}' yet. Use the accordion above to add one!
+            </div>`;
+            return;
+        }
+
+        container.innerHTML = questionsList.map((q, idx) => {
+            const canEditQuestion = isSuperAdmin || isModuleOwner || (q.createdBy && q.createdBy === userUid);
+            const optsArray = Array.isArray(q.options) ? q.options : Object.values(q.options || []);
+
+            // Dynamic vote calculation from the votes sub-tree
+            const votesObj = q.votes || {};
+            let upvotes = 0;
+            let downvotes = 0;
+            let userVote = null;
+
+            // Count every user's vote in realtime
+            Object.keys(votesObj).forEach(uid => {
+                if (votesObj[uid] === "up") upvotes++;
+                if (votesObj[uid] === "down") downvotes++;
+                if (currentUser && uid === currentUser.uid) {
+                    userVote = votesObj[uid];
+                }
+            });
+
+            // Cooldown status calculation
+            const now = Date.now();
+            const lastVote = VOTE_COOLDOWNS[q.id] || 0;
+            const timeElapsed = Math.floor((now - lastVote) / 1000);
+            const isCoolingDown = timeElapsed < COOLDOWN_SECONDS;
+            const remainingTime = COOLDOWN_SECONDS - timeElapsed;
+
+            const upText = isCoolingDown ? `⏳ ${remainingTime}s` : `👍 ${upvotes}`;
+            const downText = isCoolingDown ? `⏳ ${remainingTime}s` : `👎 ${downvotes}`;
+            const disabledAttr = isCoolingDown ? 'disabled="true"' : '';
+
+            // Highlight active user vote
+            const upStyle = userVote === "up" ? "font-weight: bold; border: 2px solid green;" : "";
+            const downStyle = userVote === "down" ? "font-weight: bold; border: 2px solid red;" : "";
+
+            const votingButtonsHTML = `
+                <div style="display: flex; gap: 0.8em; align-items: center; font-size: 0.85rem;">
+                    <span>Rating:</span>
+                    <button id="vote-up-btn-${q.id}" ${disabledAttr} onclick="window.voteQuestion('${branch}', '${q.id}', 'up')" style="padding: 2px 8px; cursor: pointer; ${upStyle}">
+                        ${upText}
+                    </button>
+                    <button id="vote-down-btn-${q.id}" ${disabledAttr} onclick="window.voteQuestion('${branch}', '${q.id}', 'down')" style="padding: 2px 8px; cursor: pointer; ${downStyle}">
+                        ${downText}
+                    </button>
+                </div>
+            `;
+
+            // Owner/Admin Edit View
+            if (canEditQuestion) {
+                return `
+                    <div style="padding: 1em; border-radius: 4px; margin-bottom: 0.8em; background: rgba(0,0,0,0.05); border: 1px solid var(--primary-color);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5em;">
+                            <strong>Q${idx + 1} (Owner / Admin Control)</strong>
+                            <button onclick="window.deleteQuestion('${branch}', '${q.id}')" class="btn-tactical btn-clear">
+                                Delete
+                            </button>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 0.4em;">
+                            <input type="text" id="edit-q-${q.id}" value="${q.q ? q.q.replace(/"/g, '&quot;') : ''}">
+                            <input type="text" id="edit-opt0-${q.id}" value="${optsArray[0] ? optsArray[0].replace(/"/g, '&quot;') : ''}">
+                            <input type="text" id="edit-opt1-${q.id}" value="${optsArray[1] ? optsArray[1].replace(/"/g, '&quot;') : ''}">
+                            <input type="text" id="edit-opt2-${q.id}" value="${optsArray[2] ? optsArray[2].replace(/"/g, '&quot;') : ''}">
+                            <input type="text" id="edit-opt3-${q.id}" value="${optsArray[3] ? optsArray[3].replace(/"/g, '&quot;') : ''}">
+                            
+                            <select id="edit-ans-${q.id}">
+                                <option value="0" ${q.answer == 0 ? 'selected' : ''}>Correct: Option 1</option>
+                                <option value="1" ${q.answer == 1 ? 'selected' : ''}>Correct: Option 2</option>
+                                <option value="2" ${q.answer == 2 ? 'selected' : ''}>Correct: Option 3</option>
+                                <option value="3" ${q.answer == 3 ? 'selected' : ''}>Correct: Option 4</option>
+                            </select>
+
+                            <input type="text" id="edit-exp-${q.id}" value="${q.explanation ? q.explanation.replace(/"/g, '&quot;') : ''}">
+
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.4em;">
+                                <button onclick="window.saveQuestionEdit('${branch}', '${q.id}')" class="btn-tactical">
+                                    Save Changes
+                                </button>
+                                ${votingButtonsHTML}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } 
+            
+            // Read-Only Community View
+            return `
+                <div style="padding: 0.8em; border-radius: 4px; margin-bottom: 0.6em; background: rgba(0,0,0,0.05); border: 1px solid var(--primary-color);">
+                    <div style="font-weight: bold; margin-bottom: 0.3em;">Q${idx + 1}: ${q.q}</div>
+                    <div style="color: var(--primary-color);"><strong>Correct Answer:</strong> ${optsArray[q.answer] || 'N/A'}</div>
+                    
+                    <div style="margin: 0.4em 0; font-size: 0.8rem; color: var(--light-text-color);">
+                        <strong>Options:</strong> ${optsArray.map((opt, i) => `${i + 1}. ${opt}`).join(' | ')}
+                    </div>
+
+                    <div style="color: var(--light-text-color); font-size: 0.8rem; margin-top: 0.2em;">
+                        <em>Citation:</em> ${q.explanation || 'N/A'}
+                    </div>
+                    
+                    <div style="margin-top: 0.5em;">
+                        ${votingButtonsHTML}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    });
 }
 
-function lockAdminPanel() {
-    isAdminAuthenticated = false;
-    document.getElementById("admin-auth-panel").classList.remove("hidden");
-    document.getElementById("admin-dashboard-panel").classList.add("hidden");
-    showView('home-view');
-}
+// ==========================================
+// 9. OLD ADMIN PANEL
+// ==========================================
 
 function populateAdminDropdown() {
     const adminSelect = document.getElementById("admin-module-select");
@@ -589,75 +935,6 @@ function populateAdminDropdown() {
     });
 }
 
-function renderAdminEditor() {
-    if (!isAdminAuthenticated) return;
-
-    const selectEl = document.getElementById("admin-module-select");
-    const container = document.getElementById("admin-questions-editor-list");
-    if (!selectEl || !selectEl.value || !container) return;
-
-    const branch = selectEl.value;
-    const data = QUESTION_REGISTRY[branch];
-
-    if (!data || !data.questions) {
-        container.innerHTML = `<div style="padding: 1em; color: var(--light-text-color);">No questions found in this module.</div>`;
-        return;
-    }
-
-    const rawQs = data.questions;
-    const questionsList = Array.isArray(rawQs) 
-        ? rawQs.map((q, idx) => ({ id: idx, ...q }))
-        : Object.keys(rawQs).map(k => ({ id: k, ...rawQs[k] }));
-
-    container.innerHTML = questionsList.map((q, idx) => {
-        const opts = Array.isArray(q.options) ? q.options : Object.values(q.options || []);
-        
-        return `
-            <div style="padding: 1em; border-radius: 4px; margin-bottom: 1em; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5em;">
-                    <strong>#${idx + 1} Question, ID: ${q.id}</strong>
-                    <button onclick="deleteQuestion('${branch}', '${q.id}')" class="btn-tactical btn-clear" style="padding: 0.2em 0.6em; font-size: 0.75rem; border-color: var(--alert-color); color: var(--alert-color);">
-                        🗑️ Delete Question
-                    </button>
-                </div>
-
-                <div style="display: flex; flex-direction: column; gap: 0.5em;">
-                    <label>Prompt:</label>
-                    <input type="text" id="edit-q-${q.id}" value="${q.q ? q.q.replace(/"/g, '&quot;') : ''}">
-
-                    <label>Option 1:</label>
-                    <input type="text" id="edit-opt0-${q.id}" value="${opts[0] ? opts[0].replace(/"/g, '&quot;') : ''}">
-
-                    <label>Option 2:</label>
-                    <input type="text" id="edit-opt1-${q.id}" value="${opts[1] ? opts[1].replace(/"/g, '&quot;') : ''}">
-
-                    <label>Option 3:</label>
-                    <input type="text" id="edit-opt2-${q.id}" value="${opts[2] ? opts[2].replace(/"/g, '&quot;') : ''}">
-
-                    <label>Option 4:</label>
-                    <input type="text" id="edit-opt3-${q.id}" value="${opts[3] ? opts[3].replace(/"/g, '&quot;') : ''}">
-
-                    <label>Correct Option Index (0 = Opt 1, 1 = Opt 2, etc.):</label>
-                    <select id="edit-ans-${q.id}">
-                        <option value="0" ${q.answer == 0 ? 'selected' : ''}>ID:0 (Option 1)</option>
-                        <option value="1" ${q.answer == 1 ? 'selected' : ''}>ID:1 (Option 2)</option>
-                        <option value="2" ${q.answer == 2 ? 'selected' : ''}>ID:2 (Option 3)</option>
-                        <option value="3" ${q.answer == 3 ? 'selected' : ''}>ID:3 (Option 4)</option>
-                    </select>
-
-                    <label>Citation / Explanation:</label>
-                    <input type="text" id="edit-exp-${q.id}" value="${q.explanation ? q.explanation.replace(/"/g, '&quot;') : ''}">
-
-                    <button onclick="saveQuestionEdit('${branch}', '${q.id}')" class="btn-tactical" style="margin-top: 0.5em;">
-                        💾 Save Changes to Firebase
-                    </button>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-// Save edited question to Firebase
 function saveQuestionEdit(branchKey, questionId) {
     const prompt = document.getElementById(`edit-q-${questionId}`).value.trim();
     const opt0 = document.getElementById(`edit-opt0-${questionId}`).value.trim();
@@ -685,19 +962,16 @@ function saveQuestionEdit(branchKey, questionId) {
     }).catch(err => alert("Update failed: " + err.message));
 }
 
-// Delete single question from Firebase
 function deleteQuestion(branchKey, questionId) {
     if (confirm("Are you sure you want to permanently delete this question?")) {
         database.ref(`quizModules/${branchKey}/questions/${questionId}`).remove()
             .then(() => {
                 alert("Question deleted successfully!");
-                renderAdminEditor();
             })
             .catch(err => alert("Delete failed: " + err.message));
     }
 }
 
-// Delete whole module from Firebase
 function deleteQuizModule() {
     const selectEl = document.getElementById("admin-module-select");
     if (!selectEl || !selectEl.value) return;
@@ -709,8 +983,12 @@ function deleteQuizModule() {
             .then(() => {
                 alert(`Module '${branchKey}' deleted!`);
                 populateAdminDropdown();
-                renderAdminEditor();
             })
             .catch(err => alert("Module delete failed: " + err.message));
     }
 }
+
+// Global scope exports for dynamically generated innerHTML onclicks
+window.voteQuestion = voteQuestion;
+window.saveQuestionEdit = saveQuestionEdit;
+window.deleteQuestion = deleteQuestion;

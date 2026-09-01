@@ -3,7 +3,7 @@
     --secondary-color: #001742;
     --alt-color: #8b0000;
     --text-color: #c9d1d9;
-    --light-text-color: #8b949e;
+    --light-text-color: #8a8b8b;
     --alert-color: #daae00;
     --background-color: #0e1117;
     --background: #0e1117;
@@ -20,7 +20,7 @@
     --secondary-color: #111728;
     --alt-color: #ba0c2f;
     --text-color: #000000;
-    --light-text-color: #9ea2a2;
+    --light-text-color: #8a8b8b;
     --alert-color: #ffcd00;
     --background-color: #f4f6f9;
     --background: #f4f6f9;
@@ -203,15 +203,15 @@ select {
     background-color: var(--input-bg);
     color: var(--text-color);
     border: 1px solid var(--border-color);
-    padding: 0.6em;
+    padding: 0.3em;
     font-family: inherit;
     border-radius: 4px;
     width: 100%;
     box-sizing: border-box;
     outline: none;
     font-size: 0.85rem;
-    margin-top: 0.25em;
-    margin-bottom: 0.75em;
+    margin-top: 0.15em;
+    margin-bottom: 0.35em;
 }
 
 input[type="text"]:focus,
@@ -224,8 +224,8 @@ select:focus {
 .btn-tactical {
     background-color: var(--alert-color);
     color: #000000;
-    font-weight: 700;
-    padding: 0.7em 1.5em;
+    font-weight: 600;
+    padding: 0.6em 1em;
     border: none;
     border-radius: 4px;
     cursor: pointer;
