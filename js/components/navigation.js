@@ -4,11 +4,21 @@ import { renderLeaderboard } from './leaderboard.js';
 import { renderUnifiedHub } from './hub.js';
 
 export function showView(viewId) {
+    // Top-level views
     const views = ['home-view', 'setup-view', 'quiz-view', 'results-view', 'leaderboard-view', 'hub-view'];
+    
     views.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.toggle('hidden', id !== viewId);
     });
+
+    // Control 'select-view' visibility explicitly:
+    // Only show when on 'home-view' or 'setup-view'
+    const selectView = document.getElementById('select-view');
+    if (selectView) {
+        const isAllowedView = (viewId === 'home-view' || viewId === 'setup-view');
+        selectView.classList.toggle('hidden', !isAllowedView);
+    }
 
     const navMap = {
         'home-view': 'nav-home',
@@ -17,12 +27,17 @@ export function showView(viewId) {
         'hub-view': 'nav-hub'
     };
 
+    // Update active navbar tab
     document.querySelectorAll('#navbar a').forEach(a => a.classList.remove('active-nav'));
     if (navMap[viewId] && document.getElementById(navMap[viewId])) {
         document.getElementById(navMap[viewId]).classList.add('active-nav');
     }
 
-    if (viewId === 'home-view') updateDashboardMetrics();
+    // View-specific initializations
+    if (viewId === 'home-view') {
+        updateDashboardMetrics();
+        renderModuleCards();
+    }
     if (viewId === 'leaderboard-view') renderLeaderboard();
     if (viewId === 'hub-view') renderUnifiedHub();
 }
@@ -33,16 +48,18 @@ export function populateBranchDropdowns() {
     const inspectSelect = document.getElementById("bank-inspect-select");
     const leaderboardSelect = document.getElementById("filter-leaderboard");
 
+    // 1. Save currently active values before wiping elements
+    const savedSetup = setupSelect ? setupSelect.value : "";
+    const savedBuilder = builderTargetSelect ? builderTargetSelect.value : "";
+    const savedInspect = inspectSelect ? inspectSelect.value : "";
+    const currentFilter = leaderboardSelect ? leaderboardSelect.value : "ALL";
+
     const moduleKeys = Object.keys(state.QUESTION_REGISTRY);
 
     if (setupSelect) setupSelect.innerHTML = "";
     if (builderTargetSelect) builderTargetSelect.innerHTML = "";
     if (inspectSelect) inspectSelect.innerHTML = "";
-
-    const currentFilter = leaderboardSelect ? leaderboardSelect.value : "ALL";
-    if (leaderboardSelect) {
-        leaderboardSelect.innerHTML = `<option value="ALL">All Modules</option>`;
-    }
+    if (leaderboardSelect) leaderboardSelect.innerHTML = `<option value="ALL">All Modules</option>`;
 
     if (moduleKeys.length === 0) {
         if (setupSelect) setupSelect.innerHTML = `<option value="">No Modules Available</option>`;
@@ -55,14 +72,51 @@ export function populateBranchDropdowns() {
         const item = state.QUESTION_REGISTRY[key];
         const label = `${item.branchName || key} (${item.manual || 'Standard'})`;
 
-        if (setupSelect) setupSelect.innerHTML += `<option value="${key}">${label}</option>`;
-        if (builderTargetSelect) builderTargetSelect.innerHTML += `<option value="${key}">${label}</option>`;
-        if (inspectSelect) inspectSelect.innerHTML += `<option value="${key}">${label}</option>`;
-        if (leaderboardSelect) leaderboardSelect.innerHTML += `<option value="${key}">${item.branchName || key}</option>`;
+        const opt1 = document.createElement("option");
+        opt1.value = key;
+        opt1.textContent = label;
+
+        const opt2 = document.createElement("option");
+        opt2.value = key;
+        opt2.textContent = label;
+
+        const opt3 = document.createElement("option");
+        opt3.value = key;
+        opt3.textContent = label;
+
+        if (setupSelect) setupSelect.appendChild(opt1);
+        if (builderTargetSelect) builderTargetSelect.appendChild(opt2);
+        if (inspectSelect) inspectSelect.appendChild(opt3);
+
+        if (leaderboardSelect) {
+            const optLb = document.createElement("option");
+            optLb.value = key;
+            optLb.textContent = item.branchName || key;
+            leaderboardSelect.appendChild(optLb);
+        }
     });
 
-    if (leaderboardSelect) leaderboardSelect.value = currentFilter;
-    if (setupSelect && setupSelect.value) state.activeBranchKey = setupSelect.value;
+    // 2. Restore selections if the modules still exist in state
+    if (inspectSelect && savedInspect && state.QUESTION_REGISTRY[savedInspect]) {
+        inspectSelect.value = savedInspect;
+    }
+
+    if (setupSelect && savedSetup && state.QUESTION_REGISTRY[savedSetup]) {
+        setupSelect.value = savedSetup;
+    }
+
+    if (builderTargetSelect && savedBuilder && state.QUESTION_REGISTRY[savedBuilder]) {
+        builderTargetSelect.value = savedBuilder;
+    }
+
+    if (leaderboardSelect) {
+        leaderboardSelect.value = currentFilter;
+    }
+
+    if (setupSelect && setupSelect.value) {
+        state.activeBranchKey = setupSelect.value;
+    }
+
     updateSliderLimits();
 }
 
@@ -128,10 +182,9 @@ export function updateSliderLimits() {
         return;
     }
 
-    // Set slider boundaries directly to the module set count
     slider.min = 1;
     slider.max = totalAvailable;
-    slider.value = totalAvailable; // Default to full question set
+    slider.value = totalAvailable;
 
     label.innerText = `${totalAvailable} ${totalAvailable === 1 ? 'Question' : 'Questions'} (Max: ${totalAvailable})`;
 }
@@ -159,4 +212,47 @@ export function sanitizeInput(str) {
     return String(str).replace(/[&<>"']/g, (m) => ({
         '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
     })[m]);
+}
+
+export function renderModuleCards() {
+    const gridContainer = document.getElementById("quiz-cards-grid");
+    if (!gridContainer) return;
+
+    const moduleKeys = Object.keys(state.QUESTION_REGISTRY);
+
+    if (moduleKeys.length === 0) {
+        gridContainer.innerHTML = `<div class="text-center" style="color: var(--light-text-color);">No active modules available.</div>`;
+        return;
+    }
+
+    gridContainer.innerHTML = moduleKeys.map(key => {
+        const data = state.QUESTION_REGISTRY[key];
+        const rawQs = data.questions || {};
+        const totalQs = Array.isArray(rawQs) ? rawQs.length : Object.keys(rawQs).length;
+
+        // Apply background image overlay if an imageUrl exists
+        const bgStyle = data.imageUrl 
+            ? `background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url('${data.imageUrl}') center/cover no-repeat; color: #ffffff;`
+            : '';
+
+        return `
+            <div class="quiz-card" style="${bgStyle}">
+                <div>
+                    <div class="quiz-card-header">
+                        <span class="quiz-card-badge">${data.category || 'General'}</span>
+                        <span style="font-size: 0.8rem; color: ${data.imageUrl ? '#ddd' : 'var(--light-text-color)'};">${totalQs} Questions</span>
+                    </div>
+                    <div class="quiz-card-title">${data.branchName || key}</div>
+                    <div class="quiz-card-meta" style="color: ${data.imageUrl ? '#eee' : 'inherit'};">
+                        <strong>Manual:</strong> ${data.manual || 'Standard Regulation'}
+                    </div>
+                </div>
+                <div class="quiz-card-footer" style="margin-top: 0.8em;">
+                    <button class="btn-tactical btn-blue" data-action="launch-module" data-key="${key}" style="width: 100%;">
+                        ⚡ Start Quiz
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
 }

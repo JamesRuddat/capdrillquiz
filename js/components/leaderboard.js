@@ -27,11 +27,11 @@ export function updateDashboardMetrics() {
                 homeTopBody.innerHTML = topPerformers.map((entry, idx) => {
                     let rankStyle = "";
                     if (idx === 0) {
-                        rankStyle = 'style="background-color: rgba(238, 255, 0, 0.56);"'; // Gold
+                        rankStyle = 'style="background-color: var(--gold-color);"'; // Gold
                     } else if (idx === 1) {
-                        rankStyle = 'style="background-color: rgba(192, 192, 192, 0.45);"'; // Silver
+                        rankStyle = 'style="background-color: var(--silver-color);"'; // Silver
                     } else if (idx === 2) {
-                        rankStyle = 'style="background-color: rgba(233, 138, 43, 0.37);"';  // Bronze
+                        rankStyle = 'style="background-color: var(--bronze-color);"';  // Bronze
                     }
 
                     return `
@@ -79,11 +79,11 @@ export function renderLeaderboard() {
 
             // 1. Assign Top 3 Podium Colors
             if (idx === 0) {
-                rowStyle = 'style="background-color: rgba(238, 255, 0, 0.56);"'; // Gold
+                rowStyle = 'style="background-color: var(--gold-color);"'; // Gold
             } else if (idx === 1) {
-                rowStyle = 'style="background-color: rgba(192, 192, 192, 0.45);"'; // Silver
+                rowStyle = 'style="background-color: var(--silver-color);"'; // Silver
             } else if (idx === 2) {
-                rowStyle = 'style="background-color: rgba(233, 138, 43, 0.37);"';  // Bronze
+                rowStyle = 'style="background-color: var(--bronze-color);"';  // Bronze
             } 
             // 2. Alternating Grey Zebra Striping for Row 4+
             else if (idx % 2 === 1) {

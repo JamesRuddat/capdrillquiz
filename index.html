@@ -25,7 +25,7 @@
             </div>
         </div>
 
-        <h1><span>Prop - Study Guide v3.5.1 (Foxcore)</span></h1>
+        <h1><span>Prop - Study Guide v3.6 (Foxcore)</span></h1>
         <hr>
     </header>
 
@@ -54,9 +54,11 @@
                 </div>
             </div>
 
-            <div class="stat-card">
+            <hr>
+
+            <div class="">
                 <div>
-                    <h3 style="font-size: 1rem; margin-bottom: 0.5em;">🏆 TOP HONOR ROLL (ALL-TIME)</h3>
+                    <h2 style="font-size: 1.5rem; margin-bottom: 0.5em; text-align: center;">🏆 TOP HONOR ROLL</h2>
                     <table>
                         <thead>
                             <tr>
@@ -72,21 +74,9 @@
                     </table>
                 </div>
             </div>
-
-            <div class="text-center" style="margin-top: 1.2em;">
-                <button id="btn-launch-eval" class="btn-tactical">
-                    Launch Evaluation Module
-                </button>
-            </div>
-
-            <hr>
-
-            <h1>Registered Modules</h1>
-            <div id="dynamic-manuals-tree">
-                <span>Loading modules from cloud database...</span>
-            </div>
+            
         </section>
-
+        
         <!-- SETUP VIEW -->
         <section id="setup-view" class="col hidden">
             <h1> EVALUATION CONFIGURATION</h1>
@@ -94,8 +84,8 @@
             <label for="quiz-select">Target Quiz Module:</label>
             <select id="quiz-select"></select>
 
-            <label for="cadet-name">Name & Rank (Leaderboard):</label>
-            <input type="text" id="cadet-name" placeholder="e.g., C/SrA Smith or Sgt Davis">
+            <label for="name">Name & Rank (Leaderboard):</label>
+            <input type="text" id="name" placeholder="e.g., C/SrA Smith or TSgt Davis">
 
             <!-- DYNAMIC QUESTION COUNT SLIDER -->
             <div style="margin: 1em 0;">
@@ -106,9 +96,14 @@
                 <input type="range" id="quiz-question-count-slider" min="1" max="1" value="1" style="width: 100%; cursor: pointer;">
             </div>
 
-            <button id="btn-begin-assessment" class="btn-tactical" style="width: 100%; margin-top: 0.5em;">
-                Begin Assessment
-            </button>
+            <button id="btn-begin-assessment" class="btn-tactical btn-blue">Begin Assessment</button>
+        </section>
+
+        <section id="select-view" class="col">
+            <h1>Modules & Quizes</h1>
+            <div id="quiz-cards-grid" class="cards-grid">
+                <div class="text-center">Loading available modules...</div>
+            </div>
         </section>
 
         <!-- QUIZ RUNNER VIEW -->
@@ -148,6 +143,7 @@
         <section id="leaderboard-view" class="col hidden">
             <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
                 <h1>Leaderboard</h1>
+                <p>Sign in to see your name on the leaderboard!</p>
                 <div>
                     <label for="filter-leaderboard" style="font-size: 0.8rem;">Filter Module:</label>
                     <select id="filter-leaderboard" style="width: auto; padding: 0.3em; margin: 0;">
@@ -185,55 +181,16 @@
                 Status: Signed in as Guest
             </div>
 
-            <!-- SECTION 1: REGISTER NEW MODULE -->
-            <button type="button" id="trig-module-form" class="accordion-trigger">
-                <span>REGISTER NEW QUIZ MODULE</span>
-                <span id="module-form-accordion-icon">▼</span>
-            </button>
-            <div id="module-form-accordion" class="accordion-content">
-                <div style="display: flex; flex-direction: column;">
-                    <input type="text" id="new-quiz-key" placeholder="Unique Key Identifier (e.g., CAP_AERO_CH1)">
-                    <input type="text" id="new-quiz-title" placeholder="Quiz Title (e.g., CAP Aerospace Chapter 1)">
-                    <input type="text" id="new-quiz-category" placeholder="Category (e.g., Aerospace, Leadership, Drill)">
-                    <input type="text" id="new-quiz-manual" placeholder="Reference Manual / Publication (e.g., CAPP 101)">
-                    <button id="btn-create-module" class="btn-tactical" style="margin-top: 0.4em;">Publish Module</button>
-                </div>
-            </div>
-
-            <!-- SECTION 2: ADD QUESTION ITEM -->
-            <button type="button" id="trig-question-form" class="accordion-trigger">
-                <span>ADD QUESTION TO EXISTING MODULE</span>
-                <span id="question-form-accordion-icon">▼</span>
-            </button>
-            <div id="question-form-accordion" class="accordion-content">
-                <div style="display: flex; flex-direction: column;">
-                    <label for="builder-target-quiz" style="font-size: 0.8rem;">Select Target Quiz Module:</label>
-                    <select id="builder-target-quiz"></select>
-
-                    <input type="text" id="builder-q-prompt" placeholder="Question Prompt">
-                    <input type="text" id="builder-opt-0" placeholder="Option 1">
-                    <input type="text" id="builder-opt-1" placeholder="Option 2">
-                    <input type="text" id="builder-opt-2" placeholder="Option 3 (Optional)">
-                    <input type="text" id="builder-opt-3" placeholder="Option 4 (Optional)">
-                    <label style="font-size: 0.75rem; text-transform: uppercase;">Correct Answer Choice:</label>
-                    <select id="builder-correct-opt">
-                        <option value="0">Option 1 is Correct</option>
-                        <option value="1">Option 2 is Correct</option>
-                        <option value="2">Option 3 is Correct</option>
-                        <option value="3">Option 4 is Correct</option>
-                    </select>
-                    <input type="text" id="builder-explanation" placeholder="Explanation Reference / Manual Citation">
-                    <button id="btn-add-question" class="btn-tactical" style="margin-top: 0.4em;">Add Question</button>
-                </div>
-            </div>
-
             <hr style="margin: 1.5em 0;">
 
-            <!-- SECTION 3: UNIFIED INSPECTOR & ADMIN EDITOR -->
-            <div style="justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 0.8em;">
-                <h1>Module & questions</h1>
-                <div style="align-items: center;">
-                    <label for="bank-inspect-select" style="font-size: 0.8rem;">Select Module:</label>
+            <!-- SECTION 2: UNIFIED INSPECTOR & INLINE CARD EDITOR -->
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 0.8em; gap: 0.5em;">
+                <h1 style="margin: 0;">Module &amp; Questions</h1>
+                <div style="display: flex; align-items: center; gap: 0.5em; flex-wrap: wrap;">
+                    <button id="btn-create-module-card" class="btn-tactical" style="padding: 0.4em 0.8em;">
+                        ➕ Create New Module
+                    </button>
+                    <label for="bank-inspect-select" style="font-size: 0.8rem; margin: 0;">Select Module:</label>
                     <select id="bank-inspect-select" style="width: auto; padding: 0.3em; margin: 0;"></select>
                     <button id="btn-delete-module" class="btn-tactical btn-clear hidden">
                         Delete Module
@@ -241,7 +198,17 @@
                 </div>
             </div>
 
-            <!-- QUESTIONS DISPLAY & EDITING CONTAINER -->
+            <!-- QUESTION ACTION CONTROL BAR -->
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin: 1em 0 0.8em 0; gap: 0.5em; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 1em;">
+    <h2 style="margin: 0; font-size: 1.2rem;">Module Questions</h2>
+    <div style="display: flex; align-items: center; gap: 0.5em; flex-wrap: wrap;">
+        <button id="btn-add-question-card" class="btn-tactical" style="padding: 0.4em 0.8em;">
+            ➕ Add Question Card
+        </button>
+    </div>
+</div>
+
+            <!-- QUESTIONS DISPLAY & INLINE EDITING CONTAINER -->
             <div id="bank-inspector-list">
                 <div style="color: var(--light-text-color); font-size: 0.8rem;">Select a module above to manage or inspect questions...</div>
             </div>

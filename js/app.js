@@ -4,21 +4,24 @@ import { handleGoogleAuth } from './services/auth-service.js';
 import { 
     showView, 
     populateBranchDropdowns, 
-    renderModuleList, 
+    renderModuleList,
+    renderModuleCards,
     toggleTheme, 
-    toggleAccordion,
     updateSliderLimits
 } from './components/navigation.js';
 import { startQuiz, advanceQuestion } from './components/quiz-engine.js';
 import { updateDashboardMetrics, renderLeaderboard } from './components/leaderboard.js';
 import { 
     renderUnifiedHub, 
-    createNewQuizModule, 
-    addCustomQuestion, 
+    addBlankQuestionCard,
     voteQuestion, 
     saveQuestionEdit, 
     deleteQuestion, 
-    deleteQuizModule 
+    deleteQuizModule,
+    toggleEditModule,
+    toggleCreateModuleCard,
+    saveModuleEdit,
+    submitNewModuleCard
 } from './components/hub.js';
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -37,7 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Global & Quiz Action Controls
     document.getElementById("theme-toggle-btn").addEventListener("click", toggleTheme);
     document.getElementById("google-auth-btn").addEventListener("click", handleGoogleAuth);
-    document.getElementById("btn-launch-eval").addEventListener("click", () => showView('setup-view'));
     document.getElementById("btn-begin-assessment").addEventListener("click", startQuiz);
     document.getElementById("next-question-btn").addEventListener("click", advanceQuestion);
 
@@ -58,33 +60,88 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // Module & Question Header Controls
+    const createModCardBtn = document.getElementById("btn-create-module-card");
+    if (createModCardBtn) {
+        createModCardBtn.addEventListener("click", () => toggleCreateModuleCard(true));
+    }
+
+    const addQuestionCardBtn = document.getElementById("btn-add-question-card");
+    if (addQuestionCardBtn) {
+        addQuestionCardBtn.addEventListener("click", () => {
+            const inspectSelect = document.getElementById("bank-inspect-select");
+            const activeBranch = inspectSelect ? inspectSelect.value : "";
+            if (!activeBranch) {
+                alert("Please select a target module first.");
+                return;
+            }
+            addBlankQuestionCard(activeBranch);
+        });
+    }
+
     // Results Navigation
     document.getElementById("btn-res-another").addEventListener("click", () => showView('setup-view'));
     document.getElementById("btn-res-leaderboard").addEventListener("click", () => showView('leaderboard-view'));
     document.getElementById("btn-res-home").addEventListener("click", () => showView('home-view'));
 
-    // Accordions & Hub Controls
-    document.getElementById("trig-module-form").addEventListener("click", () => toggleAccordion('module-form-accordion'));
-    document.getElementById("trig-question-form").addEventListener("click", () => toggleAccordion('question-form-accordion'));
-    document.getElementById("btn-create-module").addEventListener("click", createNewQuizModule);
-    document.getElementById("btn-add-question").addEventListener("click", addCustomQuestion);
-    document.getElementById("bank-inspect-select").addEventListener("change", renderUnifiedHub);
-    document.getElementById("btn-delete-module").addEventListener("click", deleteQuizModule);
-    document.getElementById("filter-leaderboard").addEventListener("change", renderLeaderboard);
+    // Module Dropdown & Delete Listeners
+    const inspectSelect = document.getElementById("bank-inspect-select");
+    if (inspectSelect) inspectSelect.addEventListener("change", renderUnifiedHub);
 
-    // Dynamic Card Delegation
-    document.getElementById("bank-inspector-list").addEventListener("click", (e) => {
-        const btn = e.target.closest("button[data-action]");
-        if (!btn) return;
+    const deleteModBtn = document.getElementById("btn-delete-module");
+    if (deleteModBtn) deleteModBtn.addEventListener("click", deleteQuizModule);
 
-        const action = btn.dataset.action;
-        const branch = btn.dataset.branch;
-        const qid = btn.dataset.qid;
+    const filterLeaderboard = document.getElementById("filter-leaderboard");
+    if (filterLeaderboard) filterLeaderboard.addEventListener("change", renderLeaderboard);
 
-        if (action === "vote") voteQuestion(branch, qid, btn.dataset.type, btn.dataset.creator);
-        else if (action === "save-q") saveQuestionEdit(branch, qid);
-        else if (action === "delete-q") deleteQuestion(branch, qid);
-    });
+    // Home View Card Grid Delegation
+    const quizCardsGrid = document.getElementById("quiz-cards-grid");
+    if (quizCardsGrid) {
+        quizCardsGrid.addEventListener("click", (e) => {
+            const btn = e.target.closest("button[data-action='launch-module']");
+            if (!btn) return;
+
+            const moduleKey = btn.dataset.key;
+            const selectEl = document.getElementById("quiz-select");
+
+            if (selectEl) {
+                selectEl.value = moduleKey;
+                updateSliderLimits();
+            }
+
+            showView('setup-view');
+        });
+    }
+
+    // Dynamic Inspector Delegation (Cards & Questions)
+    const inspectorList = document.getElementById("bank-inspector-list");
+    if (inspectorList) {
+        inspectorList.addEventListener("click", (e) => {
+            const btn = e.target.closest("button[data-action]");
+            if (!btn) return;
+
+            const action = btn.dataset.action;
+            const key = btn.dataset.key;
+            const branch = btn.dataset.branch;
+            const qid = btn.dataset.qid;
+
+            // Module Card Actions
+            if (action === "edit-module") toggleEditModule(key);
+            else if (action === "cancel-edit-module") toggleEditModule(null);
+            else if (action === "save-module") saveModuleEdit(key);
+            else if (action === "submit-new-module") submitNewModuleCard();
+            else if (action === "cancel-create-module") toggleCreateModuleCard(false);
+            else if (action === "launch-module") {
+                const selectEl = document.getElementById("quiz-select");
+                if (selectEl) selectEl.value = key;
+                showView('setup-view');
+            }
+            // Question Card Actions
+            else if (action === "vote") voteQuestion(branch, qid, btn.dataset.type, btn.dataset.creator);
+            else if (action === "save-q") saveQuestionEdit(branch, qid);
+            else if (action === "delete-q") deleteQuestion(branch, qid);
+        });
+    }
 
     // Auth Observer
     auth.onAuthStateChanged((user) => {
@@ -103,6 +160,7 @@ document.addEventListener("DOMContentLoaded", () => {
         state.QUESTION_REGISTRY = snapshot.val() || {};
         populateBranchDropdowns();
         renderModuleList();
+        renderModuleCards();
 
         const hubView = document.getElementById("hub-view");
         if (hubView && !hubView.classList.contains("hidden")) {
