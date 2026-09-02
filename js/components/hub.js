@@ -297,7 +297,7 @@ export function renderUnifiedHub() {
 
                 <div class="quiz-card-footer" style="display: flex; gap: 0.5em; margin-top: 0.8em;">
                     <button class="btn-tactical" data-action="save-module" data-key="${branch}" style="flex: 1;">
-                        💾 Save Card
+                        💾 Save Info
                     </button>
                     <button class="btn-tactical btn-clear" data-action="cancel-edit-module" style="flex: 1;">
                         Cancel
@@ -322,7 +322,7 @@ export function renderUnifiedHub() {
                 <div class="quiz-card-footer" style="display: flex; gap: 0.5em; margin-top: 0.8em; flex-wrap: wrap;">
                     ${canEditModule ? `
                         <button class="btn-tactical" data-action="edit-module" data-key="${branch}" style="flex: 1;">
-                            ✏️ Edit Card Info
+                            ✏️ Edit Info
                         </button>
                     ` : ''}
                     <button class="btn-tactical btn-clear" data-action="launch-module" data-key="${branch}" style="flex: 1;">
@@ -388,7 +388,7 @@ export function renderUnifiedHub() {
                                 <strong>Q${idx + 1} (Owner / Admin Control)</strong>
                                 <button data-action="delete-q" data-branch="${branch}" data-qid="${q.id}" class="btn-tactical btn-clear">Delete</button>
                             </div>
-                            <div style="display: flex; flex-direction: column; gap: 0.4em;">
+                            <div style="display: flex; flex-direction: column; gap: 0.3em;">
                                 <input type="text" id="edit-q-${q.id}" value="${q.q ? q.q.replace(/"/g, '&quot;') : ''}">
                                 <input type="url" id="edit-qimg-${q.id}" placeholder="Question Visual Cue Image URL (Optional)" value="${q.imageUrl ? q.imageUrl.replace(/"/g, '&quot;') : ''}">
                                 <input type="text" id="edit-opt0-${q.id}" value="${optsArray[0] ? optsArray[0].replace(/"/g, '&quot;') : ''}">
@@ -404,7 +404,7 @@ export function renderUnifiedHub() {
                                 <input type="text" id="edit-exp-${q.id}" value="${q.explanation ? q.explanation.replace(/"/g, '&quot;') : ''}">
                                 ${questionImgHTML}
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.4em;">
-                                    <button data-action="save-q" data-branch="${branch}" data-qid="${q.id}" class="btn-tactical">Update Question</button>
+                                    <button data-action="save-q" data-branch="${branch}" data-qid="${q.id}" class="btn-tactical">Update</button>
                                     ${votingButtonsHTML}
                                 </div>
                             </div>

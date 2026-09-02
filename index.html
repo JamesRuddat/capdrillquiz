@@ -8,24 +8,35 @@
     <link rel="icon" type="image/x-icon" href="/assets/images/emblems/icon.svg">
     <title>PROP - Study Guide</title>
     <link rel="stylesheet" href="styles.css">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1864969470317711" crossorigin="anonymous"></script>
 </head>
 
 <body>
     <header>
         <div id="navbar">
-            <div class="nav-links">
+            <!-- HAMBURGER BUTTON (MOBILE ONLY) -->
+            <button id="hamburger-btn" aria-label="Toggle Navigation Menu">
+                <span class="hamburger-bar"></span>
+                <span class="hamburger-bar"></span>
+                <span class="hamburger-bar"></span>
+            </button>
+
+            <!-- NAVIGATION LINKS CONTAINER -->
+            <div id="nav-drawer" class="nav-links">
                 <a id="nav-home" class="active-nav">Home</a>
                 <a id="nav-setup">Start Quiz</a>
                 <a id="nav-leaderboard">Leaderboard</a>
                 <a id="nav-hub">Quiz Hub</a>
             </div>
+
+            <!-- CONTROL BUTTONS -->
             <div class="nav-controls">
                 <button id="google-auth-btn" class="theme-toggle-btn">Sign in with Google</button>
                 <button id="theme-toggle-btn" class="theme-toggle-btn">THEME</button>
             </div>
         </div>
 
-        <h1><span>Prop - Study Guide v3.6 (Foxcore)</span></h1>
+        <h1><span>Prop - Study Guide</span></h1>
         <hr>
     </header>
 
@@ -58,7 +69,7 @@
 
             <div class="">
                 <div>
-                    <h2 style="font-size: 1.5rem; margin-bottom: 0.5em; text-align: center;">🏆 TOP HONOR ROLL</h2>
+                    <h2 style="font-size: 1.5rem; margin-bottom: 0.5em; text-align: center;">TOP HONOR ROLL</h2>
                     <table>
                         <thead>
                             <tr>
@@ -79,24 +90,26 @@
         
         <!-- SETUP VIEW -->
         <section id="setup-view" class="col hidden">
-            <h1> EVALUATION CONFIGURATION</h1>
+            <h1> Study CONFIGURATION</h1>
+            <div style="width: 50%;">
+                <label for="quiz-select">Target Quiz Module:</label>
+                <select id="quiz-select"></select>
 
-            <label for="quiz-select">Target Quiz Module:</label>
-            <select id="quiz-select"></select>
+                <label for="name">Name & Rank (Leaderboard):</label>
+                <input type="text" id="name" placeholder="e.g., C/SrA Smith or TSgt Davis">
 
-            <label for="name">Name & Rank (Leaderboard):</label>
-            <input type="text" id="name" placeholder="e.g., C/SrA Smith or TSgt Davis">
-
-            <!-- DYNAMIC QUESTION COUNT SLIDER -->
-            <div style="margin: 1em 0;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3em;">
-                    <label for="quiz-question-count-slider">Question Count:</label>
-                    <span id="quiz-question-count-label" style="font-weight: bold; color: var(--primary-color);">0 Questions</span>
+                <!-- DYNAMIC QUESTION COUNT SLIDER -->
+                <div style="margin: 1em 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3em;">
+                        <label for="quiz-question-count-slider">Question Count:</label>
+                        <span id="quiz-question-count-label">0 Questions</span>
+                    </div>
+                    <input type="range" id="quiz-question-count-slider" min="1" max="1" value="1" style="width: 100%; cursor: pointer;">
                 </div>
-                <input type="range" id="quiz-question-count-slider" min="1" max="1" value="1" style="width: 100%; cursor: pointer;">
-            </div>
 
-            <button id="btn-begin-assessment" class="btn-tactical btn-blue">Begin Assessment</button>
+                <button id="btn-begin-assessment" class="btn-tactical btn-blue">Begin Assessment</button>
+            </div>
+            
         </section>
 
         <section id="select-view" class="col">
@@ -181,17 +194,22 @@
                 Status: Signed in as Guest
             </div>
 
-            <hr style="margin: 1.5em 0;">
+            <hr>
 
             <!-- SECTION 2: UNIFIED INSPECTOR & INLINE CARD EDITOR -->
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 0.8em; gap: 0.5em;">
                 <h1 style="margin: 0;">Module &amp; Questions</h1>
+                <hr>
                 <div style="display: flex; align-items: center; gap: 0.5em; flex-wrap: wrap;">
                     <button id="btn-create-module-card" class="btn-tactical" style="padding: 0.4em 0.8em;">
                         ➕ Create New Module
                     </button>
-                    <label for="bank-inspect-select" style="font-size: 0.8rem; margin: 0;">Select Module:</label>
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 0.5em; flex-wrap: wrap;">
+                    <label for="bank-inspect-select" style="font-size: 0.8rem; margin: 0;">Edit Selected Module:</label>
                     <select id="bank-inspect-select" style="width: auto; padding: 0.3em; margin: 0;"></select>
+                    <br>
                     <button id="btn-delete-module" class="btn-tactical btn-clear hidden">
                         Delete Module
                     </button>
@@ -227,8 +245,8 @@
 </body>
 
 <footer>
-    <p>Made by Mr. Ruddat</p>
-    <div class="ad-container" style="margin: 1.5em 0; text-align: center; min-height: 90px; background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color); padding: 0.5em;">
+    <p>Made by Mr. Ruddat - v3.6.2 (Foxcore)</p>
+    <div class="ad-container" style="margin: 1.5em 0; text-align: center; min-height: 90px; background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color);">
         <ins class="adsbygoogle"
              style="display:block"
              data-ad-client="ca-pub-1864969470317711"
@@ -236,7 +254,7 @@
              data-ad-format="auto"
              data-full-width-responsive="true"></ins>
         <script>
-             (adsbygoogle = window.adsbygoogle || []).push({});
+            (adsbygoogle = window.adsbygoogle || []).push({});
         </script>
     </div>
 </footer>

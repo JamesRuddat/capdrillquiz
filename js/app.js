@@ -37,6 +37,45 @@ document.addEventListener("DOMContentLoaded", () => {
     if (heroStartBtn) heroStartBtn.addEventListener("click", () => showView('setup-view'));
     if (heroHubBtn) heroHubBtn.addEventListener("click", () => { showView('hub-view'); renderUnifiedHub(); });
 
+    // Hamburger Mobile Menu Toggle
+    const hamburgerBtn = document.getElementById("hamburger-btn");
+    const navDrawer = document.getElementById("nav-drawer");
+
+    if (hamburgerBtn && navDrawer) {
+        // Toggle menu state on button click
+        hamburgerBtn.addEventListener("click", (e) => {
+            e.stopPropagation(); // Stops the event from reaching document listener
+            const isOpen = navDrawer.classList.contains("is-open");
+            
+            if (isOpen) {
+                navDrawer.classList.remove("is-open");
+                hamburgerBtn.classList.remove("is-active");
+            } else {
+                navDrawer.classList.add("is-open");
+                hamburgerBtn.classList.add("is-active");
+            }
+        });
+
+        // Close menu when clicking any navigation link
+        navDrawer.querySelectorAll("a").forEach(link => {
+            link.addEventListener("click", () => {
+                navDrawer.classList.remove("is-open");
+                hamburgerBtn.classList.remove("is-active");
+            });
+        });
+
+        // Close menu when clicking outside anywhere else on screen
+        document.addEventListener("click", (e) => {
+            const isClickInsideMenu = navDrawer.contains(e.target);
+            const isClickOnHamburger = hamburgerBtn.contains(e.target);
+
+            if (!isClickInsideMenu && !isClickOnHamburger) {
+                navDrawer.classList.remove("is-open");
+                hamburgerBtn.classList.remove("is-active");
+            }
+        });
+    }
+
     // Global & Quiz Action Controls
     document.getElementById("theme-toggle-btn").addEventListener("click", toggleTheme);
     document.getElementById("google-auth-btn").addEventListener("click", handleGoogleAuth);
