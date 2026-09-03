@@ -2,6 +2,7 @@ import { database, SUPER_UID } from '../config.js';
 import { state } from '../state.js';
 import { validateInputsClean } from '../profanity-filter.js';
 import { convertImageToBase64 } from '../services/image-service.js';
+import { awardPoints } from '../services/user-service.js';
 
 export function voteQuestion(branchKey, questionId, voteType, creatorUid) {
     if (!state.currentUser) {
@@ -165,6 +166,10 @@ export function submitNewModuleCard() {
             showToast("New subject published!", "success");
         })
         .catch(err => showToast("Failed to publish module: " + err.message, "error"));
+
+        database.ref(`quizModules/${newKey}`).set(newModulePayload).then(() => {
+        awardPoints(100, "Creating a New Subject Module");
+    });
 }
 
 export function addBlankQuestionCard(branchKey) {

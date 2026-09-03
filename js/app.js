@@ -1,6 +1,7 @@
 import { auth, database } from './config.js';
 import { state } from './state.js';
 import { handleGoogleAuth } from './services/auth-service.js';
+import { initFlashcards } from './components/flashcards.js';
 import {
     populateBranchDropdowns,
     renderModuleList,
@@ -8,7 +9,7 @@ import {
     toggleTheme,
     updateSliderLimits
 } from './components/navigation.js';
-import { startQuiz, loadQuestion, renderResults, advanceQuestion } from './components/quiz-engine.js';
+import { startQuiz, exitQuizSession, loadQuestion, renderResults, advanceQuestion, updateBannerImage } from './components/quiz-engine.js';
 import { updateDashboardMetrics, renderLeaderboard, initTableSorting } from './components/leaderboard.js';
 import {
     renderUnifiedHub,
@@ -25,26 +26,27 @@ import {
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    // Helper function for safely attaching listeners
     const addListener = (id, event, handler) => {
         const el = document.getElementById(id);
         if (el) el.addEventListener(event, handler);
     };
 
-    // Attach Next Question button handler if present
+    // Attach Next Question button handler
     const nextBtn = document.getElementById("next-question-btn");
     if (nextBtn) {
         nextBtn.addEventListener("click", advanceQuestion);
     }
 
-    // Auto-load question when on quiz.html
     if (document.getElementById("quiz-view")) {
         loadQuestion();
     }
 
-    // Auto-load summary when on results.html
     if (document.getElementById("results-view")) {
         renderResults();
+    }
+
+    if (document.getElementById("flashcard-view")) {
+        initFlashcards();
     }
 
     initTableSorting("leaderboard-table");
@@ -53,20 +55,24 @@ document.addEventListener("DOMContentLoaded", () => {
     addListener("btn-res-leaderboard", "click", () => window.location.href = "leaderboard.html");
     addListener("btn-res-home", "click", () => window.location.href = "index.html");
 
-    // Global Action Controls
     addListener("google-auth-btn", "click", handleGoogleAuth);
 
-    // Quiz Execution Controls
-    addListener("btn-begin-assessment", "click", startQuiz);
-    addListener("next-question-btn", "click", advanceQuestion);
+    // Mode Selection Button Triggers
+    addListener("btn-mode-test", "click", () => startQuiz("test"));
+    addListener("btn-mode-study", "click", () => startQuiz("study"));
+    addListener("btn-mode-flashcards", "click", () => startQuiz("flashcard"));
+    addListener("btn-quiz-exit", "click", exitQuizSession);
 
-    // Question Count Slider Listeners
+    // Subject Selector and Banner Image Sync
     const quizSelect = document.getElementById("quiz-select");
     const countSlider = document.getElementById("quiz-question-count-slider");
     const countLabel = document.getElementById("quiz-question-count-label");
 
     if (quizSelect) {
-        quizSelect.addEventListener("change", updateSliderLimits);
+        quizSelect.addEventListener("change", () => {
+            updateSliderLimits();
+            updateBannerImage();
+        });
     }
 
     if (countSlider && countLabel) {
@@ -77,20 +83,18 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Module & Question Header Controls (Hub Page)
     addListener("btn-create-module-card", "click", () => toggleCreateModuleCard(true));
 
     addListener("btn-add-question-card", "click", () => {
         const inspectSelect = document.getElementById("bank-inspect-select");
         const activeBranch = inspectSelect ? inspectSelect.value : "";
         if (!activeBranch) {
-            alert("Please select a target subjectfirst.");
+            alert("Please select a target subject first.");
             return;
         }
         addBlankQuestionCard(activeBranch);
     });
 
-    // Module Dropdown & Delete Listeners
     const inspectSelect = document.getElementById("bank-inspect-select");
     if (inspectSelect) inspectSelect.addEventListener("change", renderUnifiedHub);
 
@@ -99,7 +103,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const filterLeaderboard = document.getElementById("filter-leaderboard");
     if (filterLeaderboard) filterLeaderboard.addEventListener("change", renderLeaderboard);
 
-    // Home View Card Grid Delegation
     const quizCardsGrid = document.getElementById("quiz-cards-grid");
     if (quizCardsGrid) {
         quizCardsGrid.addEventListener("click", (e) => {
@@ -107,13 +110,11 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!btn) return;
 
             const moduleKey = btn.dataset.key;
-            // Redirect to setup page with chosen subject in query string or localStorage
             localStorage.setItem("selectedModuleKey", moduleKey);
             window.location.href = "setup.html";
         });
     }
 
-    // Dynamic Inspector Delegation (Hub Page Cards & Questions)
     const inspectorList = document.getElementById("bank-inspector-list");
     if (inspectorList) {
         inspectorList.addEventListener("click", (e) => {
@@ -125,7 +126,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const branch = btn.dataset.branch;
             const qid = btn.dataset.qid;
 
-            // Module Card Actions
             if (action === "edit-module") toggleEditModule(key);
             else if (action === "cancel-edit-module") toggleEditModule(null);
             else if (action === "save-module") saveModuleEdit(key);
@@ -135,15 +135,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 localStorage.setItem("selectedModuleKey", key);
                 window.location.href = "setup.html";
             }
-            // Question Card Actions
             else if (action === "vote") voteQuestion(branch, qid, btn.dataset.type, btn.dataset.creator);
             else if (action === "save-q") saveQuestionEdit(branch, qid);
             else if (action === "delete-q") deleteQuestion(branch, qid);
         });
     }
 
-
-    // Helper to extract uppercase initials from display name
     function getInitials(name) {
         if (!name) return "U";
         const parts = name.trim().split(" ");
@@ -152,7 +149,6 @@ document.addEventListener("DOMContentLoaded", () => {
             : name.substring(0, 2).toUpperCase();
     }
 
-    // Auth Observer
     auth.onAuthStateChanged((user) => {
         state.currentUser = user || null;
 
@@ -172,7 +168,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // DB Observer
     database.ref("quizModules").on("value", (snapshot) => {
         state.QUESTION_REGISTRY = snapshot.val() || {};
 
@@ -180,12 +175,14 @@ document.addEventListener("DOMContentLoaded", () => {
         renderModuleList();
         renderModuleCards();
 
-        // Restore active subject choice if coming from Home page launcher button
         const savedModule = localStorage.getItem("selectedModuleKey");
         if (savedModule && quizSelect && state.QUESTION_REGISTRY[savedModule]) {
             quizSelect.value = savedModule;
             updateSliderLimits();
+            updateBannerImage();
             localStorage.removeItem("selectedModuleKey");
+        } else {
+            updateBannerImage();
         }
 
         if (document.getElementById("bank-inspector-list")) {

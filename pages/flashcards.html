@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-adsense-account" content="ca-pub-1864969470317711">
+    <link rel="icon" type="image/x-icon" href="/assets/images/emblems/icon.svg">
+    <title>PROP - Flashcards</title>
+    <link rel="stylesheet" href="../styles.css">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1864969470317711"
+        crossorigin="anonymous"></script>
+
+    <!-- Load Component Partials -->
+    <script type="module" src="/js/partials/header.js"></script>
+    <script type="module" src="/js/partials/footer.js"></script>
+</head>
+
+<body>
+
+    <site-header></site-header>
+
+    <main>
+        <!-- FLASHCARD CONTAINER VIEW -->
+        <section id="flashcard-view" class="col">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
+                <span id="flashcard-module-badge" class="quiz-card-badge">[MODULE: UNSET]</span>
+                <div style="display: flex; align-items: center; gap: 1em;">
+            <span id="flashcard-tracker" style="font-weight: bold; font-size: 0.85rem;">Card 1 of X</span>
+            <button id="btn-fc-exit" class="btn-tactical btn-red btn-sm">
+                Exit Session
+            </button>
+        </div>
+            </div>
+
+            <!-- 3D FLIP CARD STAGE -->
+            <div class="flashcard-stage">
+                <div id="flashcard" class="flashcard-inner">
+                    <!-- FRONT FACE -->
+                    <div class="flashcard-face flashcard-front">
+                        <div class="flashcard-label">QUESTION</div>
+                        <p id="flashcard-question-text">Loading question prompt...</p>
+                        <span class="flashcard-hint">Click card or press Space to flip</span>
+                    </div>
+
+                    <!-- BACK FACE -->
+                    <div class="flashcard-face flashcard-back">
+                        <div class="flashcard-label">ANSWER & EXPLANATION</div>
+                        <p id="flashcard-answer-text">Loading answer...</p>
+                        <p id="flashcard-explanation-text" class="flashcard-explanation"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NAVIGATION CONTROLS -->
+            <div class="flashcard-controls">
+                <button id="btn-fc-prev" class="btn-tactical btn-blue btn-lg" style="flex: 1;">
+                    ◀ Previous
+                </button>
+                <button id="btn-fc-flip" class="btn-tactical btn-gold btn-lg" style="flex: 1;">
+                    Flip Card
+                </button>
+                <button id="btn-fc-next" class="btn-tactical btn-blue btn-lg" style="flex: 1;">
+                    Next ▶
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <site-footer></site-footer>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script type="module" src="/js/app.js"></script>
+</body>
+
+</html>

@@ -22,27 +22,47 @@
 
     <main>
         <section id="setup-view" class="col">
-            <h1>Subject CONFIGURATION</h1>
-            <div style="width: 50%;">
-                <label for="quiz-select">Subject:</label>
-                <select id="quiz-select"></select>
+  <!-- Top Banner Header -->
+  <div id="subject-banner" class="subject-banner-container">
+    <div class="banner-overlay"></div>
+    <h1 class="banner-title">Subject Configuration</h1>
+  </div>
 
-                <label for="name">Name (Leaderboard):</label>
-                <input type="text" id="name" placeholder="e.g., C/SrA Smith or TSgt Davis">
+  <!-- Main Content Layout Grid -->
+  <div class="setup-grid">
+    <!-- Left Column: Settings -->
+    <div class="setup-config-col">
+      <label for="quiz-select" class="form-label">Subject:</label>
+      <select id="quiz-select"></select>
 
-                <div style="margin: 1em 0;">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3em;">
-                        <label for="quiz-question-count-slider">Question Count:</label>
-                        <span id="quiz-question-count-label">0 Questions</span>
-                    </div>
-                    <input type="range" id="quiz-question-count-slider" min="1" max="1" value="1"
-                        style="width: 100%; cursor: pointer;">
-                </div>
+      <label for="name" class="form-label">Name (Leaderboard):</label>
+      <input type="text" id="name" placeholder="e.g., C/SrA Smith or TSgt Davis">
 
-                <button id="btn-begin-assessment" class="btn-tactical btn-blue">Begin Studing Subject</button>
-            </div>
-        </section>
+      <div class="slider-wrapper">
+        <div class="slider-header">
+          <label for="quiz-question-count-slider" class="form-label">Question Count:</label>
+          <span id="quiz-question-count-label" class="slider-value">0 Questions</span>
+        </div>
+        <input type="range" id="quiz-question-count-slider" min="1" max="1" value="1">
+      </div>
+    </div>
+
+    <!-- Right Column: Mode Action Buttons -->
+    <div class="setup-actions-col">
+      <button id="btn-mode-test" class="btn-tactical btn-blue btn-lg">
+        Play as Test
+      </button>
+
+      <button id="btn-mode-study" class="btn-tactical btn-gold btn-lg">
+        Study Mode
+      </button>
+
+      <button id="btn-mode-flashcards" class="btn-tactical btn-lg">
+        Flash Cards
+      </button>
+    </div>
+  </div>
+</section>
 
         <section id="select-view" class="col">
             <h1>Subjects & quizzes</h1>

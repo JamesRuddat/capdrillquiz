@@ -23,9 +23,16 @@
     <main>
         <!-- QUIZ RUNNER VIEW -->
         <section id="quiz-view" class="col">
-            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.8em;">
+            <!-- Header bar with Exit Button -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8em; flex-wrap: wrap; gap: 0.5em;">
                 <span id="quiz-standard-badge" class="quiz-card-badge">[MODULE: UNSET]</span>
-                <span id="question-tracker" style="font-weight: bold;">Question 1 of X</span>
+                
+                <div style="display: flex; align-items: center; gap: 1em;">
+                    <span id="question-tracker" style="font-weight: bold; font-size: 0.85rem;">Question 1 of X</span>
+                    <button id="btn-quiz-exit" class="btn-tactical btn-red btn-sm">
+                        Exit Session
+                    </button>
+                </div>
             </div>
 
             <h1 id="question-text" style="font-size: 1.2rem; line-height: 1.4; margin-bottom: 0.8em;">
