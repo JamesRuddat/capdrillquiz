@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-adsense-account" content="ca-pub-1864969470317711">
+    <link rel="icon" type="image/x-icon" href="/assets/images/emblems/icon.svg">
+    <title>PROP - Quiz</title>
+    <link rel="stylesheet" href="../styles.css">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1864969470317711"
+        crossorigin="anonymous"></script>
+
+    <!-- Load Component Partials -->
+    <script type="module" src="/js/partials/header.js"></script>
+    <script type="module" src="/js/partials/footer.js"></script>
+</head>
+
+<body>
+
+    <site-header></site-header>
+
+    <main>
+        <!-- QUIZ RUNNER VIEW -->
+        <section id="quiz-view" class="col">
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.8em;">
+                <span id="quiz-standard-badge" class="quiz-card-badge">[MODULE: UNSET]</span>
+                <span id="question-tracker" style="font-weight: bold;">Question 1 of X</span>
+            </div>
+
+            <h1 id="question-text" style="font-size: 1.2rem; line-height: 1.4; margin-bottom: 0.8em;">
+                Loading question prompt...
+            </h1>
+
+            <div id="options-container"></div>
+            <div id="feedback-panel" class="hidden"></div>
+
+            <button id="next-question-btn" class="btn-tactical btn-lg btn-blue hidden"
+                style="width: 100%; margin-top: 1em;">
+                Next Item ➔
+            </button>
+        </section>
+    </main>
+
+    <site-footer></site-footer>
+
+    <script src="/js/profanity-filter.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script type="module" src="/js/app.js"></script>
+</body>
+
+</html>

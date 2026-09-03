@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-adsense-account" content="ca-pub-1864969470317711">
+    <link rel="icon" type="image/x-icon" href="/assets/images/emblems/icon.svg">
+    <title>PROP - Study Guide</title>
+    <link rel="stylesheet" href="styles.css">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1864969470317711" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <header>
+        <div id="navbar">
+            <!-- HAMBURGER BUTTON (MOBILE ONLY) -->
+            <button id="hamburger-btn" aria-label="Toggle Navigation Menu">
+                <span class="hamburger-bar"></span>
+                <span class="hamburger-bar"></span>
+                <span class="hamburger-bar"></span>
+            </button>
+
+            <!-- NAVIGATION LINKS CONTAINER -->
+            <div id="nav-drawer" class="nav-links">
+                <a id="nav-home" class="active-nav">Home</a>
+                <a id="nav-setup">Start Quiz</a>
+                <a id="nav-leaderboard">Leaderboard</a>
+                <a id="nav-hub">Quiz Hub</a>
+            </div>
+
+            <!-- CONTROL BUTTONS -->
+            <div class="nav-controls">
+                <button id="google-auth-btn" class="theme-toggle-btn">Sign in with Google</button>
+                <button id="theme-toggle-btn" class="theme-toggle-btn">THEME</button>
+            </div>
+        </div>
+
+        <h1><span>Prop - Study Guide</span></h1>
+        <hr>
+    </header>
+
+    <main>
+        <!-- HOME DASHBOARD VIEW -->
+        <section id="home-view" class="col">
+            <h1>Overview</h1>
+            <p>
+                Whether you are preparing for test evaluations, studying manual & regulations, or brushing up on leadership concepts, test your knowledge here with interactive quizzes built by the community.
+            </p>
+
+            <h3>100% Free Access</h3>
+            <p>No paywalls or premium tiers. Practice all study modules and test your recall as often as you need.</p>
+
+            <h3>Community-Powered</h3>
+            <p>Add your own practice questions, rate community items, and earn author reputation stars.</p>
+
+            <div class="stats-grid" id="home-stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number" id="stat-total-evals">0</span>
+                    <span class="stat-label">Total Tests Taken</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="stat-modules-count">0</span>
+                    <span class="stat-label">Active Modules & quizzes</span>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="">
+                <div>
+                    <h2 style="font-size: 1.5rem; margin-bottom: 0.5em; text-align: center;">TOP HONOR ROLL</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Participant</th>
+                                <th>Module</th>
+                                <th>Score</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="home-top-scores-body">
+                            <tr><td colspan="4" class="text-center">Loading top entries...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+        </section>
+        
+        <!-- SETUP VIEW -->
+        <section id="setup-view" class="col hidden">
+            <h1> Study CONFIGURATION</h1>
+            <div style="width: 50%;">
+                <label for="quiz-select">Target Quiz Module:</label>
+                <select id="quiz-select"></select>
+
+                <label for="name">Name & Rank (Leaderboard):</label>
+                <input type="text" id="name" placeholder="e.g., C/SrA Smith or TSgt Davis">
+
+                <!-- DYNAMIC QUESTION COUNT SLIDER -->
+                <div style="margin: 1em 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3em;">
+                        <label for="quiz-question-count-slider">Question Count:</label>
+                        <span id="quiz-question-count-label">0 Questions</span>
+                    </div>
+                    <input type="range" id="quiz-question-count-slider" min="1" max="1" value="1" style="width: 100%; cursor: pointer;">
+                </div>
+
+                <button id="btn-begin-assessment" class="btn-tactical btn-blue">Begin Assessment</button>
+            </div>
+            
+        </section>
+
+        <section id="select-view" class="col">
+            <h1>Modules & quizzes</h1>
+            <div id="quiz-cards-grid" class="cards-grid">
+                <div class="text-center">Loading available modules...</div>
+            </div>
+        </section>
+
+        <!-- QUIZ RUNNER VIEW -->
+        <section id="quiz-view" class="col hidden">
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.8em;">
+                <span id="quiz-standard-badge" style="font-weight: bold;">[MODULE: UNSET]</span>
+                <span id="question-tracker">Question 1 of X</span>
+            </div>
+
+            <h1 id="question-text" style="font-size: 1.05rem; line-height: 1.4; margin-bottom: 0.8em;">
+                Loading question prompt...
+            </h1>
+
+            <div id="options-container"></div>
+            <div id="feedback-panel" class="hidden"></div>
+
+            <button id="next-question-btn" class="btn-tactical hidden" style="width: 100%; margin-top: 1em;">
+                Next Item
+            </button>
+        </section>
+
+        <!-- RESULTS VIEW -->
+        <section id="results-view" class="col text-center hidden">
+            <div class="advisory">[EVALUATION COMPLETE] Assessment recorded to leaderboard.</div>
+
+            <h1 id="results-title" style="font-size: 1.4rem;">Score Summary</h1>
+            <p id="score-summary" style="font-size: 0.9rem; line-height: 1.5; margin: 1em 0;"></p>
+
+            <div style="display: flex; justify-content: center; gap: 0.8em; flex-wrap: wrap;">
+                <button id="btn-res-another" class="btn-tactical">Take Another Quiz</button>
+                <button id="btn-res-leaderboard" class="btn-tactical btn-blue">View Leaderboard</button>
+                <button id="btn-res-home" class="btn-tactical btn-clear">Return Home</button>
+            </div>
+        </section>
+
+        <!-- LEADERBOARD VIEW -->
+        <section id="leaderboard-view" class="col hidden">
+            <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+                <h1>Leaderboard</h1>
+                <p>Sign in to see your name on the leaderboard!</p>
+                <div>
+                    <label for="filter-leaderboard" style="font-size: 0.8rem;">Filter Module:</label>
+                    <select id="filter-leaderboard" style="width: auto; padding: 0.3em; margin: 0;">
+                        <option value="ALL">All Modules</option>
+                    </select>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Participant</th>
+                        <th>Module</th>
+                        <th>Score</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    <tr>
+                        <td colspan="4" class="text-center" style="color: var(--light-text-color);">Connecting to cloud database...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- UNIFIED CREATOR & MANAGEMENT HUB -->
+        <section id="hub-view" class="col hidden">
+            <h1>QUIZ CREATOR & HUB</h1>
+            <p style="font-size: 0.8rem; color: var(--light-text-color);">
+                Create modules, append questions, inspect community items, or manage database records.
+            </p>
+
+            <!-- STATUS BAR / AUTH BADGE -->
+            <div id="hub-auth-status" class="advisory" style="margin-bottom: 1em;">
+                Status: Signed in as Guest
+            </div>
+
+            <hr>
+
+            <!-- SECTION 2: UNIFIED INSPECTOR & INLINE CARD EDITOR -->
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 0.8em; gap: 0.5em;">
+                <h1 style="margin: 0;">Module &amp; Questions</h1>
+                <hr>
+                <div style="display: flex; align-items: center; gap: 0.5em; flex-wrap: wrap;">
+                    <button id="btn-create-module-card" class="btn-tactical" style="padding: 0.4em 0.8em;">
+                        ➕ Create New Module
+                    </button>
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 0.5em; flex-wrap: wrap;">
+                    <label for="bank-inspect-select" style="font-size: 0.8rem; margin: 0;">Edit Selected Module:</label>
+                    <select id="bank-inspect-select" style="width: auto; padding: 0.3em; margin: 0;"></select>
+                    <br>
+                    <button id="btn-delete-module" class="btn-tactical btn-clear hidden">
+                        Delete Module
+                    </button>
+                </div>
+            </div>
+
+            <!-- QUESTION ACTION CONTROL BAR -->
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin: 1em 0 0.8em 0; gap: 0.5em; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 1em;">
+    <h2 style="margin: 0; font-size: 1.2rem;">Module Questions</h2>
+    <div style="display: flex; align-items: center; gap: 0.5em; flex-wrap: wrap;">
+        <button id="btn-add-question-card" class="btn-tactical" style="padding: 0.4em 0.8em;">
+            ➕ Add Question Card
+        </button>
+    </div>
+</div>
+
+            <!-- QUESTIONS DISPLAY & INLINE EDITING CONTAINER -->
+            <div id="bank-inspector-list">
+                <div style="color: var(--light-text-color); font-size: 0.8rem;">Select a module above to manage or inspect questions...</div>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/profanity-filter.js"></script>
+
+    <!-- Load Firebase Compat SDKs (Consistent for CDN usage) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <!-- Load Custom JavaScript File -->
+    <script type="module" src="js/app.js"></script>
+</body>
+
+<footer>
+    <p>Made by Mr. Ruddat - v3.6.2 (Foxcore)</p>
+    <div class="ad-container" style="margin: 1.5em 0; text-align: center; min-height: 90px; background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color);">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-1864969470317711"
+             data-ad-slot="1234567890"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </div>
+</footer>
+
+</html>

@@ -195,7 +195,7 @@ export function addBlankQuestionCard(branchKey) {
     newQRef.set(newQuestionData)
         .then(() => {
             showToast("Blank question card added", "success");
-            
+
             // Auto scroll & focus on newly added question input
             setTimeout(() => {
                 const newEl = document.getElementById(`edit-q-${newQId}`);
@@ -240,7 +240,7 @@ export function renderUnifiedHub() {
                 </div>
                 <div class="quiz-card-footer" style="display: flex; gap: 0.5em; margin-top: 0.8em;">
                     <button class="btn-tactical" data-action="submit-new-module" style="flex: 1;">
-                        🚀 Publish Module Card
+                        Publish Module Card
                     </button>
                     <button class="btn-tactical btn-clear" data-action="cancel-create-module" style="flex: 1;">
                         Cancel
@@ -266,7 +266,7 @@ export function renderUnifiedHub() {
     const totalQs = Array.isArray(rawQs) ? rawQs.length : Object.keys(rawQs).length;
     const isEditingModule = state.editingModuleKey === branch;
 
-    const bgStyle = data.imageUrl 
+    const bgStyle = data.imageUrl
         ? `background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url('${data.imageUrl}') center/cover no-repeat; color: #fff;`
         : '';
 
@@ -297,7 +297,7 @@ export function renderUnifiedHub() {
 
                 <div class="quiz-card-footer" style="display: flex; gap: 0.5em; margin-top: 0.8em;">
                     <button class="btn-tactical" data-action="save-module" data-key="${branch}" style="flex: 1;">
-                        💾 Save Info
+                        Save Info
                     </button>
                     <button class="btn-tactical btn-clear" data-action="cancel-edit-module" style="flex: 1;">
                         Cancel
@@ -322,11 +322,11 @@ export function renderUnifiedHub() {
                 <div class="quiz-card-footer" style="display: flex; gap: 0.5em; margin-top: 0.8em; flex-wrap: wrap;">
                     ${canEditModule ? `
                         <button class="btn-tactical" data-action="edit-module" data-key="${branch}" style="flex: 1;">
-                            ✏️ Edit Info
+                            Edit Info
                         </button>
                     ` : ''}
-                    <button class="btn-tactical btn-clear" data-action="launch-module" data-key="${branch}" style="flex: 1;">
-                        ⚡ Take Quiz
+                    <button class="btn-tactical btn-blue" data-action="launch-module" data-key="${branch}" style="flex: 1;">
+                        Take Quiz
                     </button>
                 </div>
             </div>
@@ -339,14 +339,14 @@ export function renderUnifiedHub() {
     state.activeModuleListenerRef = database.ref(`quizModules/${branch}/questions`);
     state.activeModuleListenerRef.on("value", (snapshot) => {
         const qSnap = snapshot.val() || {};
-        const questionsList = Array.isArray(qSnap) 
+        const questionsList = Array.isArray(qSnap)
             ? qSnap.map((q, idx) => ({ id: idx, ...q }))
             : Object.keys(qSnap).map(k => ({ id: k, ...qSnap[k] }));
 
         let questionsHTML = "";
 
         if (questionsList.length === 0) {
-            questionsHTML = `<div style="padding: 0.8em; color: var(--light-text-color); border: 1px dashed var(--primary-color);">No questions exist in module '${branch}' yet. Tap '➕ Add Question Card' above to create one!</div>`;
+            questionsHTML = `<div style="padding: 0.8em; color: var(--light-text-color);">No questions exist in module '${branch}' yet. Tap '➕ Add Question Card' above to create one!</div>`;
         } else {
             questionsHTML = questionsList.map((q, idx) => {
                 const canEditQuestion = isSuperAdmin || isModuleOwner || (q.createdBy && q.createdBy === userUid);
@@ -366,7 +366,7 @@ export function renderUnifiedHub() {
                 const disabledAttr = isCoolingDown ? 'disabled="true"' : '';
 
                 const votingButtonsHTML = `
-                    <div style="display: flex; gap: 0.8em; align-items: center; font-size: 0.85rem;">
+                    <div style="display: flex; gap: 0.4em; align-items: center; font-size: 0.85rem;">
                         <span>Rating:</span>
                         <button id="vote-up-btn-${q.id}" ${disabledAttr} data-action="vote" data-branch="${branch}" data-qid="${q.id}" data-type="up" data-creator="${q.createdBy || ''}" style="padding: 2px 8px; cursor: pointer;">
                             ${upText}
@@ -377,13 +377,13 @@ export function renderUnifiedHub() {
                     </div>
                 `;
 
-                const questionImgHTML = q.imageUrl 
+                const questionImgHTML = q.imageUrl
                     ? `<div style="margin: 0.5em 0;"><img src="${q.imageUrl}" alt="Visual Cue" style="max-width: 100%; max-height: 200px; border-radius: 4px; border: 1px solid #ccc;"></div>`
                     : '';
 
                 if (canEditQuestion) {
                     return `
-                        <div style="padding: 1em; border-radius: 4px; margin-bottom: 0.8em; background: rgba(0,0,0,0.05); border: 1px solid var(--primary-color);">
+                        <div style="padding: 1em; border-radius: 4px; margin-bottom: 0.8em; background: rgba(0,0,0,0.05);">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5em;">
                                 <strong>Q${idx + 1} (Owner / Admin Control)</strong>
                                 <button data-action="delete-q" data-branch="${branch}" data-qid="${q.id}" class="btn-tactical btn-clear">Delete</button>
@@ -404,7 +404,7 @@ export function renderUnifiedHub() {
                                 <input type="text" id="edit-exp-${q.id}" value="${q.explanation ? q.explanation.replace(/"/g, '&quot;') : ''}">
                                 ${questionImgHTML}
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.4em;">
-                                    <button data-action="save-q" data-branch="${branch}" data-qid="${q.id}" class="btn-tactical">Update</button>
+                                    <button data-action="save-q" data-branch="${branch}" data-qid="${q.id}" class="btn-tactical btn-gold">Update</button>
                                     ${votingButtonsHTML}
                                 </div>
                             </div>
@@ -464,8 +464,8 @@ export function saveQuestionEdit(branchKey, questionId) {
         answer: answer,
         explanation: explanation
     })
-    .then(() => showToast("Question updated!", "success"))
-    .catch(err => showToast("Update failed: " + err.message, "error"));
+        .then(() => showToast("Question updated!", "success"))
+        .catch(err => showToast("Update failed: " + err.message, "error"));
 }
 
 export function deleteQuestion(branchKey, questionId) {
@@ -501,7 +501,7 @@ export function showToast(message, type = 'info') {
 
     const toast = document.createElement("div");
     toast.className = `toast-bubble toast-${type}`;
-    
+
     // Add icon indicators based on type
     const icon = type === 'success' ? '✅' : type === 'error' ? '⚠️' : 'ℹ️';
     toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;

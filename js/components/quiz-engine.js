@@ -1,8 +1,7 @@
 import { state } from '../state.js';
-import { showView, sanitizeInput } from './navigation.js';
+import { sanitizeInput } from './navigation.js';
 import { saveScoreToDB } from '../services/db-service.js';
 import { updateDashboardMetrics } from './leaderboard.js';
-import { showModal, showConfirm } from './modal.js';
 
 // Fisher-Yates unbiased random shuffle helper
 function shuffleArray(array) {
@@ -15,17 +14,17 @@ function shuffleArray(array) {
 }
 
 export function startQuiz() {
-    const nameInput = document.getElementById("cadet-name").value.trim();
-    state.activeName = nameInput || (state.currentUser ? state.currentUser.displayName : "Anonymous");
-    
+    const nameInput = document.getElementById("name")?.value.trim();
+    const activeName = nameInput || (state.currentUser ? state.currentUser.displayName : "Anonymous");
+
     const selectEl = document.getElementById("quiz-select");
     if (!selectEl || !selectEl.value) {
         alert("Please select a quiz module first!");
         return;
     }
-    
-    state.activeBranchKey = selectEl.value;
-    const registryEntry = state.QUESTION_REGISTRY[state.activeBranchKey];
+
+    const activeBranchKey = selectEl.value;
+    const registryEntry = state.QUESTION_REGISTRY[activeBranchKey];
 
     if (!registryEntry || !registryEntry.questions) {
         alert("No questions found for this module in Firebase.");
@@ -33,8 +32,8 @@ export function startQuiz() {
     }
 
     const rawQuestions = registryEntry.questions;
-    const pool = Array.isArray(rawQuestions) 
-        ? [...rawQuestions] 
+    const pool = Array.isArray(rawQuestions)
+        ? [...rawQuestions]
         : Object.values(rawQuestions);
 
     if (pool.length === 0) {
@@ -42,35 +41,61 @@ export function startQuiz() {
         return;
     }
 
-    // 1. Read slider selection count
     const slider = document.getElementById("quiz-question-count-slider");
     const requestedCount = slider ? parseInt(slider.value, 10) : pool.length;
 
-    // 2. Randomly shuffle the entire question pool
     const randomizedPool = shuffleArray(pool);
+    const activeQuestions = randomizedPool.slice(0, requestedCount);
 
-    // 3. Slice pool to requested slider count
-    state.activeQuestions = randomizedPool.slice(0, requestedCount);
+    // Save complete payload including branchName to localStorage
+    const quizSession = {
+        activeName,
+        activeBranchKey,
+        branchName: registryEntry.branchName || activeBranchKey, // Stores human-readable title
+        activeQuestions,
+        currentIdx: 0,
+        score: 0
+    };
 
-    state.currentIdx = 0;
-    state.score = 0;
+    localStorage.setItem("activeQuizSession", JSON.stringify(quizSession));
 
-    document.getElementById("quiz-standard-badge").innerText = `[MODULE: ${state.activeBranchKey}]`;
-    showView('quiz-view');
-    loadQuestion();
+    // Redirect to Runner Page
+    window.location.href = "quiz.html";
 }
 
 export function loadQuestion() {
-    const q = state.activeQuestions[state.currentIdx];
-    document.getElementById("question-tracker").innerText = `Question ${state.currentIdx + 1} of ${state.activeQuestions.length}`;
-    document.getElementById("question-text").innerText = q.q;
+    const sessionRaw = localStorage.getItem("activeQuizSession");
+    if (!sessionRaw) {
+        window.location.href = "setup.html";
+        return;
+    }
 
+    const session = JSON.parse(sessionRaw);
+
+    // Safety check if questions array is empty
+    if (!session.activeQuestions || session.activeQuestions.length === 0) {
+        window.location.href = "setup.html";
+        return;
+    }
+
+    const q = session.activeQuestions[session.currentIdx];
+
+    const badgeEl = document.getElementById("quiz-standard-badge");
+    const trackerEl = document.getElementById("question-tracker");
+    const textEl = document.getElementById("question-text");
     const container = document.getElementById("options-container");
-    container.innerHTML = "";
-
     const feedbackPanel = document.getElementById("feedback-panel");
-    feedbackPanel.className = "hidden";
-    document.getElementById("next-question-btn").classList.add("hidden");
+    const nextBtn = document.getElementById("next-question-btn");
+
+    if (!textEl || !container) return;
+
+    if (badgeEl) badgeEl.innerText = `[MODULE: ${session.branchName}]`;
+    if (trackerEl) trackerEl.innerText = `Question ${session.currentIdx + 1} of ${session.activeQuestions.length}`;
+    if (textEl) textEl.innerText = q.q;
+
+    container.innerHTML = "";
+    if (feedbackPanel) feedbackPanel.className = "hidden";
+    if (nextBtn) nextBtn.classList.add("hidden");
 
     q.options.forEach((opt, idx) => {
         const btn = document.createElement("button");
@@ -82,32 +107,44 @@ export function loadQuestion() {
 }
 
 export function selectOption(selectedIdx) {
-    const q = state.activeQuestions[state.currentIdx];
+    const session = JSON.parse(localStorage.getItem("activeQuizSession"));
+    const q = session.activeQuestions[session.currentIdx];
     const buttons = document.querySelectorAll("#options-container .option-btn");
 
     buttons.forEach(btn => btn.disabled = true);
 
     const feedbackPanel = document.getElementById("feedback-panel");
-    feedbackPanel.classList.remove("hidden");
+    if (feedbackPanel) feedbackPanel.classList.remove("hidden");
 
     if (selectedIdx === q.answer) {
-        state.score++;
+        session.score++;
         buttons[selectedIdx].classList.add("correct");
-        feedbackPanel.className = "correct-panel";
-        feedbackPanel.innerHTML = `<strong>[CORRECT]</strong> ${q.explanation || ''}`;
+        if (feedbackPanel) {
+            feedbackPanel.className = "correct-panel";
+            feedbackPanel.innerHTML = `<strong>[CORRECT]</strong> ${q.explanation || ''}`;
+        }
     } else {
         buttons[selectedIdx].classList.add("incorrect");
         if (buttons[q.answer]) buttons[q.answer].classList.add("correct");
-        feedbackPanel.className = "incorrect-panel";
-        feedbackPanel.innerHTML = `<strong>[INCORRECT]</strong> ${q.explanation || ''}`;
+        if (feedbackPanel) {
+            feedbackPanel.className = "incorrect-panel";
+            feedbackPanel.innerHTML = `<strong>[INCORRECT]</strong> ${q.explanation || ''}`;
+        }
     }
 
-    document.getElementById("next-question-btn").classList.remove("hidden");
+    // Save updated score to localStorage
+    localStorage.setItem("activeQuizSession", JSON.stringify(session));
+
+    const nextBtn = document.getElementById("next-question-btn");
+    if (nextBtn) nextBtn.classList.remove("hidden");
 }
 
 export function advanceQuestion() {
-    state.currentIdx++;
-    if (state.currentIdx < state.activeQuestions.length) {
+    const session = JSON.parse(localStorage.getItem("activeQuizSession"));
+    session.currentIdx++;
+    localStorage.setItem("activeQuizSession", JSON.stringify(session));
+
+    if (session.currentIdx < session.activeQuestions.length) {
         loadQuestion();
     } else {
         finishQuiz();
@@ -115,26 +152,52 @@ export function advanceQuestion() {
 }
 
 export function finishQuiz() {
-    const total = state.activeQuestions.length;
-    const pct = Math.round((state.score / total) * 100);
-    const cleanName = sanitizeInput(state.activeName);
+    const session = JSON.parse(localStorage.getItem("activeQuizSession"));
+    if (!session) return;
 
-    document.getElementById("results-title").innerText = `${cleanName} — Score: ${pct}%`;
-    const branchName = state.QUESTION_REGISTRY[state.activeBranchKey] 
-        ? state.QUESTION_REGISTRY[state.activeBranchKey].branchName 
-        : state.activeBranchKey;
-        
-    document.getElementById("score-summary").innerText = `Evaluatee scored ${state.score} out of ${total} correct under ${branchName} regulations.`;
+    const total = session.activeQuestions.length;
+    const pct = Math.round((session.score / total) * 100);
+    const cleanName = sanitizeInput(session.activeName);
 
+    const scoreResult = {
+        cleanName,
+        activeBranchKey: session.activeBranchKey,
+        score: session.score,
+        total,
+        pct,
+        date: new Date().toLocaleDateString()
+    };
+
+    localStorage.setItem("lastQuizResult", JSON.stringify(scoreResult));
+
+    // Save score to DB
     saveScoreToDB({
         name: cleanName,
-        branch: state.activeBranchKey,
-        score: `${state.score}/${total}`,
+        branch: session.activeBranchKey,
+        score: `${session.score}/${total}`,
         pct: pct,
-        date: new Date().toLocaleDateString()
+        date: scoreResult.date
     }).then(() => {
         updateDashboardMetrics();
     });
 
-    showView('results-view');
+    localStorage.removeItem("activeQuizSession");
+    window.location.href = "results.html";
+}
+
+export function renderResults() {
+    const resultRaw = localStorage.getItem("lastQuizResult");
+    if (!resultRaw) {
+        window.location.href = "index.html";
+        return;
+    }
+
+    const res = JSON.parse(resultRaw);
+    const titleEl = document.getElementById("results-title");
+    const summaryEl = document.getElementById("score-summary");
+
+    if (!titleEl || !summaryEl) return;
+
+    titleEl.innerText = `${res.cleanName} — Score: ${res.pct}%`;
+    summaryEl.innerText = `Evaluatee scored ${res.score} out of ${res.total} correct under ${res.branchName || res.activeBranchKey} regulations.`;
 }

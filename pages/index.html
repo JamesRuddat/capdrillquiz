@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-adsense-account" content="ca-pub-1864969470317711">
+    <link rel="icon" type="image/x-icon" href="/assets/images/emblems/icon.svg">
+    <title>PROP - Home</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1864969470317711"
+        crossorigin="anonymous"></script>
+
+    <!-- Load Component Partials -->
+    <script type="module" src="/js/partials/header.js"></script>
+    <script type="module" src="/js/partials/footer.js"></script>
+</head>
+
+<body>
+
+    <site-header></site-header>
+
+    <main>
+        <section id="home-view" class="col">
+            <h1>Overview</h1>
+            <p>
+                Whether you are preparing for test evaluations, studying manual & regulations, or brushing up on
+                leadership concepts, test your knowledge here with interactive quizzes built by the community.
+            </p>
+
+            <h3>100% Free Access</h3>
+            <p>No paywalls or premium tiers. Practice all study modules and test your recall as often as you need.</p>
+
+            <h3>Community-Powered</h3>
+            <p>Add your own practice questions, rate community items, and earn author reputation stars.</p>
+
+            <div class="stats-grid" id="home-stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number" id="stat-total-evals">0</span>
+                    <span class="stat-label">Total Tests Taken</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="stat-modules-count">0</span>
+                    <span class="stat-label">Active Modules & quizzes</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="leaderboard-view" class="col">
+            <h1>TOP HONOR ROLL</h1>
+            <table id="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th class="sortable" data-sort="name">Participant <span class="sort-icon">↕</span></th>
+                        <th class="sortable" data-sort="module">Module <span class="sort-icon">↕</span></th>
+                        <th class="sortable" data-sort="score">Score <span class="sort-icon">↕</span></th>
+                        <th class="sortable" data-sort="date">Date <span class="sort-icon">↕</span></th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    <tr>
+                        <td colspan="4" class="text-center" style="color: var(--light-text-color);">Connecting
+                            to cloud database...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="select-view" class="col">
+            <h1>Modules & quizzes</h1>
+            <div id="quiz-cards-grid" class="cards-grid">
+                <div class="text-center">Loading available modules...</div>
+            </div>
+        </section>
+    </main>
+
+    <site-footer></site-footer>
+
+    <script src="/js/profanity-filter.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script type="module" src="/js/app.js"></script>
+</body>
+
+</html>

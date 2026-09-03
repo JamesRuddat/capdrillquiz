@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-adsense-account" content="ca-pub-1864969470317711">
+    <link rel="icon" type="image/x-icon" href="/assets/images/emblems/icon.svg">
+    <title>PROP - Leaderboard</title>
+    <link rel="stylesheet" href="../styles.css">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1864969470317711"
+        crossorigin="anonymous"></script>
+
+    <!-- Load Component Partials -->
+    <script type="module" src="/js/partials/header.js"></script>
+    <script type="module" src="/js/partials/footer.js"></script>
+</head>
+
+<body>
+
+    <site-header></site-header>
+
+    <main>
+        <section id="leaderboard-view" class="col">
+            <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+                <h1>Leaderboard</h1>
+                <p>Sign in to see your name on the leaderboard!</p>
+                <div>
+                    <label for="filter-leaderboard" style="font-size: 0.8rem;">Filter Module:</label>
+                    <select id="filter-leaderboard" style="width: auto; padding: 0.3em; margin: 0;">
+                        <option value="ALL">All Modules</option>
+                    </select>
+                </div>
+            </div>
+
+            <table id="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th class="sortable" data-sort="name">Participant <span class="sort-icon">↕</span></th>
+                        <th class="sortable" data-sort="module">Module <span class="sort-icon">↕</span></th>
+                        <th class="sortable" data-sort="score">Score <span class="sort-icon">↕</span></th>
+                        <th class="sortable" data-sort="date">Date <span class="sort-icon">↕</span></th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    <tr>
+                        <td colspan="4" class="text-center" style="color: var(--light-text-color);">Connecting to cloud
+                            database...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <site-footer></site-footer>
+
+    <script src="/js/profanity-filter.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script type="module" src="/js/app.js"></script>
+</body>
+
+</html>
