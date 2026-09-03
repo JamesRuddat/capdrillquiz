@@ -16,9 +16,9 @@ export class SiteHeader extends HTMLElement {
                     <!-- NAVIGATION LINKS CONTAINER -->
                     <div id="nav-drawer" class="nav-links">
                         <a href="index.html" id="nav-home">Home</a>
-                        <a href="setup.html" id="nav-setup">Start Quiz</a>
+                        <a href="setup.html" id="nav-setup">Subjects</a>
                         <a href="leaderboard.html" id="nav-leaderboard">Leaderboard</a>
-                        <a href="hub.html" id="nav-hub">Quiz Hub</a>
+                        <a href="hub.html" id="nav-hub">Create & Edit</a>
                     </div>
 
                     <!-- CONTROL BUTTONS & USER AVATAR -->

@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const inspectSelect = document.getElementById("bank-inspect-select");
         const activeBranch = inspectSelect ? inspectSelect.value : "";
         if (!activeBranch) {
-            alert("Please select a target module first.");
+            alert("Please select a target subjectfirst.");
             return;
         }
         addBlankQuestionCard(activeBranch);
@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!btn) return;
 
             const moduleKey = btn.dataset.key;
-            // Redirect to setup page with chosen module in query string or localStorage
+            // Redirect to setup page with chosen subject in query string or localStorage
             localStorage.setItem("selectedModuleKey", moduleKey);
             window.location.href = "setup.html";
         });
@@ -180,7 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
         renderModuleList();
         renderModuleCards();
 
-        // Restore active module choice if coming from Home page launcher button
+        // Restore active subject choice if coming from Home page launcher button
         const savedModule = localStorage.getItem("selectedModuleKey");
         if (savedModule && quizSelect && state.QUESTION_REGISTRY[savedModule]) {
             quizSelect.value = savedModule;

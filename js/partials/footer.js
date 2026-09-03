@@ -2,7 +2,7 @@ export class SiteFooter extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
             <footer>
-                <p>Made by Mr. Ruddat - v3.7.1 (Foxcore)</p>
+                <p>Made by Mr. Ruddat - v3.7.2 (Foxcore)</p>
                 <div class="ad-container" style="margin: 1.5em 0; text-align: center; min-height: 90px; background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color);">
                     <ins class="adsbygoogle"
                          style="display:block"

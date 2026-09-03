@@ -140,7 +140,7 @@ export function submitNewModuleCard() {
     }
 
     if (state.QUESTION_REGISTRY[cleanKey]) {
-        showToast("A module with this Key ID already exists!", "error");
+        showToast("A subject with this Key ID already exists!", "error");
         return;
     }
 
@@ -162,7 +162,7 @@ export function submitNewModuleCard() {
             if (selectEl) selectEl.value = cleanKey;
 
             renderUnifiedHub();
-            showToast("New module published!", "success");
+            showToast("New subject published!", "success");
         })
         .catch(err => showToast("Failed to publish module: " + err.message, "error"));
 }
@@ -174,7 +174,7 @@ export function addBlankQuestionCard(branchKey) {
     }
 
     if (!branchKey) {
-        showToast("Please select a valid quiz module first.", "error");
+        showToast("Please select a valid quiz subject first.", "error");
         return;
     }
 
@@ -258,7 +258,7 @@ export function renderUnifiedHub() {
     if (deleteModBtn) deleteModBtn.classList.toggle("hidden", !(isSuperAdmin || isModuleOwner));
 
     if (!data) {
-        container.innerHTML = `<div style="padding: 0.8em; color: var(--light-text-color);">Select a valid module above to manage questions.</div>`;
+        container.innerHTML = `<div style="padding: 0.8em; color: var(--light-text-color);">Select a valid subject above to manage questions.</div>`;
         return;
     }
 
@@ -346,7 +346,7 @@ export function renderUnifiedHub() {
         let questionsHTML = "";
 
         if (questionsList.length === 0) {
-            questionsHTML = `<div style="padding: 0.8em; color: var(--light-text-color);">No questions exist in module '${branch}' yet. Tap '➕ Add Question Card' above to create one!</div>`;
+            questionsHTML = `<div style="padding: 0.8em; color: var(--light-text-color);">No questions exist in subject '${branch}' yet. Tap '➕ Add Question Card' above to create one!</div>`;
         } else {
             questionsHTML = questionsList.map((q, idx) => {
                 const canEditQuestion = isSuperAdmin || isModuleOwner || (q.createdBy && q.createdBy === userUid);
@@ -481,7 +481,7 @@ export function deleteQuizModule() {
     if (!selectEl || !selectEl.value) return;
 
     const branchKey = selectEl.value;
-    if (confirm(`CRITICAL WARNING: Delete module '${branchKey}' and ALL questions?`)) {
+    if (confirm(`CRITICAL WARNING: Delete subject '${branchKey}' and ALL questions?`)) {
         database.ref(`quizModules/${branchKey}`).remove()
             .then(() => showToast(`Module '${branchKey}' deleted`, "info"))
             .catch(err => showToast("Module delete failed: " + err.message, "error"));

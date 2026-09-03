@@ -3,6 +3,17 @@ import { updateDashboardMetrics } from './leaderboard.js';
 import { renderLeaderboard } from './leaderboard.js';
 import { renderUnifiedHub } from './hub.js';
 
+// Helper function to extract valid, non-null questions from arrays or sparse Firebase objects
+function getValidQuestionsCount(questionsPayload) {
+    if (!questionsPayload) return 0;
+
+    const items = Array.isArray(questionsPayload) 
+        ? questionsPayload 
+        : Object.values(questionsPayload);
+
+    return items.filter(q => q && typeof q === 'object' && typeof q.q === 'string' && q.q.trim() !== '').length;
+}
+
 export function showView(viewId) {
     // Top-level views
     const views = ['home-view', 'setup-view', 'quiz-view', 'results-view', 'leaderboard-view', 'hub-view'];
@@ -59,12 +70,12 @@ export function populateBranchDropdowns() {
     if (setupSelect) setupSelect.innerHTML = "";
     if (builderTargetSelect) builderTargetSelect.innerHTML = "";
     if (inspectSelect) inspectSelect.innerHTML = "";
-    if (leaderboardSelect) leaderboardSelect.innerHTML = `<option value="ALL">All Modules</option>`;
+    if (leaderboardSelect) leaderboardSelect.innerHTML = `<option value="ALL">All Subjects</option>`;
 
     if (moduleKeys.length === 0) {
-        if (setupSelect) setupSelect.innerHTML = `<option value="">No Modules Available</option>`;
-        if (builderTargetSelect) builderTargetSelect.innerHTML = `<option value="">No Modules Available</option>`;
-        if (inspectSelect) inspectSelect.innerHTML = `<option value="">No Modules Available</option>`;
+        if (setupSelect) setupSelect.innerHTML = `<option value="">No Subjects Available</option>`;
+        if (builderTargetSelect) builderTargetSelect.innerHTML = `<option value="">No Subjects Available</option>`;
+        if (inspectSelect) inspectSelect.innerHTML = `<option value="">No Subjects Available</option>`;
         return;
     }
 
@@ -96,7 +107,7 @@ export function populateBranchDropdowns() {
         }
     });
 
-    // 2. Restore selections if the modules still exist in state
+    // 2. Restore selections if the subjects still exist in state
     if (inspectSelect && savedInspect && state.QUESTION_REGISTRY[savedInspect]) {
         inspectSelect.value = savedInspect;
     }
@@ -127,15 +138,14 @@ export function renderModuleList() {
     const moduleKeys = Object.keys(state.QUESTION_REGISTRY);
 
     if (moduleKeys.length === 0) {
-        treeContainer.innerHTML = `<span style="color: var(--light-text-color);">No modules registered in database yet.</span>`;
+        treeContainer.innerHTML = `<span style="color: var(--light-text-color);">No subjects registered in database yet.</span>`;
         return;
     }
 
     let html = `<ul class="tree">`;
     moduleKeys.forEach((key) => {
         const item = state.QUESTION_REGISTRY[key];
-        const rawQs = item.questions;
-        const count = rawQs ? (Array.isArray(rawQs) ? rawQs.length : Object.keys(rawQs).length) : 0;
+        const count = getValidQuestionsCount(item.questions);
 
         html += `
             <li><strong>${item.branchName || key} — ${item.manual || 'N/A'}</strong>
@@ -169,10 +179,7 @@ export function updateSliderLimits() {
         return;
     }
 
-    const rawQuestions = module.questions;
-    const totalAvailable = Array.isArray(rawQuestions)
-        ? rawQuestions.length
-        : Object.keys(rawQuestions).length;
+    const totalAvailable = getValidQuestionsCount(module.questions);
 
     if (totalAvailable === 0) {
         slider.min = 1;
@@ -221,16 +228,14 @@ export function renderModuleCards() {
     const moduleKeys = Object.keys(state.QUESTION_REGISTRY);
 
     if (moduleKeys.length === 0) {
-        gridContainer.innerHTML = `<div class="text-center" style="color: var(--light-text-color);">No active modules available.</div>`;
+        gridContainer.innerHTML = `<div class="text-center" style="color: var(--light-text-color);">No active subjects available.</div>`;
         return;
     }
 
     gridContainer.innerHTML = moduleKeys.map(key => {
         const data = state.QUESTION_REGISTRY[key];
-        const rawQs = data.questions || {};
-        const totalQs = Array.isArray(rawQs) ? rawQs.length : Object.keys(rawQs).length;
+        const totalQs = getValidQuestionsCount(data.questions);
 
-        // Apply background image overlay if an imageUrl exists
         const bgStyle = data.imageUrl 
             ? `background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url('${data.imageUrl}') center/cover no-repeat; color: #ffffff;`
             : '';
@@ -249,7 +254,7 @@ export function renderModuleCards() {
                 </div>
                 <div class="quiz-card-footer" style="margin-top: 0.8em;">
                     <button class="btn-tactical btn-blue" data-action="launch-module" data-key="${key}" style="width: 100%;">
-                        ⚡ Start Quiz
+                        Start
                     </button>
                 </div>
             </div>

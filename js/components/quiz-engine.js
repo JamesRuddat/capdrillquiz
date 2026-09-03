@@ -13,45 +13,57 @@ function shuffleArray(array) {
     return arr;
 }
 
+// Helper to reliably extract valid questions from sparse objects or arrays
+function extractValidQuestions(rawQuestions) {
+    if (!rawQuestions) return [];
+    
+    // Convert sparse arrays or objects into a flat array of values
+    const rawItems = Array.isArray(rawQuestions) 
+        ? rawQuestions 
+        : Object.values(rawQuestions);
+
+    // Filter out nulls, undefined, holes from deleted keys, and malformed entries
+    return rawItems.filter(q => q && typeof q === 'object' && typeof q.q === 'string' && q.q.trim() !== '');
+}
+
 export function startQuiz() {
     const nameInput = document.getElementById("name")?.value.trim();
     const activeName = nameInput || (state.currentUser ? state.currentUser.displayName : "Anonymous");
-
+    
     const selectEl = document.getElementById("quiz-select");
     if (!selectEl || !selectEl.value) {
-        alert("Please select a quiz module first!");
+        alert("Please select a quiz subject first!");
         return;
     }
-
+    
     const activeBranchKey = selectEl.value;
     const registryEntry = state.QUESTION_REGISTRY[activeBranchKey];
 
     if (!registryEntry || !registryEntry.questions) {
-        alert("No questions found for this module in Firebase.");
+        alert("No questions found for this subject in Firebase.");
         return;
     }
 
-    const rawQuestions = registryEntry.questions;
-    const pool = Array.isArray(rawQuestions)
-        ? [...rawQuestions]
-        : Object.values(rawQuestions);
+    // Safely extract questions, filtering out deleted/missing numeric keys
+    const pool = extractValidQuestions(registryEntry.questions);
 
     if (pool.length === 0) {
-        alert("This module does not have any questions added yet!");
+        alert("This subject does not have any valid questions added yet!");
         return;
     }
 
     const slider = document.getElementById("quiz-question-count-slider");
     const requestedCount = slider ? parseInt(slider.value, 10) : pool.length;
 
+    // Shuffle valid items and clamp selection count to real pool length
     const randomizedPool = shuffleArray(pool);
-    const activeQuestions = randomizedPool.slice(0, requestedCount);
+    const activeQuestions = randomizedPool.slice(0, Math.min(requestedCount, pool.length));
 
-    // Save complete payload including branchName to localStorage
+    // Save complete payload to localStorage
     const quizSession = {
         activeName,
         activeBranchKey,
-        branchName: registryEntry.branchName || activeBranchKey, // Stores human-readable title
+        branchName: registryEntry.branchName || activeBranchKey,
         activeQuestions,
         currentIdx: 0,
         score: 0
@@ -72,13 +84,19 @@ export function loadQuestion() {
 
     const session = JSON.parse(sessionRaw);
 
-    // Safety check if questions array is empty
     if (!session.activeQuestions || session.activeQuestions.length === 0) {
         window.location.href = "setup.html";
         return;
     }
 
     const q = session.activeQuestions[session.currentIdx];
+
+    // GUARD CLAUSE: Skip or redirect safely if question payload is somehow corrupt
+    if (!q || !q.q) {
+        console.error("Invalid question payload encountered at index:", session.currentIdx);
+        window.location.href = "setup.html";
+        return;
+    }
 
     const badgeEl = document.getElementById("quiz-standard-badge");
     const trackerEl = document.getElementById("question-tracker");
@@ -87,7 +105,7 @@ export function loadQuestion() {
     const feedbackPanel = document.getElementById("feedback-panel");
     const nextBtn = document.getElementById("next-question-btn");
 
-    if (!textEl || !container) return;
+    if (!textEl || !container) return; 
 
     if (badgeEl) badgeEl.innerText = `[MODULE: ${session.branchName}]`;
     if (trackerEl) trackerEl.innerText = `Question ${session.currentIdx + 1} of ${session.activeQuestions.length}`;
@@ -132,7 +150,6 @@ export function selectOption(selectedIdx) {
         }
     }
 
-    // Save updated score to localStorage
     localStorage.setItem("activeQuizSession", JSON.stringify(session));
 
     const nextBtn = document.getElementById("next-question-btn");
@@ -162,6 +179,7 @@ export function finishQuiz() {
     const scoreResult = {
         cleanName,
         activeBranchKey: session.activeBranchKey,
+        branchName: session.branchName,
         score: session.score,
         total,
         pct,
@@ -170,7 +188,6 @@ export function finishQuiz() {
 
     localStorage.setItem("lastQuizResult", JSON.stringify(scoreResult));
 
-    // Save score to DB
     saveScoreToDB({
         name: cleanName,
         branch: session.activeBranchKey,
