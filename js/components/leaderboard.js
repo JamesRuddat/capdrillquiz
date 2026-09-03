@@ -1,9 +1,60 @@
 import { state } from '../state.js';
 import { database } from '../config.js';
-import { fetchScoresOnce } from '../services/db-service.js';
 
 let currentSortCol = null;
 let currentSortAsc = true;
+
+/**
+ * Helper: Extracts raw correct count from score strings or properties.
+ * E.g., "90/100" -> 90, "9/10" -> 9
+ */
+function parseCorrectCount(item) {
+    if (!item) return 0;
+    if (typeof item.correctCount === 'number') {
+        return item.correctCount;
+    }
+    
+    const scoreStr = String(item.score || item || '');
+    if (scoreStr.includes('/')) {
+        const parts = scoreStr.split('/');
+        const parsed = parseInt(parts[0], 10);
+        if (!isNaN(parsed)) return parsed;
+    }
+    
+    const directNum = parseInt(scoreStr, 10);
+    return isNaN(directNum) ? 0 : directNum;
+}
+
+/**
+ * Helper: Formats callsign display with UID matching & legacy censorship support
+ */
+function formatCallsignDisplay(item, currentUid, currentUserCallsign) {
+    const rawName = item.callsign || item.name || '';
+    
+    // Check if entry belongs to the logged-in user via UID or callsign fallback
+    const isMe = (currentUid && item.uid && item.uid === currentUid) || 
+                 (currentUserCallsign && rawName === currentUserCallsign);
+
+    // If it's the current user, always display their active callsign + YOU badge
+    if (isMe) {
+        const activeName = currentUserCallsign || rawName || 'Active User';
+        return `<strong>${activeName}</strong> <span class="quiz-card-badge">YOU</span>`;
+    }
+
+    // For other users: redact if entry lacks callsign/UID or is flagged legacy
+    const isLegacy = (!item.callsign && !item.uid) || item.isLegacyName === true;
+
+    if (isLegacy) {
+        return `
+            <span style="color: var(--light-text-color); font-style: italic;" title="Recorded prior to callsign system update">
+                [Limited]
+            </span>
+            <span class="quiz-card-badge" style="font-size: 0.7rem; opacity: 0.8; margin-left: 4px;">Legacy</span>
+        `;
+    }
+
+    return `<strong>${rawName}</strong>`;
+}
 
 /**
  * Page Initialization Entry Point for Leaderboard
@@ -30,7 +81,7 @@ export function initLeaderboardPage() {
 }
 
 /**
- * Updates Dashboard Stat Counters (Home Page)
+ * Updates Dashboard Stat Counters and Top 3 High Scores Preview (Index Page)
  */
 export function updateDashboardMetrics() {
     // 1. Update active modules counter
@@ -58,11 +109,20 @@ export function updateDashboardMetrics() {
             return;
         }
 
-        // Sort by highest percentage score first
-        scoreList.sort((a, b) => (b.pct || 0) - (a.pct || 0));
+        // SORT BY TOTAL CORRECT ANSWERS DESCENDING (90/100 beats 9/10)
+        scoreList.sort((a, b) => {
+            const correctA = parseCorrectCount(a);
+            const correctB = parseCorrectCount(b);
+            if (correctB !== correctA) {
+                return correctB - correctA;
+            }
+            return (b.pct || 0) - (a.pct || 0); // Tie-breaker: higher %
+        });
 
-        // Take top 3 scores
+        // Take top 3 scores for index page
         const top3 = scoreList.slice(0, 3);
+        const currentUid = (state.currentUser && state.currentUser.uid) || state.userUid || null;
+        const currentUserCallsign = state.userCallsign || null;
 
         homeTopBody.innerHTML = top3.map((item, idx) => {
             let rankStyle = "";
@@ -70,11 +130,7 @@ export function updateDashboardMetrics() {
             else if (idx === 1) rankStyle = 'style="background-color: rgba(200, 200, 200, 0.15);"';
             else if (idx === 2) rankStyle = 'style="background-color: rgba(205, 127, 50, 0.15);"';
 
-            const name = item.name || item.callsign || 'Anonymous';
-            const isMe = state.userCallsign && name === state.userCallsign;
-            const nameLabel = isMe 
-                ? `<strong>${name}</strong> <span class="quiz-card-badge">YOU</span>` 
-                : `<strong>${name}</strong>`;
+            const nameLabel = formatCallsignDisplay(item, currentUid, currentUserCallsign);
 
             return `
                 <tr ${rankStyle}>
@@ -111,6 +167,8 @@ export async function renderLeaderboard() {
 
     const mode = modeSelect ? modeSelect.value : 'test-scores';
     const selectedSubject = subjectSelect ? subjectSelect.value : 'ALL';
+    
+    const currentUid = (state.currentUser && state.currentUser.uid) || state.userUid || null;
     const currentUserCallsign = state.userCallsign || null;
 
     // 1. RENDER: Lifetime Points Leaderboard (Pulls from /users)
@@ -128,7 +186,10 @@ export async function renderLeaderboard() {
 
             const userList = Object.keys(users)
                 .map(uid => ({
-                    callsign: users[uid].callsign || "Anonymous",
+                    uid: uid,
+                    callsign: users[uid].callsign || null,
+                    name: users[uid].name || null,
+                    isLegacyName: users[uid].isLegacyName || false,
                     points: users[uid].points || 0
                 }))
                 .filter(u => u.points > 0)
@@ -141,11 +202,10 @@ export async function renderLeaderboard() {
             }
 
             tbody.innerHTML = userList.slice(0, limitCount).map(user => {
-                const isMe = currentUserCallsign && user.callsign === currentUserCallsign;
+                const isMe = (currentUid && user.uid === currentUid) || 
+                             (currentUserCallsign && user.callsign === currentUserCallsign);
                 const highlightStyle = isMe ? 'style="background-color: rgba(255, 205, 0, 0.12);"' : '';
-                const callsignLabel = isMe 
-                    ? `<strong>${user.callsign}</strong> <span class="quiz-card-badge">YOU</span>` 
-                    : `<strong>${user.callsign}</strong>`;
+                const callsignLabel = formatCallsignDisplay(user, currentUid, currentUserCallsign);
 
                 return `
                     <tr ${highlightStyle}>
@@ -181,8 +241,15 @@ export async function renderLeaderboard() {
                 scoreList = scoreList.filter(item => item.branch === selectedSubject || item.activeBranchKey === selectedSubject);
             }
 
-            // Sort highest percentage score first
-            scoreList.sort((a, b) => (b.pct || 0) - (a.pct || 0));
+            // SORT BY TOTAL CORRECT ANSWERS DESCENDING
+            scoreList.sort((a, b) => {
+                const correctA = parseCorrectCount(a);
+                const correctB = parseCorrectCount(b);
+                if (correctB !== correctA) {
+                    return correctB - correctA;
+                }
+                return (b.pct || 0) - (a.pct || 0); // Tie-breaker: higher %
+            });
 
             if (scoreList.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="4" class="text-center" style="color: var(--light-text-color);">No test scores logged yet. Be the first to complete a quiz!</td></tr>`;
@@ -191,8 +258,9 @@ export async function renderLeaderboard() {
             }
 
             tbody.innerHTML = scoreList.slice(0, limitCount).map((item, idx) => {
-                const name = item.name || item.callsign || 'Anonymous';
-                const isMe = currentUserCallsign && name === currentUserCallsign;
+                const rawName = item.callsign || item.name;
+                const isMe = (currentUid && item.uid && item.uid === currentUid) || 
+                             (currentUserCallsign && rawName === currentUserCallsign);
                 
                 // Gold / Silver / Bronze accent backgrounds for Home Preview top 3
                 let rankBg = "";
@@ -205,9 +273,7 @@ export async function renderLeaderboard() {
                 }
 
                 const displayScore = `${item.score} (${item.pct}%)`;
-                const nameLabel = isMe 
-                    ? `<strong>${name}</strong> <span class="quiz-card-badge">YOU</span>` 
-                    : `<strong>${name}</strong>`;
+                const nameLabel = formatCallsignDisplay(item, currentUid, currentUserCallsign);
 
                 return `
                     <tr style="${rankBg}">
@@ -270,9 +336,9 @@ export function initTableSorting(tableId) {
                 const cellB = b.children[index]?.innerText.trim() || "";
 
                 if (sortKey === "score") {
-                    const scoreA = parseScorePercentage(cellA);
-                    const scoreB = parseScorePercentage(cellB);
-                    return currentSortAsc ? scoreA - scoreB : scoreB - scoreA;
+                    const countA = parseCorrectCount(cellA);
+                    const countB = parseCorrectCount(cellB);
+                    return currentSortAsc ? countA - countB : countB - countA;
                 }
 
                 if (sortKey === "date") {
@@ -281,8 +347,8 @@ export function initTableSorting(tableId) {
                     return currentSortAsc ? dateA - dateB : dateB - dateA;
                 }
 
-                const cleanA = cellA.replace(/\s*YOU$/, '');
-                const cleanB = cellB.replace(/\s*YOU$/, '');
+                const cleanA = cellA.replace(/\s*YOU$/, '').replace(/\s*Legacy$/, '');
+                const cleanB = cellB.replace(/\s*YOU$/, '').replace(/\s*Legacy$/, '');
                 return currentSortAsc
                     ? cleanA.localeCompare(cleanB, undefined, { sensitivity: 'base', numeric: true })
                     : cleanB.localeCompare(cleanA, undefined, { sensitivity: 'base', numeric: true });
@@ -291,22 +357,4 @@ export function initTableSorting(tableId) {
             rows.forEach(row => tbody.appendChild(row));
         };
     });
-}
-
-function parseScorePercentage(val) {
-    const match = val.match(/\((\d+)%\)/) || val.match(/(\d+)%/);
-    if (match) return parseFloat(match[1]);
-
-    if (val.includes("pts")) {
-        const parsedPts = parseFloat(val.replace(/[^\d.]/g, ''));
-        return isNaN(parsedPts) ? 0 : parsedPts;
-    }
-
-    if (val.includes("/")) {
-        const [num, denom] = val.split("/").map(v => parseFloat(v));
-        return denom ? (num / denom) * 100 : 0;
-    }
-
-    const parsed = parseFloat(val.replace(/[^\d.]/g, ''));
-    return isNaN(parsed) ? 0 : parsed;
 }

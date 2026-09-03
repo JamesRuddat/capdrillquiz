@@ -274,6 +274,7 @@ export async function finishQuiz() {
     if (session.mode === 'test') {
         try {
             await saveScoreToDB({
+                uid: state.currentUser ? state.currentUser.uid : null,
                 name: cleanName,
                 branch: session.activeBranchKey,
                 score: `${session.score}/${total}`,

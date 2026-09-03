@@ -2,6 +2,7 @@ import { auth, googleProvider, database } from '../config.js';
 import { state } from '../state.js';
 import { showToast } from './user-service.js';
 import { showPrompt } from '../components/modal.js';
+import { renderLeaderboard } from '../components/leaderboard.js';
 
 const CALLSIGNS = [
     // --- Tactical, Unit & Patrol Handles ---
@@ -29,11 +30,18 @@ export async function handleGoogleAuth() {
             const uid = state.currentUser.uid;
             await auth.signOut();
             
-            // Clear session caches
+            // Clear active user states & session caches
+            state.userUid = null;
+            state.userCallsign = null;
+            state.userPoints = 0;
+
             sessionStorage.removeItem(`callsign_${uid}`);
             sessionStorage.removeItem(`points_${uid}`);
             
             showToast("Signed out successfully.", "info");
+
+            // Refresh leaderboard to strip 'YOU' tags upon sign-out
+            renderLeaderboard();
         } catch (error) {
             showToast("Error signing out: " + error.message, "error");
         }
@@ -60,7 +68,15 @@ export function generateTacticalCallsign() {
  * Ensures user has an assigned callsign in Firebase upon logging in
  */
 export async function initializeUserCallsign(user) {
-    if (!user) return null;
+    if (!user) {
+        state.userUid = null;
+        state.userCallsign = null;
+        return null;
+    }
+
+    // Always set state.userUid immediately for UID matching
+    state.currentUser = user;
+    state.userUid = user.uid;
 
     // 1. FAST PATH: Check local session cache first to eliminate navigation load times
     const cachedCallsign = sessionStorage.getItem(`callsign_${user.uid}`);
@@ -111,6 +127,9 @@ export async function initializeUserCallsign(user) {
         sessionStorage.setItem(`callsign_${user.uid}`, finalCallsign);
         sessionStorage.setItem(`points_${user.uid}`, state.userPoints.toString());
 
+        // Refresh UI to display 'YOU' badges
+        renderLeaderboard();
+
         return state.userCallsign;
     } catch (err) {
         console.error("Failed to initialize user callsign:", err);
@@ -150,6 +169,9 @@ export async function editUserCallsign() {
             if (header && typeof header.renderUser === 'function') {
                 header.renderUser(cleanCallsign, state.userPoints || 0);
             }
+
+            // 3. Re-render leaderboard to update row labels while preserving UID-based 'YOU' tags
+            renderLeaderboard();
 
             showToast(`Callsign updated: ${cleanCallsign}`, "success");
         } catch (err) {

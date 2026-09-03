@@ -2,7 +2,7 @@ export class SiteFooter extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
             <footer>
-                <p>Made by Mr. Ruddat - v3.7.2 (Foxcore)</p>
+                <p>Made by Mr. Ruddat - v3.9.1 (Foxcore)</p>
             </footer>
         `;
     }
