@@ -2,6 +2,35 @@ import { state } from '../state.js';
 import { sanitizeInput } from './navigation.js';
 import { saveScoreToDB } from '../services/db-service.js';
 import { updateDashboardMetrics } from './leaderboard.js';
+import { awardPoints, showToast } from '../services/user-service.js';
+import { showConfirm } from './modal.js';
+
+export function initQuizPage() {
+    loadQuestion();
+
+    const nextBtn = document.getElementById("next-question-btn");
+    if (nextBtn) {
+        nextBtn.addEventListener("click", advanceQuestion);
+    }
+
+    const exitBtn = document.getElementById("btn-quiz-exit");
+    if (exitBtn) {
+        exitBtn.addEventListener("click", exitQuizSession);
+    }
+}
+
+export function initResultsPage() {
+    renderResults();
+
+    const anotherBtn = document.getElementById("btn-res-another");
+    if (anotherBtn) anotherBtn.addEventListener("click", () => window.location.href = "setup.html");
+
+    const leaderboardBtn = document.getElementById("btn-res-leaderboard");
+    if (leaderboardBtn) leaderboardBtn.addEventListener("click", () => window.location.href = "leaderboard.html");
+
+    const homeBtn = document.getElementById("btn-res-home");
+    if (homeBtn) homeBtn.addEventListener("click", () => window.location.href = "index.html");
+}
 
 function shuffleArray(array) {
     const arr = [...array];
@@ -21,9 +50,6 @@ function extractValidQuestions(rawQuestions) {
     return rawItems.filter(q => q && typeof q === 'object' && typeof q.q === 'string' && q.q.trim() !== '');
 }
 
-/**
- * Updates the top hero banner image when a subject is selected
- */
 export function updateBannerImage() {
     const selectEl = document.getElementById("quiz-select");
     const bannerEl = document.getElementById("subject-banner");
@@ -34,45 +60,35 @@ export function updateBannerImage() {
     const activeBranchKey = selectEl.value;
     const registryEntry = state.QUESTION_REGISTRY[activeBranchKey];
 
-    // Fallback default image and title if key or entry doesn't exist yet
     const defaultImage = "https://www.gocivilairpatrol.com/media/photoalbums/67190384_2450135768383102_536700487_A2E9342E843CE.jpg?dimensions=950x633";
     const imageUrl = (registryEntry && registryEntry.imageUrl) ? registryEntry.imageUrl : defaultImage;
     const subjectTitle = (registryEntry && registryEntry.branchName) ? registryEntry.branchName : "Subject Configuration";
 
-    // Update background image
     bannerEl.style.backgroundImage = `url('${imageUrl}')`;
 
-    // Update banner title text dynamically
     if (bannerTitleEl) {
         bannerTitleEl.innerText = subjectTitle;
     }
 }
 
-/**
- * Starts a quiz session in a specified mode ('test', 'study', or 'flashcard')
- */
 export function startQuiz(mode = 'test') {
-    const nameInput = document.getElementById("name")?.value.trim();
-    const activeName = nameInput || (state.currentUser ? state.currentUser.displayName : "Anonymous");
-    
     const selectEl = document.getElementById("quiz-select");
     if (!selectEl || !selectEl.value) {
-        alert("Please select a quiz subject first!");
+        showToast("Please select a quiz subject first!", "error");
         return;
     }
-    
+
     const activeBranchKey = selectEl.value;
     const registryEntry = state.QUESTION_REGISTRY[activeBranchKey];
 
     if (!registryEntry || !registryEntry.questions) {
-        alert("No questions found for this subject in Firebase.");
+        showToast("No questions found for this subject.", "error");
         return;
     }
 
     const pool = extractValidQuestions(registryEntry.questions);
-
     if (pool.length === 0) {
-        alert("This subject does not have any valid questions added yet!");
+        showToast("This subject does not have valid questions yet!", "error");
         return;
     }
 
@@ -81,6 +97,10 @@ export function startQuiz(mode = 'test') {
 
     const randomizedPool = shuffleArray(pool);
     const activeQuestions = randomizedPool.slice(0, Math.min(requestedCount, pool.length));
+
+    // Resolve name/callsign
+    const nameInput = document.getElementById("name")?.value.trim();
+    const activeName = state.userCallsign || nameInput || (state.currentUser ? state.currentUser.displayName : "Anonymous Cadet");
 
     const quizSession = {
         mode,
@@ -157,15 +177,12 @@ export function selectOption(selectedIdx) {
     const q = session.activeQuestions[session.currentIdx];
     const buttons = document.querySelectorAll("#options-container .option-btn");
 
-    // Disable options once selected
     buttons.forEach(btn => btn.disabled = true);
 
-    // Track if user got it right
     if (selectedIdx === q.answer) {
         session.score++;
     }
 
-    // Save user's selected choice for complete review on results page if needed
     if (!session.userAnswers) session.userAnswers = [];
     session.userAnswers[session.currentIdx] = selectedIdx;
 
@@ -175,7 +192,6 @@ export function selectOption(selectedIdx) {
     const nextBtn = document.getElementById("next-question-btn");
 
     if (session.mode === 'test') {
-        // --- TEST MODE: HIDE ANSWERS & AUTOMATICALLY ADVANCE OR SHOW 'NEXT' ---
         buttons[selectedIdx].style.borderColor = "var(--alert-color)";
         buttons[selectedIdx].style.backgroundColor = "rgba(255, 205, 0, 0.15)";
 
@@ -188,7 +204,6 @@ export function selectOption(selectedIdx) {
             nextBtn.classList.remove("hidden");
         }
     } else {
-        // --- STUDY MODE: SHOW INSTANT FEEDBACK & EXPLANATION ---
         if (feedbackPanel) feedbackPanel.classList.remove("hidden");
 
         if (selectedIdx === q.answer) {
@@ -224,23 +239,20 @@ export function advanceQuestion() {
     }
 }
 
-export function finishQuiz() {
+export async function finishQuiz() {
     const session = JSON.parse(localStorage.getItem("activeQuizSession"));
     if (!session) return;
 
     const total = session.activeQuestions.length;
     const pct = Math.round((session.score / total) * 100);
-    const cleanName = sanitizeInput(session.activeName);
+    const cleanName = sanitizeInput(state.userCallsign || session.activeName);
 
-    // Calculate Points
     if (session.mode === 'test') {
-        // 10 Points per correct answer
         const pointsEarned = session.score * 10;
         if (pointsEarned > 0) {
             awardPoints(pointsEarned, "Test Evaluation");
         }
     } else if (session.mode === 'study') {
-        // 50 Points for completing a full study set
         awardPoints(50, "Study Set Completion");
     }
 
@@ -260,15 +272,18 @@ export function finishQuiz() {
     localStorage.setItem("lastQuizResult", JSON.stringify(scoreResult));
 
     if (session.mode === 'test') {
-        saveScoreToDB({
-            name: cleanName,
-            branch: session.activeBranchKey,
-            score: `${session.score}/${total}`,
-            pct: pct,
-            date: scoreResult.date
-        }).then(() => {
+        try {
+            await saveScoreToDB({
+                name: cleanName,
+                branch: session.activeBranchKey,
+                score: `${session.score}/${total}`,
+                pct: pct,
+                date: scoreResult.date
+            });
             updateDashboardMetrics();
-        });
+        } catch (err) {
+            console.error("Failed to save score to DB:", err);
+        }
     }
 
     localStorage.removeItem("activeQuizSession");
@@ -304,7 +319,6 @@ export function renderResults() {
         }
     }
 
-    // Render itemized list of questions and graded options
     if (breakdownEl && res.questions && res.questions.length > 0) {
         breakdownEl.innerHTML = `
             <h2 style="font-size: 1.2rem; margin-bottom: 0.8em; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4em;">
@@ -356,7 +370,7 @@ export function renderResults() {
     }
 }
 
-export function exitQuizSession() {
+export async function exitQuizSession() {
     const sessionRaw = localStorage.getItem("activeQuizSession");
     if (!sessionRaw) {
         window.location.href = "setup.html";
@@ -366,13 +380,13 @@ export function exitQuizSession() {
     const session = JSON.parse(sessionRaw);
 
     if (session.mode === 'test') {
-        const confirmExit = confirm(
-            "⚠️ WARNING: Exiting early will cancel your test!\n\nYour score will NOT be saved to the leaderboard until you complete all questions. Are you sure you want to exit?"
+        const confirmed = await showConfirm(
+            "Exiting early will cancel your test and your score will NOT be saved to the leaderboard. Are you sure you want to exit?",
+            "Exit Test Session"
         );
-        if (!confirmExit) return;
+        if (!confirmed) return;
     }
 
-    // Clean active session storage and return to setup page
     localStorage.removeItem("activeQuizSession");
     window.location.href = "setup.html";
 }

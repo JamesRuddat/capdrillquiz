@@ -7,13 +7,14 @@
     <meta name="google-adsense-account" content="ca-pub-1864969470317711">
     <link rel="icon" type="image/x-icon" href="/assets/images/emblems/icon.svg">
     <title>PROP - Results</title>
-    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="/styles.css">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1864969470317711"
         crossorigin="anonymous"></script>
 
     <!-- Load Component Partials -->
-    <script type="module" src="/js/partials/header.js"></script>
-    <script type="module" src="/js/partials/footer.js"></script>
+    <script type="module" src="/js/components/header.js"></script>
+    <script type="module" src="/js/components/footer.js"></script>
+    <script type="module" src="/js/components/modal-element.js"></script>
 </head>
 
 <body>
@@ -23,15 +24,15 @@
     <main>
         <!-- RESULTS VIEW -->
         <section id="results-view" class="col text-center">
-            <div class="advisory">[EVALUATION COMPLETE] Assessment recorded to leaderboard.</div>
+            <div id="results-advisory" class="advisory">[EVALUATION COMPLETE] Assessment recorded to leaderboard.</div>
 
             <h1 id="results-title" style="font-size: 1.8rem; margin-bottom: 0.5em;">Score Summary</h1>
             <p id="score-summary" style="font-size: 1.05rem; line-height: 1.5; margin: 1em 0;"></p>
 
             <div style="display: flex; justify-content: center; gap: 0.8em; flex-wrap: wrap; margin-top: 1.5em;">
-                <button id="btn-res-another" class="btn-tactical btn-gold">Take Another Quiz</button>
-                <button id="btn-res-leaderboard" class="btn-tactical btn-blue">View Leaderboard</button>
-                <button id="btn-res-home" class="btn-tactical btn-red">Return Home</button>
+                <button id="btn-res-another" class="btn-tactical btn-gold" type="button">Take Another Quiz</button>
+                <button id="btn-res-leaderboard" class="btn-tactical btn-blue" type="button">View Leaderboard</button>
+                <button id="btn-res-home" class="btn-tactical btn-red" type="button">Return Home</button>
             </div>
         </section>
 
@@ -40,6 +41,7 @@
         </section>
     </main>
 
+    <custom-modal></custom-modal>
     <site-footer></site-footer>
 
     <script src="/js/profanity-filter.js"></script>

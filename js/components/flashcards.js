@@ -32,14 +32,12 @@ export function initFlashcards() {
     if (badgeEl) badgeEl.innerText = `[MODULE: ${session.branchName}]`;
 
     function renderCard(index) {
-        // FIX 1: Instant zero-rotation reset without unwinding animation
         if (cardEl) {
             cardEl.style.transition = "none";
             currentRotation = 0;
             cardEl.style.transform = "rotateY(0deg)";
             
-            // Force browser repaint before restoring smooth CSS transitions
-            void cardEl.offsetHeight;
+            void cardEl.offsetHeight; // Force browser repaint
             cardEl.style.transition = "";
         }
 
@@ -49,12 +47,10 @@ export function initFlashcards() {
         if (trackerEl) trackerEl.innerText = `Card ${index + 1} of ${questions.length}`;
         if (questionTextEl) questionTextEl.innerText = q.q;
 
-        // FIX 2: Display pure answer text without option numbers like "2. "
         let rawAnswer = (q.options && q.options[q.answer] !== undefined)
             ? q.options[q.answer]
             : "No correct answer defined.";
 
-        // Strip leading numbers, dots, and spaces (e.g., "2. The left foot" -> "The left foot")
         const cleanAnswer = rawAnswer.replace(/^\d+[\.\)]\s*/, '');
 
         if (answerTextEl) answerTextEl.innerText = cleanAnswer;
@@ -70,6 +66,28 @@ export function initFlashcards() {
         if (!cardEl) return;
         currentRotation += 180;
         cardEl.style.transform = `rotateY(${currentRotation}deg)`;
+    }
+
+    function handleKeydown(e) {
+        if (e.code === "Space") {
+            e.preventDefault();
+            spinCard();
+        } else if (e.code === "ArrowRight") {
+            if (currentIndex < questions.length - 1) {
+                currentIndex++;
+                renderCard(currentIndex);
+            }
+        } else if (e.code === "ArrowLeft") {
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderCard(currentIndex);
+            }
+        }
+    }
+
+    function cleanupAndExit() {
+        document.removeEventListener("keydown", handleKeydown);
+        window.location.href = "setup.html";
     }
 
     if (cardEl) cardEl.addEventListener("click", spinCard);
@@ -90,7 +108,6 @@ export function initFlashcards() {
                 currentIndex++;
                 renderCard(currentIndex);
 
-                // Award points upon completing the deck
                 if (currentIndex === questions.length - 1) {
                     awardPoints(50, "Flashcard Deck Completion");
                 }
@@ -99,27 +116,12 @@ export function initFlashcards() {
     }
 
     if (btnExit) {
-        btnExit.addEventListener("click", () => {
-            window.location.href = "setup.html";
-        });
+        btnExit.addEventListener("click", cleanupAndExit);
     }
 
-    document.addEventListener("keydown", (e) => {
-        if (e.code === "Space") {
-            e.preventDefault();
-            spinCard();
-        } else if (e.code === "ArrowRight") {
-            if (currentIndex < questions.length - 1) {
-                currentIndex++;
-                renderCard(currentIndex);
-            }
-        } else if (e.code === "ArrowLeft") {
-            if (currentIndex > 0) {
-                currentIndex--;
-                renderCard(currentIndex);
-            }
-        }
-    });
+    // Attach keyboard events with explicit cleanup
+    document.removeEventListener("keydown", handleKeydown);
+    document.addEventListener("keydown", handleKeydown);
 
     renderCard(currentIndex);
 }

@@ -1,6 +1,5 @@
 import { state } from '../state.js';
-import { updateDashboardMetrics } from './leaderboard.js';
-import { renderLeaderboard } from './leaderboard.js';
+import { updateDashboardMetrics, renderLeaderboard } from './leaderboard.js';
 import { renderUnifiedHub } from './hub.js';
 
 // Helper function to extract valid, non-null questions from arrays or sparse Firebase objects
@@ -15,7 +14,7 @@ function getValidQuestionsCount(questionsPayload) {
 }
 
 export function showView(viewId) {
-    // Top-level views
+    // Top-level views (Multi-page DOM fallback)
     const views = ['home-view', 'setup-view', 'quiz-view', 'results-view', 'leaderboard-view', 'hub-view'];
     
     views.forEach(id => {
@@ -23,8 +22,7 @@ export function showView(viewId) {
         if (el) el.classList.toggle('hidden', id !== viewId);
     });
 
-    // Control 'select-view' visibility explicitly:
-    // Only show when on 'home-view' or 'setup-view'
+    // Control 'select-view' visibility explicitly
     const selectView = document.getElementById('select-view');
     if (selectView) {
         const isAllowedView = (viewId === 'home-view' || viewId === 'setup-view');
@@ -47,7 +45,11 @@ export function showView(viewId) {
     // View-specific initializations
     if (viewId === 'home-view') {
         updateDashboardMetrics();
+        renderLeaderboard();
         renderModuleCards();
+    }
+    if (viewId === 'setup-view') {
+        populateBranchDropdowns();
     }
     if (viewId === 'leaderboard-view') renderLeaderboard();
     if (viewId === 'hub-view') renderUnifiedHub();
@@ -59,13 +61,16 @@ export function populateBranchDropdowns() {
     const inspectSelect = document.getElementById("bank-inspect-select");
     const leaderboardSelect = document.getElementById("filter-leaderboard");
 
-    // 1. Save currently active values before wiping elements
-    const savedSetup = setupSelect ? setupSelect.value : "";
+    // 1. Retrieve pre-selected subject passed from multi-page card redirect
+    const savedCardSubject = sessionStorage.getItem("selectedSubjectKey");
+
+    // 2. Save active choices
+    const savedSetup = setupSelect ? (savedCardSubject || setupSelect.value) : savedCardSubject;
     const savedBuilder = builderTargetSelect ? builderTargetSelect.value : "";
     const savedInspect = inspectSelect ? inspectSelect.value : "";
     const currentFilter = leaderboardSelect ? leaderboardSelect.value : "ALL";
 
-    const moduleKeys = Object.keys(state.QUESTION_REGISTRY);
+    const moduleKeys = Object.keys(state.QUESTION_REGISTRY || {});
 
     if (setupSelect) setupSelect.innerHTML = "";
     if (builderTargetSelect) builderTargetSelect.innerHTML = "";
@@ -107,7 +112,7 @@ export function populateBranchDropdowns() {
         }
     });
 
-    // 2. Restore selections if the subjects still exist in state
+    // 3. Apply active selection
     if (inspectSelect && savedInspect && state.QUESTION_REGISTRY[savedInspect]) {
         inspectSelect.value = savedInspect;
     }
@@ -128,6 +133,9 @@ export function populateBranchDropdowns() {
         state.activeBranchKey = setupSelect.value;
     }
 
+    // Clean consumed session selection key
+    sessionStorage.removeItem("selectedSubjectKey");
+
     updateSliderLimits();
 }
 
@@ -135,7 +143,7 @@ export function renderModuleList() {
     const treeContainer = document.getElementById("dynamic-manuals-tree");
     if (!treeContainer) return;
 
-    const moduleKeys = Object.keys(state.QUESTION_REGISTRY);
+    const moduleKeys = Object.keys(state.QUESTION_REGISTRY || {});
 
     if (moduleKeys.length === 0) {
         treeContainer.innerHTML = `<span style="color: var(--light-text-color);">No subjects registered in database yet.</span>`;
@@ -169,7 +177,7 @@ export function updateSliderLimits() {
     if (!selectEl || !slider || !label) return;
 
     const selectedKey = selectEl.value;
-    const module = state.QUESTION_REGISTRY[selectedKey];
+    const module = state.QUESTION_REGISTRY ? state.QUESTION_REGISTRY[selectedKey] : null;
 
     if (!module || !module.questions) {
         slider.min = 1;
@@ -225,10 +233,10 @@ export function renderModuleCards() {
     const gridContainer = document.getElementById("quiz-cards-grid");
     if (!gridContainer) return;
 
-    const moduleKeys = Object.keys(state.QUESTION_REGISTRY);
+    const moduleKeys = Object.keys(state.QUESTION_REGISTRY || {});
 
     if (moduleKeys.length === 0) {
-        gridContainer.innerHTML = `<div class="text-center" style="color: var(--light-text-color);">No active subjects available.</div>`;
+        gridContainer.innerHTML = `<div class="text-center" style="color: var(--light-text-color); grid-column: 1/-1;">No active subjects available.</div>`;
         return;
     }
 
@@ -243,7 +251,7 @@ export function renderModuleCards() {
         return `
             <div class="quiz-card" style="${bgStyle}">
                 <div>
-                    <div class="quiz-card-header">
+                    <div class="quiz-card-header" style="display: flex; justify-content: space-between; align-items: center;">
                         <span class="quiz-card-badge">${data.category || 'General'}</span>
                         <span style="font-size: 0.8rem; color: ${data.imageUrl ? '#ddd' : 'var(--light-text-color)'};">${totalQs} Questions</span>
                     </div>
@@ -253,11 +261,20 @@ export function renderModuleCards() {
                     </div>
                 </div>
                 <div class="quiz-card-footer" style="margin-top: 0.8em;">
-                    <button class="btn-tactical btn-blue" data-action="launch-module" data-key="${key}" style="width: 100%;">
+                    <button class="btn-tactical btn-blue width-full btn-card-start" data-key="${key}" type="button">
                         Start
                     </button>
                 </div>
             </div>
         `;
     }).join('');
+
+    // Multi-page navigation redirect handler
+    gridContainer.querySelectorAll(".btn-card-start").forEach(btn => {
+        btn.onclick = (e) => {
+            const selectedKey = e.currentTarget.dataset.key;
+            sessionStorage.setItem("selectedSubjectKey", selectedKey);
+            window.location.href = "setup.html";
+        };
+    });
 }

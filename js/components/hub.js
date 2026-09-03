@@ -1,12 +1,97 @@
 import { database, SUPER_UID } from '../config.js';
 import { state } from '../state.js';
 import { validateInputsClean } from '../profanity-filter.js';
-import { convertImageToBase64 } from '../services/image-service.js';
-import { awardPoints } from '../services/user-service.js';
+import { awardPoints, showToast } from '../services/user-service.js';
+import { showConfirm } from './modal.js';
+
+/**
+ * Hub Page Initialization Controller
+ */
+export function initHubPage() {
+    const inspectSelect = document.getElementById("bank-inspect-select");
+    if (inspectSelect) {
+        // Prevent stacking event listeners if initialized multiple times
+        inspectSelect.removeEventListener("change", renderUnifiedHub);
+        inspectSelect.addEventListener("change", renderUnifiedHub);
+    }
+
+    const deleteModBtn = document.getElementById("btn-delete-module");
+    if (deleteModBtn) {
+        deleteModBtn.removeEventListener("click", deleteQuizModule);
+        deleteModBtn.addEventListener("click", deleteQuizModule);
+    }
+
+    const addQuestionBtn = document.getElementById("btn-add-question-card");
+    if (addQuestionBtn) {
+        addQuestionBtn.onclick = () => {
+            const activeBranch = inspectSelect ? inspectSelect.value : "";
+            if (!activeBranch) {
+                showToast("Please select a target subject first.", "error");
+                return;
+            }
+            addBlankQuestionCard(activeBranch);
+        };
+    }
+
+    const createCardBtn = document.getElementById("btn-create-module-card");
+    if (createCardBtn) {
+        createCardBtn.onclick = () => toggleCreateModuleCard(true);
+    }
+
+    // Unified Event Delegation for Dynamic Elements
+    const inspectorList = document.getElementById("bank-inspector-list");
+    if (inspectorList) {
+        // Remove prior listener to prevent duplicated click handlers
+        inspectorList.onclick = (e) => {
+            const btn = e.target.closest("button[data-action]");
+            if (!btn) return;
+
+            const action = btn.dataset.action;
+            const branch = btn.dataset.key || btn.dataset.branch;
+            const qid = btn.dataset.qid;
+
+            switch (action) {
+                case "submit-new-module":
+                    submitNewModuleCard();
+                    break;
+                case "cancel-create-module":
+                    toggleCreateModuleCard(false);
+                    break;
+                case "edit-module":
+                    toggleEditModule(branch);
+                    break;
+                case "save-module":
+                    saveModuleEdit(branch);
+                    break;
+                case "cancel-edit-module":
+                    toggleEditModule(null);
+                    break;
+                case "launch-module":
+                    const selectEl = document.getElementById("quiz-select") || document.getElementById("bank-inspect-select");
+                    if (selectEl) selectEl.value = branch;
+                    window.location.href = "setup.html";
+                    break;
+                case "save-q":
+                    saveQuestionEdit(branch, qid);
+                    break;
+                case "delete-q":
+                    deleteQuestion(branch, qid);
+                    break;
+                case "vote":
+                    const voteType = btn.dataset.type;
+                    const creator = btn.dataset.creator;
+                    voteQuestion(branch, qid, voteType, creator);
+                    break;
+            }
+        };
+    }
+
+    renderUnifiedHub();
+}
 
 export function voteQuestion(branchKey, questionId, voteType, creatorUid) {
     if (!state.currentUser) {
-        alert("You must be logged in to vote!");
+        showToast("You must be logged in to vote!", "info");
         return;
     }
 
@@ -54,8 +139,8 @@ export function startVoteCooldownTimer(questionId) {
             delete state.ACTIVE_INTERVALS[questionId];
             delete state.VOTE_COOLDOWNS[questionId];
 
-            const hubView = document.getElementById("hub-view");
-            if (hubView && !hubView.classList.contains("hidden")) {
+            const hubView = document.getElementById("bank-inspector-list");
+            if (hubView) {
                 renderUnifiedHub();
             }
         }
@@ -162,14 +247,11 @@ export function submitNewModuleCard() {
             const selectEl = document.getElementById("bank-inspect-select");
             if (selectEl) selectEl.value = cleanKey;
 
+            awardPoints(100, "Creating a New Subject Module");
             renderUnifiedHub();
             showToast("New subject published!", "success");
         })
         .catch(err => showToast("Failed to publish module: " + err.message, "error"));
-
-        database.ref(`quizModules/${newKey}`).set(newModulePayload).then(() => {
-        awardPoints(100, "Creating a New Subject Module");
-    });
 }
 
 export function addBlankQuestionCard(branchKey) {
@@ -201,7 +283,6 @@ export function addBlankQuestionCard(branchKey) {
         .then(() => {
             showToast("Blank question card added", "success");
 
-            // Auto scroll & focus on newly added question input
             setTimeout(() => {
                 const newEl = document.getElementById(`edit-q-${newQId}`);
                 if (newEl) {
@@ -227,11 +308,10 @@ export function renderUnifiedHub() {
 
     if (authStatus) {
         if (isSuperAdmin) authStatus.innerHTML = `<strong>Mode: SUPER ADMIN</strong> (Full Control)`;
-        else if (state.currentUser) authStatus.innerHTML = `Signed in as: <strong>${state.currentUser.displayName || state.currentUser.email}</strong>`;
+        else if (state.currentUser) authStatus.innerHTML = `Signed in as: <strong>${state.userCallsign || state.currentUser.email}</strong>`;
         else authStatus.innerHTML = `Status: Guest (Read-Only Mode)`;
     }
 
-    // 1. INLINE NEW MODULE CARD BUILDER
     if (state.isCreatingNewModule) {
         container.innerHTML = `
             <div class="quiz-card" style="margin-bottom: 1.2em; border: 2px dashed var(--primary-color); padding: 1.2em;">
@@ -275,7 +355,6 @@ export function renderUnifiedHub() {
         ? `background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url('${data.imageUrl}') center/cover no-repeat; color: #fff;`
         : '';
 
-    // 2. WYSIWYG MODULE CARD HEADER
     let moduleCardHTML = "";
     if (isEditingModule) {
         moduleCardHTML = `
@@ -338,7 +417,6 @@ export function renderUnifiedHub() {
         `;
     }
 
-    // 3. REAL-TIME QUESTION LIST LISTENER & RENDERER
     if (state.activeModuleListenerRef) state.activeModuleListenerRef.off();
 
     state.activeModuleListenerRef = database.ref(`quizModules/${branch}/questions`);
@@ -456,7 +534,6 @@ export function saveQuestionEdit(branchKey, questionId) {
         return;
     }
 
-    // Filter check: validate all input text fields
     if (!validateInputsClean([prompt, opt0, opt1, opt2, opt3, explanation, qImgUrl])) {
         showToast("Inappropriate language detected in your updates.", "error");
         return;
@@ -473,54 +550,24 @@ export function saveQuestionEdit(branchKey, questionId) {
         .catch(err => showToast("Update failed: " + err.message, "error"));
 }
 
-export function deleteQuestion(branchKey, questionId) {
-    if (confirm("Permanently delete this question?")) {
+export async function deleteQuestion(branchKey, questionId) {
+    const confirmed = await showConfirm("Permanently delete this question?", "Delete Question");
+    if (confirmed) {
         database.ref(`quizModules/${branchKey}/questions/${questionId}`).remove()
             .then(() => showToast("Question deleted", "info"))
             .catch(err => showToast("Delete failed: " + err.message, "error"));
     }
 }
 
-export function deleteQuizModule() {
+export async function deleteQuizModule() {
     const selectEl = document.getElementById("bank-inspect-select");
     if (!selectEl || !selectEl.value) return;
 
     const branchKey = selectEl.value;
-    if (confirm(`CRITICAL WARNING: Delete subject '${branchKey}' and ALL questions?`)) {
+    const confirmed = await showConfirm(`CRITICAL WARNING: Delete subject '${branchKey}' and ALL questions?`, "Delete Subject Module");
+    if (confirmed) {
         database.ref(`quizModules/${branchKey}`).remove()
             .then(() => showToast(`Module '${branchKey}' deleted`, "info"))
             .catch(err => showToast("Module delete failed: " + err.message, "error"));
     }
-}
-
-/**
- * Non-blocking toast notification helper using CSS classes
- */
-export function showToast(message, type = 'info') {
-    let container = document.getElementById("toast-container");
-    if (!container) {
-        container = document.createElement("div");
-        container.id = "toast-container";
-        document.body.appendChild(container);
-    }
-
-    const toast = document.createElement("div");
-    toast.className = `toast-bubble toast-${type}`;
-
-    // Add icon indicators based on type
-    const icon = type === 'success' ? '✅' : type === 'error' ? '⚠️' : 'ℹ️';
-    toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
-
-    container.appendChild(toast);
-
-    // Trigger smooth CSS entrance animation
-    requestAnimationFrame(() => {
-        toast.classList.add("toast-show");
-    });
-
-    // Auto dismiss after 2.5 seconds
-    setTimeout(() => {
-        toast.classList.remove("toast-show");
-        setTimeout(() => toast.remove(), 250);
-    }, 2500);
 }

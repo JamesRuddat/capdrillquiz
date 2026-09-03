@@ -7,13 +7,14 @@
     <meta name="google-adsense-account" content="ca-pub-1864969470317711">
     <link rel="icon" type="image/x-icon" href="/assets/images/emblems/icon.svg">
     <title>PROP - Start Quiz</title>
-    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="/styles.css">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1864969470317711"
         crossorigin="anonymous"></script>
 
     <!-- Load Component Partials -->
-    <script type="module" src="/js/partials/header.js"></script>
-    <script type="module" src="/js/partials/footer.js"></script>
+    <script type="module" src="/js/components/header.js"></script>
+    <script type="module" src="/js/components/footer.js"></script>
+    <script type="module" src="/js/components/modal-element.js"></script>
 </head>
 
 <body>
@@ -22,56 +23,57 @@
 
     <main>
         <section id="setup-view" class="col">
-  <!-- Top Banner Header -->
-  <div id="subject-banner" class="subject-banner-container">
-    <div class="banner-overlay"></div>
-    <h1 class="banner-title">Subject Configuration</h1>
-  </div>
+            <!-- Top Banner Header -->
+            <div id="subject-banner" class="subject-banner-container">
+                <div class="banner-overlay"></div>
+                <h1 class="banner-title">Subject Configuration</h1>
+            </div>
 
-  <!-- Main Content Layout Grid -->
-  <div class="setup-grid">
-    <!-- Left Column: Settings -->
-    <div class="setup-config-col">
-      <label for="quiz-select" class="form-label">Subject:</label>
-      <select id="quiz-select"></select>
+            <!-- Main Content Layout Grid -->
+            <div class="setup-grid">
+                <!-- Left Column: Settings -->
+                <div class="setup-config-col">
+                    <label for="quiz-select" class="form-label">Subject:</label>
+                    <select id="quiz-select"></select>
 
-      <label for="name" class="form-label">Name (Leaderboard):</label>
-      <input type="text" id="name" placeholder="e.g., C/SrA Smith or TSgt Davis">
+                    <label for="name" class="form-label">Callsign (Leaderboard):</label>
+                    <input type="text" id="name" placeholder="Auto-synced to callsign" readonly style="opacity: 0.8; cursor: not-allowed;">
 
-      <div class="slider-wrapper">
-        <div class="slider-header">
-          <label for="quiz-question-count-slider" class="form-label">Question Count:</label>
-          <span id="quiz-question-count-label" class="slider-value">0 Questions</span>
-        </div>
-        <input type="range" id="quiz-question-count-slider" min="1" max="1" value="1">
-      </div>
-    </div>
+                    <div class="slider-wrapper">
+                        <div class="slider-header">
+                            <label for="quiz-question-count-slider" class="form-label">Question Count:</label>
+                            <span id="quiz-question-count-label" class="slider-value">1 Question</span>
+                        </div>
+                        <input type="range" id="quiz-question-count-slider" min="1" max="1" value="1">
+                    </div>
+                </div>
 
-    <!-- Right Column: Mode Action Buttons -->
-    <div class="setup-actions-col">
-      <button id="btn-mode-test" class="btn-tactical btn-blue btn-lg">
-        Play as Test
-      </button>
+                <!-- Right Column: Mode Action Buttons -->
+                <div class="setup-actions-col">
+                    <button id="btn-mode-test" class="btn-tactical btn-blue btn-lg" type="button">
+                        Play as Test
+                    </button>
 
-      <button id="btn-mode-study" class="btn-tactical btn-gold btn-lg">
-        Study Mode
-      </button>
+                    <button id="btn-mode-study" class="btn-tactical btn-gold btn-lg" type="button">
+                        Study Mode
+                    </button>
 
-      <button id="btn-mode-flashcards" class="btn-tactical btn-lg">
-        Flash Cards
-      </button>
-    </div>
-  </div>
-</section>
+                    <button id="btn-mode-flashcards" class="btn-tactical btn-lg" type="button">
+                        Flash Cards
+                    </button>
+                </div>
+            </div>
+        </section>
 
         <section id="select-view" class="col">
-            <h1>Subjects & quizzes</h1>
+            <h1>Subjects &amp; Quizzes</h1>
             <div id="quiz-cards-grid" class="cards-grid">
                 <div class="text-center">Loading available subjects...</div>
             </div>
         </section>
     </main>
 
+    <custom-modal></custom-modal>
     <site-footer></site-footer>
 
     <script src="/js/profanity-filter.js"></script>

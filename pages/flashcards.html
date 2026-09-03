@@ -12,8 +12,9 @@
         crossorigin="anonymous"></script>
 
     <!-- Load Component Partials -->
-    <script type="module" src="/js/partials/header.js"></script>
-    <script type="module" src="/js/partials/footer.js"></script>
+    <script type="module" src="/js/components/header.js"></script>
+    <script type="module" src="/js/components/footer.js"></script>
+    <script type="module" src="/js/components/modal-element.js"></script>
 </head>
 
 <body>
@@ -26,11 +27,11 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
                 <span id="flashcard-module-badge" class="quiz-card-badge">[MODULE: UNSET]</span>
                 <div style="display: flex; align-items: center; gap: 1em;">
-            <span id="flashcard-tracker" style="font-weight: bold; font-size: 0.85rem;">Card 1 of X</span>
-            <button id="btn-fc-exit" class="btn-tactical btn-red btn-sm">
-                Exit Session
-            </button>
-        </div>
+                    <span id="flashcard-tracker" style="font-weight: bold; font-size: 0.85rem;">Card 1 of X</span>
+                    <button id="btn-fc-exit" class="btn-tactical btn-red btn-sm" type="button">
+                        Exit Session
+                    </button>
+                </div>
             </div>
 
             <!-- 3D FLIP CARD STAGE -->
@@ -54,19 +55,20 @@
 
             <!-- NAVIGATION CONTROLS -->
             <div class="flashcard-controls">
-                <button id="btn-fc-prev" class="btn-tactical btn-blue btn-lg" style="flex: 1;">
+                <button id="btn-fc-prev" class="btn-tactical btn-blue btn-lg" type="button" style="flex: 1;">
                     ◀ Previous
                 </button>
-                <button id="btn-fc-flip" class="btn-tactical btn-gold btn-lg" style="flex: 1;">
+                <button id="btn-fc-flip" class="btn-tactical btn-gold btn-lg" type="button" style="flex: 1;">
                     Flip Card
                 </button>
-                <button id="btn-fc-next" class="btn-tactical btn-blue btn-lg" style="flex: 1;">
+                <button id="btn-fc-next" class="btn-tactical btn-blue btn-lg" type="button" style="flex: 1;">
                     Next ▶
                 </button>
             </div>
         </section>
     </main>
 
+    <custom-modal></custom-modal>
     <site-footer></site-footer>
 
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>

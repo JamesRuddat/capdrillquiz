@@ -7,13 +7,14 @@
     <meta name="google-adsense-account" content="ca-pub-1864969470317711">
     <link rel="icon" type="image/x-icon" href="/assets/images/emblems/icon.svg">
     <title>PROP - Quiz</title>
-    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="/styles.css">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1864969470317711"
         crossorigin="anonymous"></script>
 
     <!-- Load Component Partials -->
-    <script type="module" src="/js/partials/header.js"></script>
-    <script type="module" src="/js/partials/footer.js"></script>
+    <script type="module" src="/js/components/header.js"></script>
+    <script type="module" src="/js/components/footer.js"></script>
+    <script type="module" src="/js/components/modal-element.js"></script>
 </head>
 
 <body>
@@ -29,7 +30,7 @@
                 
                 <div style="display: flex; align-items: center; gap: 1em;">
                     <span id="question-tracker" style="font-weight: bold; font-size: 0.85rem;">Question 1 of X</span>
-                    <button id="btn-quiz-exit" class="btn-tactical btn-red btn-sm">
+                    <button id="btn-quiz-exit" class="btn-tactical btn-red btn-sm" type="button">
                         Exit Session
                     </button>
                 </div>
@@ -42,13 +43,14 @@
             <div id="options-container"></div>
             <div id="feedback-panel" class="hidden"></div>
 
-            <button id="next-question-btn" class="btn-tactical btn-lg btn-blue hidden"
+            <button id="next-question-btn" class="btn-tactical btn-lg btn-blue hidden" type="button"
                 style="width: 100%; margin-top: 1em;">
                 Next Item ➔
             </button>
         </section>
     </main>
 
+    <custom-modal></custom-modal>
     <site-footer></site-footer>
 
     <script src="/js/profanity-filter.js"></script>

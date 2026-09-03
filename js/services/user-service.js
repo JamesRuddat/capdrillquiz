@@ -14,14 +14,21 @@ export async function awardPoints(pointsToEarn, reason = "completing an activity
         return;
     }
 
-    const userRef = database.ref(`users/${user.uid}/points`);
+    const pointsRef = database.ref(`users/${user.uid}/points`);
 
     try {
-        const snapshot = await userRef.once('value');
-        const currentPoints = snapshot.val() || 0;
-        const newPoints = currentPoints + pointsToEarn;
+        const { snapshot } = await pointsRef.transaction((currentPoints) => {
+            return (currentPoints || 0) + pointsToEarn;
+        });
 
-        await userRef.set(newPoints);
+        const newPoints = snapshot.val();
+        state.userPoints = newPoints; // Update local state
+
+        // Sync header badge immediately
+        const header = document.querySelector("site-header");
+        if (header && typeof header.renderUser === 'function') {
+            header.renderUser(state.userCallsign, state.userPoints);
+        }
 
         showToast(`+${pointsToEarn} Points Earned for ${reason}! Total: ${newPoints} pts`, "success");
     } catch (err) {
@@ -37,6 +44,17 @@ function showGuestPointPrompt(points, reason) {
         `💡 Log in to claim ${points} points for ${reason}!`,
         "info"
     );
+
+    const container = document.getElementById("toast-container");
+    const lastToast = container?.lastElementChild;
+    if (lastToast) {
+        lastToast.style.cursor = "pointer";
+        lastToast.addEventListener("click", () => {
+            const header = document.querySelector("site-header");
+            const googleAuthBtn = header ? header.querySelector("#google-auth-btn") : document.getElementById("google-auth-btn");
+            if (googleAuthBtn) googleAuthBtn.click();
+        });
+    }
 }
 
 /**
