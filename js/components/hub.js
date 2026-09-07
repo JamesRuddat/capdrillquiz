@@ -4,15 +4,16 @@ import { validateInputsClean } from '../profanity-filter.js';
 import { awardPoints, showToast } from '../services/user-service.js';
 import { showConfirm } from './modal.js';
 
+let isInitialLoadComplete = false;
+
 /**
  * Hub Page Initialization Controller
  */
 export function initHubPage() {
     const inspectSelect = document.getElementById("bank-inspect-select");
     if (inspectSelect) {
-        // Prevent stacking event listeners if initialized multiple times
-        inspectSelect.removeEventListener("change", renderUnifiedHub);
-        inspectSelect.addEventListener("change", renderUnifiedHub);
+        inspectSelect.removeEventListener("change", handleSubjectSelectChange);
+        inspectSelect.addEventListener("change", handleSubjectSelectChange);
     }
 
     const deleteModBtn = document.getElementById("btn-delete-module");
@@ -38,10 +39,9 @@ export function initHubPage() {
         createCardBtn.onclick = () => toggleCreateModuleCard(true);
     }
 
-    // Unified Event Delegation for Dynamic Elements
+    // Dynamic Element Handler
     const inspectorList = document.getElementById("bank-inspector-list");
     if (inspectorList) {
-        // Remove prior listener to prevent duplicated click handlers
         inspectorList.onclick = (e) => {
             const btn = e.target.closest("button[data-action]");
             if (!btn) return;
@@ -82,10 +82,93 @@ export function initHubPage() {
                     const creator = btn.dataset.creator;
                     voteQuestion(branch, qid, voteType, creator);
                     break;
+                case "trigger-create-from-blank":
+                    toggleCreateModuleCard(true);
+                    break;
             }
         };
     }
 
+    // Listen to Firebase module registry once before evaluating URL params
+    database.ref('quizModules').once('value', (snapshot) => {
+        state.QUESTION_REGISTRY = snapshot.val() || {};
+        isInitialLoadComplete = true;
+        
+        // Populate select options without auto-selecting the first option
+        populateInspectSelectOptions();
+        
+        // Now evaluate route parameters with populated registry
+        processUrlRouteParameters();
+    });
+}
+
+/**
+ * Populates dropdown options without picking the first item
+ */
+function populateInspectSelectOptions() {
+    const inspectSelect = document.getElementById("bank-inspect-select");
+    if (!inspectSelect) return;
+
+    const keys = Object.keys(state.QUESTION_REGISTRY || {});
+    let optionsHTML = `<option value="">-- Select a Subject --</option>`;
+
+    keys.forEach(key => {
+        const mod = state.QUESTION_REGISTRY[key];
+        const title = mod.branchName || key;
+        optionsHTML += `<option value="${key}">${title}</option>`;
+    });
+
+    inspectSelect.innerHTML = optionsHTML;
+}
+
+/**
+ * Parses URL query strings to determine initial render state
+ */
+function processUrlRouteParameters() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchQuery = urlParams.get("search")?.trim();
+    const editSubjectKey = urlParams.get("subject")?.trim();
+    const inspectSelect = document.getElementById("bank-inspect-select");
+
+    // 1. PATH A: Directed here to edit a specific subject module (?subject=KEY)
+    if (editSubjectKey && state.QUESTION_REGISTRY[editSubjectKey]) {
+        if (inspectSelect) inspectSelect.value = editSubjectKey;
+        state.isCreatingNewModule = false;
+        renderUnifiedHub();
+        return;
+    }
+
+    // 2. PATH B: Redirected from search query to build new module (?search=QUERY)
+    if (searchQuery) {
+        state.isCreatingNewModule = true;
+        if (inspectSelect) inspectSelect.value = "";
+        renderUnifiedHub();
+
+        setTimeout(() => {
+            const titleInput = document.getElementById("create-mod-title");
+            if (titleInput) {
+                titleInput.value = searchQuery;
+                titleInput.focus();
+            }
+        }, 50);
+
+        showToast(`Creating new module for "${searchQuery}"`, "info");
+        return;
+    }
+
+    // 3. DEFAULT PATH: Ensure dropdown is empty and render blank state card
+    if (inspectSelect) inspectSelect.value = "";
+    state.isCreatingNewModule = false;
+    renderUnifiedHub();
+}
+
+/**
+ * Handle manual dropdown selection
+ */
+function handleSubjectSelectChange(e) {
+    const selectedKey = e.target.value;
+    state.isCreatingNewModule = false;
+    state.editingModuleKey = null;
     renderUnifiedHub();
 }
 
@@ -161,6 +244,10 @@ export function toggleEditModule(key) {
 export function toggleCreateModuleCard(show) {
     state.editingModuleKey = null;
     state.isCreatingNewModule = show;
+    
+    const inspectSelect = document.getElementById("bank-inspect-select");
+    if (show && inspectSelect) inspectSelect.value = "";
+    
     renderUnifiedHub();
 }
 
@@ -312,10 +399,11 @@ export function renderUnifiedHub() {
         else authStatus.innerHTML = `Status: Guest (Read-Only Mode)`;
     }
 
+    // 1. Creating New Module View
     if (state.isCreatingNewModule) {
         container.innerHTML = `
             <div class="quiz-card" style="margin-bottom: 1.2em; border: 2px dashed var(--primary-color); padding: 1.2em;">
-                <h3 style="margin: 0 0 0.6em 0; color: var(--primary-color);">➕ Create New Quiz Module</h3>
+                <h3 style="margin: 0 0 0.6em 0; color: var(--primary-color);">➕ Create New Subject</h3>
                 <div style="display: flex; flex-direction: column; gap: 0.5em;">
                     <input type="text" id="create-mod-key" placeholder="Module Key ID (e.g., CAP_AERO_CH1)">
                     <input type="text" id="create-mod-title" placeholder="Module Title (e.g., Aerospace Chapter 1)">
@@ -325,7 +413,7 @@ export function renderUnifiedHub() {
                 </div>
                 <div class="quiz-card-footer" style="display: flex; gap: 0.5em; margin-top: 0.8em;">
                     <button class="btn-tactical" data-action="submit-new-module" style="flex: 1;">
-                        Publish Module Card
+                        Publish Subject
                     </button>
                     <button class="btn-tactical btn-clear" data-action="cancel-create-module" style="flex: 1;">
                         Cancel
@@ -342,11 +430,24 @@ export function renderUnifiedHub() {
 
     if (deleteModBtn) deleteModBtn.classList.toggle("hidden", !(isSuperAdmin || isModuleOwner));
 
-    if (!data) {
-        container.innerHTML = `<div style="padding: 0.8em; color: var(--light-text-color);">Select a valid subject above to manage questions.</div>`;
+    // 2. Default Blank State View (No Subject Selected)
+    if (!branch || !data) {
+        container.innerHTML = `
+            <div class="quiz-card" style="text-align: center; padding: 2.5em 1.5em; border: 2px dashed var(--border-color); margin-bottom: 1.2em;">
+                <div style="font-size: 3rem; margin-bottom: 0.3em;">📋</div>
+                <h3 style="margin-bottom: 0.4em;">Subject Hub Manager</h3>
+                <p style="color: var(--light-text-color); font-size: 0.9rem; max-width: 480px; margin: 0 auto 1.5em auto;">
+                    Select an existing subject from the dropdown above to manage its question bank, or click below to publish a brand-new module.
+                </p>
+                <button class="btn-tactical btn-gold" data-action="trigger-create-from-blank">
+                    ➕ Create New Subject
+                </button>
+            </div>
+        `;
         return;
     }
 
+    // 3. Subject Module Selected View
     const rawQs = data.questions || {};
     const totalQs = Array.isArray(rawQs) ? rawQs.length : Object.keys(rawQs).length;
     const isEditingModule = state.editingModuleKey === branch;

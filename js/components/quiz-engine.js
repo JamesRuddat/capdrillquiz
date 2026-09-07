@@ -4,6 +4,7 @@ import { saveScoreToDB } from '../services/db-service.js';
 import { updateDashboardMetrics } from './leaderboard.js';
 import { awardPoints, showToast } from '../services/user-service.js';
 import { showConfirm } from './modal.js';
+import { checkAndAwardBadges } from '../services/badge-service.js';
 
 export function initQuizPage() {
     loadQuestion();
@@ -247,13 +248,16 @@ export async function finishQuiz() {
     const pct = Math.round((session.score / total) * 100);
     const cleanName = sanitizeInput(state.userCallsign || session.activeName);
 
+    let pointsEarned = 0;
+
     if (session.mode === 'test') {
-        const pointsEarned = session.score * 10;
+        pointsEarned = session.score * 10;
         if (pointsEarned > 0) {
             awardPoints(pointsEarned, "Test Evaluation");
         }
     } else if (session.mode === 'study') {
-        awardPoints(50, "Study Set Completion");
+        pointsEarned = 50;
+        awardPoints(pointsEarned, "Study Set Completion");
     }
 
     const scoreResult = {
@@ -275,6 +279,7 @@ export async function finishQuiz() {
         try {
             await saveScoreToDB({
                 uid: state.currentUser ? state.currentUser.uid : null,
+                callsign: state.userCallsign || cleanName,
                 name: cleanName,
                 branch: session.activeBranchKey,
                 score: `${session.score}/${total}`,
@@ -284,6 +289,20 @@ export async function finishQuiz() {
             updateDashboardMetrics();
         } catch (err) {
             console.error("Failed to save score to DB:", err);
+        }
+    }
+
+    // Evaluate and unlock badges for the logged-in user
+    if (state.currentUser) {
+        try {
+            await checkAndAwardBadges({
+                correctCount: session.score,
+                pct: pct,
+                pointsEarned: pointsEarned,
+                mode: session.mode
+            });
+        } catch (err) {
+            console.error("Failed to process achievement badges:", err);
         }
     }
 

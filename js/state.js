@@ -9,6 +9,7 @@ export const state = {
     currentIdx: 0,
     score: 0,
     currentUser: null,
+    authInitialized: false,
     activeModuleListenerRef: null,
     editingModuleKey: null,   // Tracks inline card editing in Hub
     isCreatingNewModule: false, // Tracks inline card creation in Hub
