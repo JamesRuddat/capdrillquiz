@@ -11,10 +11,10 @@ export function initAdminPage() {
     // Guard view against non-authorized users
     const checkAuth = () => {
         const userUid = state.currentUser ? state.currentUser.uid : null;
-        const isSuperAdmin = userUid === SUPER_UID;
-        const userRole = state.userRole || (isSuperAdmin ? "admin" : "user");
+        const isSuper = userUid === SUPER_UID;
+        const userRole = state.userRole || (isSuper ? "admin" : "user");
 
-        if (!state.currentUser || (userRole !== "admin" && userRole !== "mod" && !isSuperAdmin)) {
+        if (!state.currentUser || (userRole !== "admin" && userRole !== "mod" && !isSuper)) {
             if (authGuard) {
                 authGuard.innerHTML = `<span style="color: #f85149;"><strong>ACCESS DENIED:</strong> You must be an Admin or Moderator to view this page.</span>`;
             }
@@ -117,8 +117,8 @@ function renderUserProfile(uid, userData, scores, questions) {
 
     const currentRole = userData.role || "user";
     const userUid = state.currentUser ? state.currentUser.uid : null;
-    const isSuperAdmin = userUid === SUPER_UID;
-    const isAdmin = isSuperAdmin || state.userRole === "admin";
+    const isSuper = userUid === SUPER_UID;
+    const isAdmin = isSuper || state.userRole === "admin";
 
     // Format Scores Table
     let scoresHTML = scores.length === 0 

@@ -324,11 +324,11 @@ export function addBlankQuestionCard(branchKey) {
     }
 
     const userUid = state.currentUser.uid;
-    const isSuperAdmin = userUid === SUPER_UID;
-    const userRole = state.userRole || (isSuperAdmin ? "admin" : "user");
+    const isSuper = userUid === SUPER_UID;
+    const userRole = state.userRole || (isSuper ? "admin" : "user");
     
     // Verified Authors (Admins & Moderators) auto-verify their creations
-    const isVerifiedAuthor = isSuperAdmin || userRole === "admin" || userRole === "mod";
+    const isVerifiedAuthor = isSuper || userRole === "admin" || userRole === "mod";
 
     const newQRef = database.ref(`subjects/${branchKey}/questions`).push();
 
@@ -361,18 +361,18 @@ export function renderUnifiedHub() {
     if (!container) return;
 
     const userUid = state.currentUser ? state.currentUser.uid : null;
-    const isSuperAdmin = userUid === SUPER_UID;
-    const userRole = state.userRole || (isSuperAdmin ? "admin" : "user");
-    const isAdmin = isSuperAdmin || userRole === "admin";
+    const isSuper = userUid === SUPER_UID;
+    const userRole = state.userRole || (isSuper ? "admin" : "user");
+    const isAdmin = isSuper || userRole === "admin";
 
 if (authStatus) {
         let roleBadge = "Guest";
-        if (isSuperAdmin) roleBadge = "SUPER ADMIN";
+        if (isSuper) roleBadge = "SUPER ADMIN";
         else if (userRole === "admin") roleBadge = "ADMIN";
         else if (userRole === "mod") roleBadge = "MODERATOR";
         else if (state.currentUser) roleBadge = "CADET";
 
-        const isModOrAdmin = isSuperAdmin || userRole === "admin" || userRole === "mod";
+        const isModOrAdmin = isSuper || userRole === "admin" || userRole === "mod";
 
         authStatus.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
@@ -425,7 +425,7 @@ if (authStatus) {
     const data = state.QUESTION_REGISTRY[branch];
     const isModuleOwner = data && data.createdBy && data.createdBy === userUid;
 
-    if (deleteModBtn) deleteModBtn.classList.toggle("hidden", !(isSuperAdmin || isModuleOwner));
+    if (deleteModBtn) deleteModBtn.classList.toggle("hidden", !(isSuper || isModuleOwner));
 
     // 2. Blank State View
     if (!branch || !data) {
@@ -488,7 +488,7 @@ if (authStatus) {
             </div>
         `;
     } else {
-        const canEditModule = isSuperAdmin || isModuleOwner;
+        const canEditModule = isSuper || isModuleOwner;
         const formattedDescription = formatTextWithLinks(data.description || '');
 
         moduleCardHTML = `
@@ -527,7 +527,7 @@ if (authStatus) {
 
         let questionsHTML = questionsList.length === 0 
             ? `<div style="padding: 0.8em; color: var(--light-text-color);">No questions exist in subject '${branch}' yet. Tap '➕ Add Question Card' above to create one!</div>`
-            : questionsList.map((q, idx) => renderQuestionItem(q, idx, branch, isSuperAdmin || isModuleOwner, userUid)).join('');
+            : questionsList.map((q, idx) => renderQuestionItem(q, idx, branch, isSuper || isModuleOwner, userUid)).join('');
 
         container.innerHTML = moduleCardHTML + questionsHTML;
     });
@@ -672,9 +672,9 @@ export async function saveQuestionEdit(branchKey, questionId) {
     }
 
     const userUid = state.currentUser ? state.currentUser.uid : null;
-    const isSuperAdmin = userUid === SUPER_UID;
-    const userRole = state.userRole || (isSuperAdmin ? "admin" : "user");
-    const isVerifiedAuthor = isSuperAdmin || userRole === "admin" || userRole === "mod";
+    const isSuper = userUid === SUPER_UID;
+    const userRole = state.userRole || (isSuper ? "admin" : "user");
+    const isVerifiedAuthor = isSuper || userRole === "admin" || userRole === "mod";
 
     const updatePayload = {
         q: prompt,

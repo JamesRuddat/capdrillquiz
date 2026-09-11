@@ -2,12 +2,19 @@ export class SiteFooter extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
             <footer>
-                <p>Made by Mr. Ruddat - v3.9.1 (Foxcore)</p>
+                <p>
+                    Made by Mr. Ruddat - v4.0.1 (Shadowfox) | 
+                    <a href="https://github.com/JamesRuddat/capdrillquiz/commits/main/" 
+                       target="_blank" 
+                       rel="noopener noreferrer" 
+                       style="color: var(--primary-color, #4ea8de); text-decoration: underline;">
+                        View Commit History
+                    </a>
+                </p>
             </footer>
         `;
     }
 }
-
 customElements.define('site-footer', SiteFooter);
 
 /*

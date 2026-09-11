@@ -16,9 +16,3 @@ export const database = firebase.database();
 export const auth = firebase.auth();
 export const googleProvider = new firebase.auth.GoogleAuthProvider();
 export const SUPER_UID = 'e8cCmxtEqMN4pr9i3DCkl2yo2iz2';
-
-// List of Firebase UIDs authorized to manage
-export const ADMIN_UIDS = [
-    "p8X1Y9zQ23A4bC5dE6fG7hI8jK9l",
-    "m0N1O2p3Q4r5S6t7U8v9W0x1Y2z3"
-];

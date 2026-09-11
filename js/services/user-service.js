@@ -13,10 +13,10 @@ export async function updateUserRole(targetUid, newRole) {
     }
 
     const userUid = state.currentUser.uid;
-    const isSuperAdmin = userUid === SUPER_UID;
-    const currentRole = state.userRole || (isSuperAdmin ? "admin" : "user");
+    const isSuper = userUid === SUPER_UID;
+    const currentRole = state.userRole || (isSuper ? "admin" : "user");
 
-    if (currentRole !== "admin" && !isSuperAdmin) {
+    if (currentRole !== "admin" && !isSuper) {
         showToast("Only Admins can modify user roles!", "error");
         return;
     }

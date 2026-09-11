@@ -556,11 +556,11 @@ function renderUnifiedHub() {
     const branch = inspectSelect.value;
     const data = QUESTION_REGISTRY[branch];
     const userUid = currentUser ? currentUser.uid : null;
-    const isSuperAdmin = userUid === SUPER_UID;
+    const isSuper = userUid === SUPER_UID;
     const isModuleOwner = data && data.createdBy && data.createdBy === userUid;
 
     if (authStatus) {
-        if (isSuperAdmin) {
+        if (isSuper) {
             authStatus.innerHTML = `<strong>Mode: SUPER ADMIN</strong> (Full Control)`;
         } else if (currentUser) {
             authStatus.innerHTML = `Signed in as: <strong>${currentUser.displayName || currentUser.email}</strong>`;
@@ -572,7 +572,7 @@ function renderUnifiedHub() {
     if (!data) return;
 
     if (deleteModBtn) {
-        deleteModBtn.classList.toggle("hidden", !(isSuperAdmin || isModuleOwner));
+        deleteModBtn.classList.toggle("hidden", !(isSuper || isModuleOwner));
     }
 
     if (activeModuleListenerRef) {
@@ -594,7 +594,7 @@ function renderUnifiedHub() {
         }
 
         container.innerHTML = questionsList.map((q, idx) => {
-            const canEditQuestion = isSuperAdmin || isModuleOwner || (q.createdBy && q.createdBy === userUid);
+            const canEditQuestion = isSuper || isModuleOwner || (q.createdBy && q.createdBy === userUid);
             const optsArray = Array.isArray(q.options) ? q.options : Object.values(q.options || []);
 
             // 1. Calculate Votes (Support BOTH new 'votes' map AND legacy 'upvotes'/'downvotes' numbers)
