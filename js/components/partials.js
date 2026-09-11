@@ -10,12 +10,12 @@ function loadPartial(id, file) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  loadPartial("head-placeholder", "/partials/head.html").then(() => {
+  loadPartial("head-placeholder", "/components/head.html").then(() => {
     Promise.all([
-      loadPartial("announcement-placeholder", "/partials/announcement.html"),
-      loadPartial("header-placeholder", "/partials/header.html"),
-      loadPartial("nav-placeholder", "/partials/nav.html"),
-      loadPartial("footer-placeholder", "/partials/footer.html")
+      loadPartial("announcement-placeholder", "/components/announcement.html"),
+      loadPartial("header-placeholder", "/components/header.html"),
+      loadPartial("nav-placeholder", "/components/nav.html"),
+      loadPartial("footer-placeholder", "/components/footer.html")
     ]).then(() => {
       setupAnnouncement();
 

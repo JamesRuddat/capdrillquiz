@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+    <html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-adsense-account" content="ca-pub-1864969470317711">
+    <link rel="icon" type="image/x-icon" href="/assets/images/emblems/icon.svg">
+    <title>PROP - Profile</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1864969470317711"
+        crossorigin="anonymous"></script>
+
+    <!-- Load Component Partials -->
+    <script type="module" src="/js/components/header.js"></script>
+    <script type="module" src="/js/components/footer.js"></script>
+    <script type="module" src="/js/pages/modal-element.js"></script>
+</head>
+<body>
+    <site-header></site-header>
+
+    <main>
+        <!-- Guest Fallback -->
+        <div id="profile-guest-notice" class="card text-center hidden">
+            <h2>Authentication Required</h2>
+            <p style="color: var(--light-text-color);">Please sign in with Google to view your profile, stats, and badges.</p>
+            <button id="profile-signin-btn" class="btn-tactical btn-gold" type="button" style="margin-top: 1em;">
+                Sign In with Google
+            </button>
+        </div>
+
+        <!-- Authenticated Profile View -->
+        <div id="profile-content" class="hidden">
+            <!-- Header Card -->
+            <div class="card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1em;">
+                <div>
+                    <span class="quiz-card-badge">RECORD</span>
+                    <h1 id="profile-callsign-display" style="margin: 0.2em 0 0 0;">---</h1>
+                    <p id="profile-uid-display" style="margin: 0.2em 0 0 0; font-size: 0.75rem; color: var(--light-text-color); font-family: monospace;"></p>
+                </div>
+                <div style="display: flex; gap: 1em; align-items: center;">
+                    <div class="text-center" style="border: 1px solid var(--border-color); padding: 0.6em 1.2em; border-radius: 6px;">
+                        <div style="font-size: 0.75rem; color: var(--light-text-color);">LIFETIME STARS</div>
+                        <div id="profile-points-display" style="font-size: 1.5rem; font-weight: bold; color: var(--alert-color);">⭐ 0</div>
+                    </div>
+                    <button id="btn-change-callsign" class="btn-tactical btn-sm" type="button">
+                        Edit Callsign
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Overview -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1em; margin: 1.5em 0;">
+                <div class="card text-center">
+                    <div style="font-size: 0.8rem; color: var(--light-text-color);">EVALUATIONS COMPLETED</div>
+                    <div id="stat-evals-count" style="font-size: 1.8rem; font-weight: bold; margin-top: 0.2em;">0</div>
+                </div>
+                <div class="card text-center">
+                    <div style="font-size: 0.8rem; color: var(--light-text-color);">TOTAL CORRECT ANSWERS</div>
+                    <div id="stat-correct-count" style="font-size: 1.8rem; font-weight: bold; margin-top: 0.2em;">0</div>
+                </div>
+            </div>
+
+            <!-- Badges & Achievements Showcase -->
+            <section class="card" style="margin-top: 1.5em;">
+                <h2 style="margin-bottom: 0.8em;">ACHIEVEMENTS & MILESTONES</h2>
+                <div id="user-badges-grid">
+                    <p style="color: var(--light-text-color);">Loading achievements...</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <custom-modal></custom-modal>
+    <site-footer></site-footer>
+
+    <script type="module" src="/js/pages/profile-page.js"></script>
+
+    <script src="/js/profanity-filter.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script type="module" src="/js/app.js"></script>
+</body>
+</html>

@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Global Real-Time Database Reader for Modules Metadata
-    database.ref("quizModules").on("value", (snapshot) => {
+    database.ref("subjects").on("value", (snapshot) => {
         const data = snapshot.val();
         if (data) {
             QUESTION_REGISTRY = data;
@@ -102,10 +102,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 renderUnifiedHub();
             }
         } else {
-            const treeEl = document.getElementById("dynamic-manuals-tree");
+            const treeEl = document.getElementById("dynamic-publications-tree");
             if (treeEl) {
                 treeEl.innerHTML = `<div style="color: var(--alert-color); padding: 0.5em; border: 1px dashed var(--alert-color);">
-                    ❌ No quiz modules found in database under 'quizModules/'. Use Quiz Hub to create one!
+                    ❌ No quiz modules found in database under 'subjects/'. Use Quiz Hub to create one!
                 </div>`;
             }
         }
@@ -165,7 +165,7 @@ function populateBranchDropdowns() {
 
     moduleKeys.forEach((key) => {
         const item = QUESTION_REGISTRY[key];
-        const label = `${item.branchName || key} (${item.manual || 'Standard'})`;
+        const label = `${item.branchName || key} (${item.publication || 'Standard'})`;
 
         if (setupSelect) setupSelect.innerHTML += `<option value="${key}">${label}</option>`;
         if (builderTargetSelect) builderTargetSelect.innerHTML += `<option value="${key}">${label}</option>`;
@@ -178,7 +178,7 @@ function populateBranchDropdowns() {
 }
 
 function renderModuleList() {
-    const treeContainer = document.getElementById("dynamic-manuals-tree");
+    const treeContainer = document.getElementById("dynamic-publications-tree");
     if (!treeContainer) return;
 
     const moduleKeys = Object.keys(QUESTION_REGISTRY);
@@ -195,7 +195,7 @@ function renderModuleList() {
         const count = rawQs ? (Array.isArray(rawQs) ? rawQs.length : Object.keys(rawQs).length) : 0;
 
         html += `
-            <li><strong>${item.branchName || key} — ${item.manual || 'N/A'}</strong>
+            <li><strong>${item.branchName || key} — ${item.publication || 'N/A'}</strong>
                 <ul>
                     <li>Category: ${item.category || 'General'}</li>
                     <li>Registered Questions: ${count}</li>
@@ -478,7 +478,7 @@ function voteQuestion(branchKey, questionId, voteType) {
     VOTE_COOLDOWNS[questionId] = now;
 
     const userId = currentUser.uid;
-    const voteRef = database.ref(`quizModules/${branchKey}/questions/${questionId}/votes/${userId}`);
+    const voteRef = database.ref(`subjects/${branchKey}/questions/${questionId}/votes/${userId}`);
 
     // Update Firebase
     voteRef.once("value", (snapshot) => {
@@ -556,11 +556,11 @@ function renderUnifiedHub() {
     const branch = inspectSelect.value;
     const data = QUESTION_REGISTRY[branch];
     const userUid = currentUser ? currentUser.uid : null;
-    const isSuperAdmin = userUid === SUPER_UID;
+    const isSuper = userUid === SUPER_UID;
     const isModuleOwner = data && data.createdBy && data.createdBy === userUid;
 
     if (authStatus) {
-        if (isSuperAdmin) {
+        if (isSuper) {
             authStatus.innerHTML = `<strong>Mode: SUPER ADMIN</strong> (Full Control)`;
         } else if (currentUser) {
             authStatus.innerHTML = `Signed in as: <strong>${currentUser.displayName || currentUser.email}</strong>`;
@@ -572,14 +572,14 @@ function renderUnifiedHub() {
     if (!data) return;
 
     if (deleteModBtn) {
-        deleteModBtn.classList.toggle("hidden", !(isSuperAdmin || isModuleOwner));
+        deleteModBtn.classList.toggle("hidden", !(isSuper || isModuleOwner));
     }
 
     if (activeModuleListenerRef) {
         activeModuleListenerRef.off();
     }
 
-    activeModuleListenerRef = database.ref(`quizModules/${branch}/questions`);
+    activeModuleListenerRef = database.ref(`subjects/${branch}/questions`);
     activeModuleListenerRef.on("value", (snapshot) => {
         const rawQs = snapshot.val() || {};
         const questionsList = Array.isArray(rawQs) 
@@ -594,7 +594,7 @@ function renderUnifiedHub() {
         }
 
         container.innerHTML = questionsList.map((q, idx) => {
-            const canEditQuestion = isSuperAdmin || isModuleOwner || (q.createdBy && q.createdBy === userUid);
+            const canEditQuestion = isSuper || isModuleOwner || (q.createdBy && q.createdBy === userUid);
             const optsArray = Array.isArray(q.options) ? q.options : Object.values(q.options || []);
 
             // 1. Calculate Votes (Support BOTH new 'votes' map AND legacy 'upvotes'/'downvotes' numbers)
@@ -691,7 +691,7 @@ function createNewQuizModule() {
     const keyInput = document.getElementById("new-quiz-key").value.trim();
     const titleInput = document.getElementById("new-quiz-title").value.trim();
     const catInput = document.getElementById("new-quiz-category").value.trim();
-    const manualInput = document.getElementById("new-quiz-manual").value.trim();
+    const publicationInput = document.getElementById("new-quiz-publication").value.trim();
 
     const cleanKey = keyInput.toUpperCase().replace(/[^A-Z0-9_]/g, '');
 
@@ -700,7 +700,7 @@ function createNewQuizModule() {
         return;
     }
 
-    if (!window.validateInputsClean([keyInput, titleInput, catInput, manualInput])) {
+    if (!window.validateInputsClean([keyInput, titleInput, catInput, publicationInput])) {
         alert("Inappropriate language detected in your module fields. Please revise your text.");
         return;
     }
@@ -710,17 +710,17 @@ function createNewQuizModule() {
         return;
     }
 
-    database.ref(`quizModules/${cleanKey}`).set({
+    database.ref(`subjects/${cleanKey}`).set({
         branchName: titleInput,
         category: catInput || "General",
-        manual: manualInput || "Standard Regulation",
+        publication: publicationInput || "Standard Regulation",
         createdBy: currentUser.uid,
         questions: {}
     }).then(() => {
         document.getElementById("new-quiz-key").value = "";
         document.getElementById("new-quiz-title").value = "";
         document.getElementById("new-quiz-category").value = "";
-        document.getElementById("new-quiz-manual").value = "";
+        document.getElementById("new-quiz-publication").value = "";
         toggleAccordion('module-form-accordion');
         alert(`Module '${cleanKey}' created successfully in cloud database!`);
     }).catch((err) => {
@@ -776,7 +776,7 @@ function addCustomQuestion() {
         createdBy: currentUser.uid
     };
 
-    database.ref(`quizModules/${branch}/questions`).push(newQuestion)
+    database.ref(`subjects/${branch}/questions`).push(newQuestion)
         .then(() => {
             document.getElementById("builder-q-prompt").value = "";
             document.getElementById("builder-opt-0").value = "";
@@ -809,7 +809,7 @@ function saveQuestionEdit(branchKey, questionId) {
         return;
     }
 
-    database.ref(`quizModules/${branchKey}/questions/${questionId}`).update({
+    database.ref(`subjects/${branchKey}/questions/${questionId}`).update({
         q: prompt,
         options: options,
         answer: answer,
@@ -821,7 +821,7 @@ function saveQuestionEdit(branchKey, questionId) {
 
 function deleteQuestion(branchKey, questionId) {
     if (confirm("Are you sure you want to permanently delete this question?")) {
-        database.ref(`quizModules/${branchKey}/questions/${questionId}`).remove()
+        database.ref(`subjects/${branchKey}/questions/${questionId}`).remove()
             .then(() => {
                 alert("Question deleted successfully!");
             })
@@ -836,7 +836,7 @@ function deleteQuizModule() {
     const branchKey = selectEl.value;
 
     if (confirm(`CRITICAL WARNING: Permanently delete module '${branchKey}' and ALL its questions from Firebase?`)) {
-        database.ref(`quizModules/${branchKey}`).remove()
+        database.ref(`subjects/${branchKey}`).remove()
             .then(() => {
                 alert(`Module '${branchKey}' deleted!`);
             })

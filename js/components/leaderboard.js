@@ -1,112 +1,320 @@
 import { state } from '../state.js';
-import { fetchScoresOnce, fetchScoresOrderedByPct } from '../services/db-service.js';
-
-export function updateDashboardMetrics() {
-    fetchScoresOnce(logs => {
-        const totalEl = document.getElementById("stat-total-evals");
-        if (totalEl) totalEl.innerText = logs.length;
-
-        const modulesCountEl = document.getElementById("stat-modules-count");
-        if (modulesCountEl) modulesCountEl.innerText = Object.keys(state.QUESTION_REGISTRY || {}).length;
-
-        const homeTopBody = document.getElementById("home-top-scores-body");
-        if (homeTopBody) {
-            logs.sort((a, b) => {
-                if (b.pct !== a.pct) {
-                    return b.pct - a.pct;
-                }
-                return new Date(b.date) - new Date(a.date);
-            });
-
-            const topPerformers = logs.slice(0, 3);
-
-            if (topPerformers.length === 0) {
-                homeTopBody.innerHTML = `<tr><td colspan="4" class="text-center" style="color: var(--light-text-color);">No scores logged yet. Be the first!</td></tr>`;
-            } else {
-                homeTopBody.innerHTML = topPerformers.map((entry, idx) => {
-                    let rankStyle = "";
-                    if (idx === 0) rankStyle = 'style="background-color: var(--gold-color);"';
-                    else if (idx === 1) rankStyle = 'style="background-color: var(--silver-color);"';
-                    else if (idx === 2) rankStyle = 'style="background-color: var(--bronze-color);"';
-
-                    return `
-                        <tr ${rankStyle}>
-                            <td><strong>#${idx + 1} ${entry.name}</strong></td>
-                            <td>${entry.branch}</td>
-                            <td style="color: var(--text-color); font-weight: bold;">${entry.score} (${entry.pct}%)</td>
-                            <td style="color: var(--light-text-color); font-size: 0.85rem;">${entry.date}</td>
-                        </tr>
-                    `;
-                }).join('');
-            }
-        }
-    });
-}
-
-export function renderLeaderboard() {
-    const filterSelect = document.getElementById("filter-leaderboard");
-    const filter = filterSelect ? filterSelect.value : "ALL";
-    const tbody = document.getElementById("leaderboard-body");
-    if (!tbody) return;
-
-    tbody.innerHTML = `<tr><td colspan="4" class="text-center">Loading universal scores from Firebase...</td></tr>`;
-
-    fetchScoresOrderedByPct(logs => {
-        tbody.innerHTML = "";
-
-        logs.sort((a, b) => {
-            if (b.pct !== a.pct) {
-                return b.pct - a.pct;
-            }
-            return new Date(b.date) - new Date(a.date);
-        });
-
-        const filtered = logs.filter(item => filter === "ALL" || item.branch === filter);
-
-        if (filtered.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" class="text-center">No scores logged yet for this filter.</td></tr>`;
-            return;
-        }
-
-        tbody.innerHTML = filtered.map((entry, idx) => {
-            let rowStyle = "";
-            if (idx === 0) rowStyle = 'style="background-color: var(--gold-color);"';
-            else if (idx === 1) rowStyle = 'style="background-color: var(--silver-color);"';
-            else if (idx === 2) rowStyle = 'style="background-color: var(--bronze-color);"';
-            else if (idx % 2 === 1) rowStyle = 'style="background-color: rgba(0, 0, 0, 0.04);"';
-
-            return `
-                <tr ${rowStyle}>
-                    <td><strong>#${idx + 1} ${entry.name}</strong></td>
-                    <td>${entry.branch}</td>
-                    <td style="color: var(--text-color); font-weight: bold;">${entry.score} (${entry.pct}%)</td>
-                    <td class="timestamp" style="color: var(--light-text-color); font-size: 0.85rem;">${entry.date}</td>
-                </tr>
-            `;
-        }).join('');
-    });
-}
+import { database } from '../config.js';
 
 let currentSortCol = null;
 let currentSortAsc = true;
 
+/**
+ * Helper: Extracts raw correct count from score strings or properties.
+ * E.g., "90/100" -> 90, "9/10" -> 9
+ */
+function parseCorrectCount(item) {
+    if (!item) return 0;
+    if (typeof item.correctCount === 'number') {
+        return item.correctCount;
+    }
+    
+    const scoreStr = String(item.score || item || '');
+    if (scoreStr.includes('/')) {
+        const parts = scoreStr.split('/');
+        const parsed = parseInt(parts[0], 10);
+        if (!isNaN(parsed)) return parsed;
+    }
+    
+    const directNum = parseInt(scoreStr, 10);
+    return isNaN(directNum) ? 0 : directNum;
+}
+
+/**
+ * Helper: Formats callsign display with UID matching & legacy censorship support
+ */
+function formatCallsignDisplay(item, currentUid, currentUserCallsign) {
+    const rawName = item.callsign || item.name || '';
+    
+    // Check if entry belongs to the logged-in user via UID or callsign fallback
+    const isMe = (currentUid && item.uid && item.uid === currentUid) || 
+                 (currentUserCallsign && rawName === currentUserCallsign);
+
+    // If it's the current user, always display their active callsign + YOU badge
+    if (isMe) {
+        const activeName = currentUserCallsign || rawName || 'Active User';
+        return `<strong>${activeName}</strong> <span class="quiz-card-badge">YOU</span>`;
+    }
+
+    // For other users: redact if entry lacks callsign/UID or is flagged legacy
+    const isLegacy = (!item.callsign && !item.uid) || item.isLegacyName === true;
+
+    if (isLegacy) {
+        return `
+            <span style="color: var(--light-text-color); font-style: italic;" title="Recorded prior to callsign system update">
+                [Limited]
+            </span>
+            <span class="quiz-card-badge" style="font-size: 0.7rem; opacity: 0.8; margin-left: 4px;">Legacy</span>
+        `;
+    }
+
+    return `<strong>${rawName}</strong>`;
+}
+
+/**
+ * Page Initialization Entry Point for Leaderboard
+ */
+export function initLeaderboardPage() {
+    const modeSelect = document.getElementById("leaderboard-mode-select");
+    const subjectSelect = document.getElementById("filter-leaderboard");
+
+    if (modeSelect) {
+        modeSelect.addEventListener("change", (e) => {
+            const subjectWrapper = document.getElementById("subject-filter-wrapper");
+            if (subjectWrapper) {
+                subjectWrapper.style.display = e.target.value === 'user-points' ? 'none' : 'block';
+            }
+            renderLeaderboard();
+        });
+    }
+
+    if (subjectSelect) {
+        subjectSelect.addEventListener("change", () => renderLeaderboard());
+    }
+
+    renderLeaderboard();
+}
+
+/**
+ * Updates Dashboard Stat Counters and Top 3 High Scores Preview (Index Page)
+ */
+export function updateDashboardMetrics() {
+    // 1. Update active modules counter
+    const modulesCountEl = document.getElementById("stat-modules-count");
+    if (modulesCountEl) {
+        modulesCountEl.innerText = Object.keys(state.QUESTION_REGISTRY || {}).length;
+    }
+
+    // 2. Fetch and render top 3 high scores for index page
+    const homeTopBody = document.getElementById("home-top-scores-body");
+    if (!homeTopBody) return;
+
+    database.ref("scores").once("value").then(snapshot => {
+        const scores = snapshot.val() || {};
+        const scoreList = Object.values(scores);
+
+        // Update total test evaluations counter on home page
+        const totalEvalsEl = document.getElementById("stat-total-evals");
+        if (totalEvalsEl) {
+            totalEvalsEl.innerText = scoreList.length;
+        }
+
+        if (scoreList.length === 0) {
+            homeTopBody.innerHTML = `<tr><td colspan="4" class="text-center" style="color: var(--light-text-color);">No scores logged yet. Be the first!</td></tr>`;
+            return;
+        }
+
+        // SORT BY TOTAL CORRECT ANSWERS DESCENDING (90/100 beats 9/10)
+        scoreList.sort((a, b) => {
+            const correctA = parseCorrectCount(a);
+            const correctB = parseCorrectCount(b);
+            if (correctB !== correctA) {
+                return correctB - correctA;
+            }
+            return (b.pct || 0) - (a.pct || 0); // Tie-breaker: higher %
+        });
+
+        // Take top 3 scores for index page
+        const top3 = scoreList.slice(0, 3);
+        const currentUid = (state.currentUser && state.currentUser.uid) || state.userUid || null;
+        const currentUserCallsign = state.userCallsign || null;
+
+        homeTopBody.innerHTML = top3.map((item, idx) => {
+            let rankStyle = "";
+            if (idx === 0) rankStyle = 'style="background-color: rgba(255, 205, 0, 0.15);"';
+            else if (idx === 1) rankStyle = 'style="background-color: rgba(200, 200, 200, 0.15);"';
+            else if (idx === 2) rankStyle = 'style="background-color: rgba(205, 127, 50, 0.15);"';
+
+            const nameLabel = formatCallsignDisplay(item, currentUid, currentUserCallsign);
+
+            return `
+                <tr ${rankStyle}>
+                    <td>${nameLabel}</td>
+                    <td>${item.branch || 'General'}</td>
+                    <td style="font-weight: bold; color: var(--alert-color);">${item.score} (${item.pct}%)</td>
+                    <td style="color: var(--light-text-color); font-size: 0.85rem;">${item.date || 'N/A'}</td>
+                </tr>
+            `;
+        }).join('');
+    }).catch(err => {
+        console.error("Error loading top 3 preview scores:", err);
+        homeTopBody.innerHTML = `<tr><td colspan="4" class="text-center" style="color: var(--light-text-color);">Unable to load top scores preview.</td></tr>`;
+    });
+}
+
+/**
+ * Renders Full Leaderboard Table (Supports both 'scores' and 'user-points' modes)
+ */
+export async function renderLeaderboard() {
+    const mainBody = document.getElementById("leaderboard-body");
+    const homeBody = document.getElementById("home-top-scores-body");
+    const tbody = mainBody || homeBody;
+    const thead = document.getElementById("leaderboard-thead");
+
+    if (!tbody || !thead) return;
+
+    // Is this the home page preview card?
+    const isHomePage = !mainBody && !!homeBody;
+    const limitCount = isHomePage ? 3 : 50;
+
+    const modeSelect = document.getElementById("leaderboard-mode-select");
+    const subjectSelect = document.getElementById("filter-leaderboard");
+
+    const mode = modeSelect ? modeSelect.value : 'test-scores';
+    const selectedSubject = subjectSelect ? subjectSelect.value : 'ALL';
+    
+    const currentUid = (state.currentUser && state.currentUser.uid) || state.userUid || null;
+    const currentUserCallsign = state.userCallsign || null;
+
+    // 1. RENDER: Lifetime Points Leaderboard (Pulls from /users)
+    if (mode === 'user-points' && !isHomePage) {
+        thead.innerHTML = `
+            <tr>
+                <th class="sortable" data-sort="name">Callsign <span class="sort-icon">↕</span></th>
+                <th class="text-center sortable" data-sort="score">Lifetime Points <span class="sort-icon">↕</span></th>
+            </tr>
+        `;
+
+        try {
+            const snapshot = await database.ref("users").once("value");
+            const users = snapshot.val() || {};
+
+            const userList = Object.keys(users)
+                .map(uid => ({
+                    uid: uid,
+                    callsign: users[uid].callsign || null,
+                    name: users[uid].name || null,
+                    isLegacyName: users[uid].isLegacyName || false,
+                    points: users[uid].points || 0
+                }))
+                .filter(u => u.points > 0)
+                .sort((a, b) => b.points - a.points);
+
+            if (userList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="2" class="text-center" style="color: var(--light-text-color);">No points recorded yet. Complete quizzes to earn stars!</td></tr>`;
+                initTableSorting("leaderboard-table");
+                return;
+            }
+
+            tbody.innerHTML = userList.slice(0, limitCount).map(user => {
+                const isMe = (currentUid && user.uid === currentUid) || 
+                             (currentUserCallsign && user.callsign === currentUserCallsign);
+                const highlightStyle = isMe ? 'style="background-color: rgba(255, 205, 0, 0.12);"' : '';
+                const callsignLabel = formatCallsignDisplay(user, currentUid, currentUserCallsign);
+
+                return `
+                    <tr ${highlightStyle}>
+                        <td>${callsignLabel}</td>
+                        <td class="text-center" style="font-weight: bold; color: var(--alert-color);">⭐ ${user.points} pts</td>
+                    </tr>
+                `;
+            }).join('');
+
+        } catch (err) {
+            console.error("Error loading points leaderboard:", err);
+            tbody.innerHTML = `<tr><td colspan="2" class="text-center" style="color: var(--light-text-color);">Unable to load user points.</td></tr>`;
+        }
+
+    // 2. RENDER: Top Test Scores (Pulls from /scores)
+    } else {
+        thead.innerHTML = `
+            <tr>
+                <th class="sortable" data-sort="name">Callsign <span class="sort-icon">↕</span></th>
+                <th class="sortable" data-sort="module">Subject <span class="sort-icon">↕</span></th>
+                <th class="sortable" data-sort="score">Score <span class="sort-icon">↕</span></th>
+                <th class="sortable" data-sort="date">Date <span class="sort-icon">↕</span></th>
+            </tr>
+        `;
+
+        try {
+            const snapshot = await database.ref("scores").once("value");
+            const scores = snapshot.val() || {};
+
+            let scoreList = Object.values(scores);
+
+            if (selectedSubject !== 'ALL') {
+                scoreList = scoreList.filter(item => item.branch === selectedSubject || item.activeBranchKey === selectedSubject);
+            }
+
+            // SORT BY TOTAL CORRECT ANSWERS DESCENDING
+            scoreList.sort((a, b) => {
+                const correctA = parseCorrectCount(a);
+                const correctB = parseCorrectCount(b);
+                if (correctB !== correctA) {
+                    return correctB - correctA;
+                }
+                return (b.pct || 0) - (a.pct || 0); // Tie-breaker: higher %
+            });
+
+            if (scoreList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center" style="color: var(--light-text-color);">No test scores logged yet. Be the first to complete a quiz!</td></tr>`;
+                initTableSorting("leaderboard-table");
+                return;
+            }
+
+            tbody.innerHTML = scoreList.slice(0, limitCount).map((item, idx) => {
+                const rawName = item.callsign || item.name;
+                const isMe = (currentUid && item.uid && item.uid === currentUid) || 
+                             (currentUserCallsign && rawName === currentUserCallsign);
+                
+                // Gold / Silver / Bronze accent backgrounds for Home Preview top 3
+                let rankBg = "";
+                if (isHomePage) {
+                    if (idx === 0) rankBg = 'background-color: rgba(255, 205, 0, 0.15);';
+                    else if (idx === 1) rankBg = 'background-color: rgba(200, 200, 200, 0.15);';
+                    else if (idx === 2) rankBg = 'background-color: rgba(205, 127, 50, 0.15);';
+                } else if (isMe) {
+                    rankBg = 'background-color: rgba(255, 205, 0, 0.12);';
+                }
+
+                const displayScore = `${item.score} (${item.pct}%)`;
+                const nameLabel = formatCallsignDisplay(item, currentUid, currentUserCallsign);
+
+                return `
+                    <tr style="${rankBg}">
+                        <td>${nameLabel}</td>
+                        <td>${item.branch || 'General'}</td>
+                        <td style="font-weight: bold; color: var(--alert-color);">${displayScore}</td>
+                        <td style="color: var(--light-text-color); font-size: 0.85rem;">${item.date || 'N/A'}</td>
+                    </tr>
+                `;
+            }).join('');
+
+        } catch (err) {
+            console.error("Error loading scores:", err);
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center" style="color: var(--light-text-color);">Failed to load scores data.</td></tr>`;
+        }
+    }
+
+    // Re-bind sort listeners to newly rendered DOM headers
+    initTableSorting("leaderboard-table");
+}
+
+/**
+ * In-memory client-side table column sorting
+ */
 export function initTableSorting(tableId) {
     const table = document.getElementById(tableId);
     if (!table) return;
 
     const headers = table.querySelectorAll("th.sortable");
     headers.forEach((th, index) => {
-        th.addEventListener("click", () => {
+        th.onclick = () => {
             const tbody = table.querySelector("tbody");
-            const rows = Array.from(tbody.querySelectorAll("tr"));
+            if (!tbody) return;
 
+            const rows = Array.from(tbody.querySelectorAll("tr"));
             if (rows.length === 1 && rows[0].querySelector("td[colspan]")) return;
 
             if (currentSortCol === index) {
                 currentSortAsc = !currentSortAsc;
             } else {
                 currentSortCol = index;
-                // Default to descending for Score/Date, ascending for Name/Module
                 const sortType = th.dataset.sort;
                 currentSortAsc = !(sortType === "score" || sortType === "date");
             }
@@ -128,9 +336,9 @@ export function initTableSorting(tableId) {
                 const cellB = b.children[index]?.innerText.trim() || "";
 
                 if (sortKey === "score") {
-                    const scoreA = parseScorePercentage(cellA);
-                    const scoreB = parseScorePercentage(cellB);
-                    return currentSortAsc ? scoreA - scoreB : scoreB - scoreA;
+                    const countA = parseCorrectCount(cellA);
+                    const countB = parseCorrectCount(cellB);
+                    return currentSortAsc ? countA - countB : countB - countA;
                 }
 
                 if (sortKey === "date") {
@@ -139,29 +347,14 @@ export function initTableSorting(tableId) {
                     return currentSortAsc ? dateA - dateB : dateB - dateA;
                 }
 
-                // Default string sorting for Name/Participant & Module
-                const cleanA = cellA.replace(/^#\d+\s*/, ''); // Remove "#1 " prefix for ranking strings
-                const cleanB = cellB.replace(/^#\d+\s*/, '');
+                const cleanA = cellA.replace(/\s*YOU$/, '').replace(/\s*Legacy$/, '');
+                const cleanB = cellB.replace(/\s*YOU$/, '').replace(/\s*Legacy$/, '');
                 return currentSortAsc
                     ? cleanA.localeCompare(cleanB, undefined, { sensitivity: 'base', numeric: true })
                     : cleanB.localeCompare(cleanA, undefined, { sensitivity: 'base', numeric: true });
             });
 
             rows.forEach(row => tbody.appendChild(row));
-        });
+        };
     });
-}
-
-// Extracts percentage from strings like "8/10 (80%)" or "80%"
-function parseScorePercentage(val) {
-    const match = val.match(/\((\d+)%\)/) || val.match(/(\d+)%/);
-    if (match) return parseFloat(match[1]);
-
-    if (val.includes("/")) {
-        const [num, denom] = val.split("/").map(v => parseFloat(v));
-        return denom ? (num / denom) * 100 : 0;
-    }
-
-    const parsed = parseFloat(val);
-    return isNaN(parsed) ? 0 : parsed;
 }

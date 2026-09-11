@@ -6,6 +6,21 @@ Built using plain JavaScript (ES Modules), HTML5, CSS3, and Firebase Realtime Da
 
 ---
 
+js/
+├── config.js
+├── state.js
+├── app.js                   <-- Global Auth & Router ONLY (~35 lines)
+├── components/
+│   ├── header.js            <-- Encapsulates avatar/menu/dropdown behavior
+│   ├── modal.js             <-- Encapsulates custom promise dialogs
+│   ├── quiz-engine.js       <-- Quiz/Test pages
+│   ├── flashcards.js        <-- Flashcards page
+│   ├── leaderboard.js       <-- Leaderboard page
+│   └── hub.js               <-- Question creation/edit page
+└── services/
+    ├── auth-service.js
+    └── user-service.js
+
 ## Features
 
 * **100% Free & Open Access:** No paywalls, subscription tiers, or hidden charges.

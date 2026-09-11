@@ -7,51 +7,73 @@
     <meta name="google-adsense-account" content="ca-pub-1864969470317711">
     <link rel="icon" type="image/x-icon" href="/assets/images/emblems/icon.svg">
     <title>PROP - Leaderboard</title>
-    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="/styles.css">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1864969470317711"
         crossorigin="anonymous"></script>
 
     <!-- Load Component Partials -->
-    <script type="module" src="/js/partials/header.js"></script>
-    <script type="module" src="/js/partials/footer.js"></script>
+    <script type="module" src="/js/components/header.js"></script>
+    <script type="module" src="/js/components/footer.js"></script>
+    <script type="module" src="/js/pages/modal-element.js"></script>
 </head>
 
 <body>
 
     <site-header></site-header>
 
-    <main>
-        <section id="leaderboard-view" class="col">
-            <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
-                <h1>Leaderboard</h1>
-                <p>Sign in to see your name on the leaderboard!</p>
+<main>
+    <section id="leaderboard-view" class="col">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8em; margin-bottom: 1em;">
+            <div>
+                <h1 style="margin: 0;">Leaderboard</h1>
+                <p style="margin: 0.2em 0 0 0; font-size: 0.85rem; color: var(--light-text-color);">
+                    Sign in to claim your callsign on the public rankings!
+                </p>
+            </div>
+            
+            <div style="display: flex; gap: 0.8em; flex-wrap: wrap; align-items: center;">
                 <div>
-                    <label for="filter-leaderboard" style="font-size: 0.8rem;">Filter Module:</label>
-                    <select id="filter-leaderboard" style="width: auto; padding: 0.3em; margin: 0;">
+                    <label for="leaderboard-mode-select" style="font-size: 0.8rem; display: block; font-weight: bold;">Type:</label>
+                    <select id="leaderboard-mode-select" style="width: auto; padding: 0.3em 0.6em; margin: 0;">
+                        <option value="test-scores">Top Evaluations</option>
+                        <option value="user-points">Most Lifetime Points ⭐</option>
+                    </select>
+                </div>
+
+                <div id="subject-filter-wrapper">
+                    <label for="filter-leaderboard" style="font-size: 0.8rem; display: block; font-weight: bold;">Subject:</label>
+                    <select id="filter-leaderboard" style="width: auto; padding: 0.3em 0.6em; margin: 0;">
                         <option value="ALL">All Subjects</option>
                     </select>
                 </div>
+
+                <p style="font-size: 0.75rem; color: var(--light-text-color); margin-top: 0.5em;">
+    * Entries prior to the 3.9.1. update have been automatically altered.
+</p>
             </div>
+        </div>
 
-            <table id="leaderboard-table">
-                <thead>
-                    <tr>
-                        <th class="sortable" data-sort="name">Participant <span class="sort-icon">↕</span></th>
-                        <th class="sortable" data-sort="module">Module <span class="sort-icon">↕</span></th>
-                        <th class="sortable" data-sort="score">Score <span class="sort-icon">↕</span></th>
-                        <th class="sortable" data-sort="date">Date <span class="sort-icon">↕</span></th>
-                    </tr>
-                </thead>
-                <tbody id="leaderboard-body">
-                    <tr>
-                        <td colspan="4" class="text-center" style="color: var(--light-text-color);">Connecting to cloud
-                            database...</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-    </main>
+        <table id="leaderboard-table">
+            <thead id="leaderboard-thead">
+                <tr>
+                    <th class="sortable" data-sort="name">Callsign <span class="sort-icon">↕</span></th>
+                    <th class="sortable" data-sort="module">Subject <span class="sort-icon">↕</span></th>
+                    <th class="sortable" data-sort="score">Score <span class="sort-icon">↕</span></th>
+                    <th class="sortable" data-sort="date">Date <span class="sort-icon">↕</span></th>
+                </tr>
+            </thead>
+            <tbody id="leaderboard-body">
+                <tr>
+                    <td colspan="4" class="text-center">
+                        Connecting to cloud database...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
 
+    <custom-modal></custom-modal>
     <site-footer></site-footer>
 
     <script src="/js/profanity-filter.js"></script>

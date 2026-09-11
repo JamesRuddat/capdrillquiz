@@ -12,8 +12,9 @@
         crossorigin="anonymous"></script>
 
     <!-- Load Component Partials -->
-    <script type="module" src="/js/partials/header.js"></script>
-    <script type="module" src="/js/partials/footer.js"></script>
+    <script type="module" src="/js/components/header.js"></script>
+    <script type="module" src="/js/components/footer.js"></script>
+    <script type="module" src="/js/pages/modal-element.js"></script>
 </head>
 
 <body>
@@ -44,10 +45,10 @@
                 </div>
 
                 <div style="display: flex; align-items: center; gap: 0.5em; flex-wrap: wrap;">
-                    <label for="bank-inspect-select" style="font-size: 0.8rem; margin: 0;">Edit Selected Subject:</label>
+                    <label for="bank-inspect-select" style="font-size: 0.8rem; margin: 0;">View Subject:</label>
                     <select id="bank-inspect-select" style="width: auto; padding: 0.3em; margin: 0;"></select>
                     <button id="btn-delete-module" class="btn-tactical btn-clear hidden">
-                        Delete Module
+                        Delete Subject
                     </button>
                 </div>
             </div>
@@ -68,7 +69,7 @@
             </div>
         </section>
     </main>
-
+<custom-modal></custom-modal>
     <site-footer></site-footer>
 
     <script src="/js/profanity-filter.js"></script>

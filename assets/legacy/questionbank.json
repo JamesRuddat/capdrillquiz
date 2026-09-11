@@ -1,2140 +1,2279 @@
 {
-  "quizModules": {
-    "CAP": {
+  "subjects": {
+    "CAP_DRILL": {
       "branchName": "Civil Air Patrol Drill",
       "category": "Drill",
       "imageUrl": "https://www.gocivilairpatrol.com/media/photoalbums/67190384_2450135768383102_536700487_A2E9342E843CE.jpg?dimensions=950x633",
-      "manual": "CAPP 60-33",
-      "questions": {
-        "0": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "CAPP 60-33 is the official Civil Air Patrol Drill and Ceremonies Pamphlet.",
+      "publication": "CAPP 60-33",
+      "description": "Master Civil Air Patrol drill movements, commands, and ceremonial procedures under CAPP 60-33. Access the official drill pamphlet here: https://www.gocivilairpatrol.com/media/cms/P060_033_2_AUG_2016_42436A7A93EE9.pdf",
+      "questions": [
+        {
+          "q": "Which official publication governs Civil Air Patrol Drill & Ceremonies?",
+          "imageUrl": "",
           "options": [
             "CAPR 52-16",
             "CAPP 60-33",
             "CAPR 39-1",
             "DAFPAM 34-1203"
           ],
-          "q": "Which official publication governs Civil Air Patrol Drill & Ceremonies?",
-          "upvotes": 5
+          "answer": 1,
+          "explanation": "CAPP 60-33 is the official Civil Air Patrol Drill and Ceremonies Pamphlet.",
+          "upvotes": 5,
+          "downvotes": 0
         },
-        "1": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "CAPP 60-33 specifies Quick Time cadence as 100 to 120 steps per minute.",
+        {
+          "q": "In CAP drill, what is the standard Quick Time cadence rate?",
+          "imageUrl": "",
           "options": [
             "90 to 100 steps/min",
             "110 to 130 steps/min",
             "100 to 120 steps/min",
             "180 steps/min"
           ],
-          "q": "In CAP drill, what is the standard Quick Time cadence rate?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "CAPP 60-33 specifies Quick Time cadence as 100 to 120 steps per minute.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "2": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "The command 'TO THE REAR, MARCH' is given as the right foot strikes the ground.",
+        {
+          "q": "On which foot is the command 'TO THE REAR, MARCH' given in CAP drill?",
+          "imageUrl": "",
           "options": [
             "Left foot",
             "Right foot",
             "Either foot",
             "Both feet"
           ],
-          "q": "On which foot is the command 'TO THE REAR, MARCH' given in CAP drill?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "The command 'TO THE REAR, MARCH' is given as the right foot strikes the ground.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "3": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "Standard Quick Time step length in CAP drill is 24 inches.",
+        {
+          "q": "What is the standard step length for Quick Time in CAP drill?",
+          "imageUrl": "",
           "options": [
             "15 inches",
             "18 inches",
             "24 inches",
             "30 inches"
           ],
-          "q": "What is the standard step length for Quick Time in CAP drill?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "Standard Quick Time step length in CAP drill is 24 inches.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "4": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "At Position of Attention, feet form a 45-degree angle.",
+        {
+          "q": "At the Position of Attention, what angle should your feet form?",
+          "imageUrl": "",
           "options": [
             "45 degrees",
             "60 degrees",
             "30 degrees",
             "90 degrees"
           ],
-          "q": "At the Position of Attention, what angle should your feet form?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "At Position of Attention, feet form a 45-degree angle.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "5": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "Half Step length is 12 inches.",
+        {
+          "q": "What is the step length for Half Step in CAP marching?",
+          "imageUrl": "",
           "options": [
             "6 inches",
             "12 inches",
             "15 inches",
             "18 inches"
           ],
-          "q": "What is the step length for Half Step in CAP marching?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "Half Step length is 12 inches.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "6": {
-          "answer": 3,
-          "downvotes": 0,
-          "explanation": "Eyes Right is given on the right foot.",
+        {
+          "q": "In CAP ceremonies, on which foot is 'EYES, RIGHT' called?",
+          "imageUrl": "",
           "options": [
             "Left foot",
             "Either foot",
             "Standing position",
             "Right foot"
           ],
-          "q": "In CAP ceremonies, on which foot is 'EYES, RIGHT' called?",
-          "upvotes": 0
+          "answer": 3,
+          "explanation": "Eyes Right is given on the right foot.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "7": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "Distance between ranks in a flight is 40 inches.",
+        {
+          "q": "What is the standard distance between ranks in a CAP flight formation?",
+          "imageUrl": "",
           "options": [
             "30 inches",
             "40 inches",
             "60 inches",
             "24 inches"
           ],
-          "q": "What is the standard distance between ranks in a CAP flight formation?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "Distance between ranks in a flight is 40 inches.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "8": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "Normal interval is measured by extending the left arm horizontally at shoulder height.",
+        {
+          "q": "How is Normal Interval measured between cadets in a rank?",
+          "imageUrl": "",
           "options": [
             "Left arm extended horizontally",
             "Right arm extended horizontally",
             "Left hand on hip",
             "Right hand on hip"
           ],
-          "q": "How is Normal Interval measured between cadets in a rank?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "Normal interval is measured by extending the left arm horizontally at shoulder height.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "9": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "Close interval is measured by placing the left hand on the hip.",
+        {
+          "q": "How is Close Interval measured during alignment?",
+          "imageUrl": "",
           "options": [
             "Right hand on hip",
             "Elbows touching",
             "Left hand on hip",
             "12-inch gap"
           ],
-          "q": "How is Close Interval measured during alignment?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "Close interval is measured by placing the left hand on the hip.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "10": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "The preparatory command tells formation members what movement is to be executed.",
+        {
+          "q": "What is the primary function of a Preparatory Command?",
+          "imageUrl": "",
           "options": [
             "When to move",
             "What movement to execute",
             "Who executes the movement",
             "How fast to step"
           ],
-          "q": "What is the primary function of a Preparatory Command?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "The preparatory command tells formation members what movement is to be executed.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "11": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "The command of execution indicates when the movement is to be performed.",
+        {
+          "q": "What does the Command of Execution specify?",
+          "imageUrl": "",
           "options": [
             "When to execute the movement",
             "The direction of movement",
             "The cadence rate",
             "Which foot to start on"
           ],
-          "q": "What does the Command of Execution specify?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "The command of execution indicates when the movement is to be performed.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "12": {
-          "answer": 3,
-          "downvotes": 0,
-          "explanation": "'As You Were' revokes an improper preparatory command.",
+        {
+          "q": "Which command revokes an incorrect preparatory command?",
+          "imageUrl": "",
           "options": [
             "FALL OUT",
             "REST",
             "DISMISSED",
             "AS YOU WERE"
           ],
-          "q": "Which command revokes an incorrect preparatory command?",
-          "upvotes": 0
+          "answer": 3,
+          "explanation": "'As You Were' revokes an improper preparatory command.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "13": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "Double Time cadence is 180 steps per minute.",
+        {
+          "q": "What is the cadence rate for Double Time in CAP drill?",
+          "imageUrl": "",
           "options": [
             "120 steps/min",
             "180 steps/min",
             "150 steps/min",
             "200 steps/min"
           ],
-          "q": "What is the cadence rate for Double Time in CAP drill?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "Double Time cadence is 180 steps per minute.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "14": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "Step length for Double Time is 30 inches.",
+        {
+          "q": "What is the length of a Double Time step?",
+          "imageUrl": "",
           "options": [
             "18 inches",
             "24 inches",
             "30 inches",
             "36 inches"
           ],
-          "q": "What is the length of a Double Time step?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "Step length for Double Time is 30 inches.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "15": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "'Right Flank, MARCH' is called as the right foot strikes the ground.",
+        {
+          "q": "On which foot is 'Right Flank, MARCH' given while marching?",
+          "imageUrl": "",
           "options": [
             "Right foot",
             "Left foot",
             "Either foot",
             "Standing position"
           ],
-          "q": "On which foot is 'Right Flank, MARCH' given while marching?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "'Right Flank, MARCH' is called as the right foot strikes the ground.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "16": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "'Left Flank, MARCH' is called as the left foot strikes the ground.",
+        {
+          "q": "On which foot is 'Left Flank, MARCH' given while marching?",
+          "imageUrl": "",
           "options": [
             "Right foot",
             "Left foot",
             "Either foot",
             "Both feet"
           ],
-          "q": "On which foot is 'Left Flank, MARCH' given while marching?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "'Left Flank, MARCH' is called as the left foot strikes the ground.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "17": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "At PARADE, REST, feet are moved 12 inches apart measured from the inside of heels.",
+        {
+          "q": "At Parade Rest, how far apart are feet positioned?",
+          "imageUrl": "",
           "options": [
             "6 inches",
             "10 inches",
             "12 inches",
             "18 inches"
           ],
-          "q": "At Parade Rest, how far apart are feet positioned?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "At PARADE, REST, feet are moved 12 inches apart measured from the inside of heels.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "18": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "At AT EASE, cadets may move their right foot provided they stay silent.",
+        {
+          "q": "What is allowed at the position of AT EASE?",
+          "imageUrl": "",
           "options": [
             "Right foot may move, must remain silent",
             "May talk quietly",
             "Left foot must remain fixed",
             "May leave formation"
           ],
-          "q": "What is allowed at the position of AT EASE?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "At AT EASE, cadets may move their right foot provided they stay silent.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "19": {
-          "answer": 3,
-          "downvotes": 0,
-          "explanation": "At REST, cadets may talk and move, keeping their right foot in place.",
+        {
+          "q": "What freedom is granted at the position of REST?",
+          "imageUrl": "",
           "options": [
             "May leave the area",
             "Must keep head strictly straight",
             "No movement permitted",
             "May talk quietly with right foot in place"
           ],
-          "q": "What freedom is granted at the position of REST?",
-          "upvotes": 0
+          "answer": 3,
+          "explanation": "At REST, cadets may talk and move, keeping their right foot in place.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "20": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "'FALL OUT' allows cadets to leave their position in formation but remain nearby.",
+        {
+          "q": "What does the command 'FALL OUT' require formation members to do?",
+          "imageUrl": "",
           "options": [
             "Dismissed completely",
             "Leave formation but stay in immediate area",
             "Turn 180 degrees",
             "Sit down immediately"
           ],
-          "q": "What does the command 'FALL OUT' require formation members to do?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "'FALL OUT' allows cadets to leave their position in formation but remain nearby.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "21": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "'DISMISSED' terminates the duty or drill instruction period.",
+        {
+          "q": "What does the command 'DISMISSED' signify?",
+          "imageUrl": "",
           "options": [
             "Terminates the drill period",
             "Re-forms the flight",
             "Marches flight off area",
             "Puts flight at ease"
           ],
-          "q": "What does the command 'DISMISSED' signify?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "'DISMISSED' terminates the duty or drill instruction period.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "22": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "A guidon bearer carries the organizational colors/flag.",
+        {
+          "q": "What is the primary role of a Guidon Bearer in ceremonies?",
+          "imageUrl": "",
           "options": [
             "Flies air target drones",
             "Leads physical training",
             "Carries the unit flag/emblem standard",
             "Inspects uniforms"
           ],
-          "q": "What is the primary role of a Guidon Bearer in ceremonies?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "A guidon bearer carries the organizational colors/flag.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "23": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "In a column of threes, the element leader of the third element is the base.",
+        {
+          "q": "In Column Formation, who serves as the base when performing Column Right?",
+          "imageUrl": "",
           "options": [
             "First element leader",
             "Third element leader",
             "Flight commander",
             "Flight guide"
           ],
-          "q": "In Column Formation, who serves as the base when performing Column Right?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "In a column of threes, the element leader of the third element is the base.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "24": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "'Column Right, MARCH' is called on the right foot.",
+        {
+          "q": "On which foot is 'Column Right, MARCH' given?",
+          "imageUrl": "",
           "options": [
             "Right foot",
             "Left foot",
             "Either foot",
             "Heels together"
           ],
-          "q": "On which foot is 'Column Right, MARCH' given?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "'Column Right, MARCH' is called on the right foot.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "25": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "'Column Left, MARCH' is called on the left foot.",
+        {
+          "q": "On which foot is 'Column Left, MARCH' given?",
+          "imageUrl": "",
           "options": [
             "Right foot",
             "Left foot",
             "Either foot",
             "Standing position"
           ],
-          "q": "On which foot is 'Column Left, MARCH' given?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "'Column Left, MARCH' is called on the left foot.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "26": {
-          "answer": 3,
-          "downvotes": 0,
-          "explanation": "Mark Time cadence remains identical to Quick Time (100-120 bpm).",
+        {
+          "q": "What is the cadence rate during 'Mark Time, MARCH'?",
+          "imageUrl": "",
           "options": [
             "60 steps/min",
             "180 steps/min",
             "80 steps/min",
             "100 to 120 steps/min"
           ],
-          "q": "What is the cadence rate during 'Mark Time, MARCH'?",
-          "upvotes": 0
+          "answer": 3,
+          "explanation": "Mark Time cadence remains identical to Quick Time (100-120 bpm).",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "27": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "In Mark Time, feet are raised 4 inches off the ground.",
+        {
+          "q": "How high are feet raised during Mark Time?",
+          "imageUrl": "",
           "options": [
             "2 inches",
             "6 inches",
             "4 inches",
             "12 inches"
           ],
-          "q": "How high are feet raised during Mark Time?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "In Mark Time, feet are raised 4 inches off the ground.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "28": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "'Flight, HALT' can be given on either foot.",
+        {
+          "q": "On which foot is the command 'Flight, HALT' given while marching in Quick Time?",
+          "imageUrl": "",
           "options": [
             "Either foot",
             "Left foot only",
             "Right foot only",
             "Both feet together"
           ],
-          "q": "On which foot is the command 'Flight, HALT' given while marching in Quick Time?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "'Flight, HALT' can be given on either foot.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "29": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "After 'Flight, HALT', one additional step is taken before halting completely.",
+        {
+          "q": "How many steps are taken after the command of execution for 'HALT'?",
+          "imageUrl": "",
           "options": [
             "No additional steps",
             "1 additional step",
             "2 additional steps",
             "3 additional steps"
           ],
-          "q": "How many steps are taken after the command of execution for 'HALT'?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "After 'Flight, HALT', one additional step is taken before halting completely.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "30": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "In Open Ranks, the 1st rank takes 3 steps forward.",
+        {
+          "q": "In a 4-rank flight executing 'Open Ranks, MARCH', how many steps does the 1st rank take?",
+          "imageUrl": "",
           "options": [
             "1 step",
             "2 steps",
             "3 steps",
             "4 steps"
           ],
-          "q": "In a 4-rank flight executing 'Open Ranks, MARCH', how many steps does the 1st rank take?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "In Open Ranks, the 1st rank takes 3 steps forward.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "31": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "The 2nd rank takes 2 steps forward during Open Ranks.",
-          "options": [
-            "1 step",
-            "2 steps",
-            "3 steps",
-            "Stands fast"
-          ],
+        {
           "q": "How many steps forward does the 2nd rank take during Open Ranks?",
-          "upvotes": 0
-        },
-        "32": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "The 3rd rank takes 1 step forward during Open Ranks.",
+          "imageUrl": "",
           "options": [
             "1 step",
             "2 steps",
             "3 steps",
             "Stands fast"
           ],
-          "q": "How many steps forward does the 3rd rank take during Open Ranks?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "The 2nd rank takes 2 steps forward during Open Ranks.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "33": {
-          "answer": 3,
-          "downvotes": 0,
-          "explanation": "The 4th rank stands fast during Open Ranks.",
+        {
+          "q": "How many steps forward does the 3rd rank take during Open Ranks?",
+          "imageUrl": "",
+          "options": [
+            "1 step",
+            "2 steps",
+            "3 steps",
+            "Stands fast"
+          ],
+          "answer": 0,
+          "explanation": "The 3rd rank takes 1 step forward during Open Ranks.",
+          "upvotes": 0,
+          "downvotes": 0
+        },
+        {
+          "q": "What action does the 4th rank take during 'Open Ranks, MARCH'?",
+          "imageUrl": "",
           "options": [
             "Takes 1 step backward",
             "Takes 1 step forward",
             "Takes 2 steps backward",
             "Stands fast"
           ],
-          "q": "What action does the 4th rank take during 'Open Ranks, MARCH'?",
-          "upvotes": 0
+          "answer": 3,
+          "explanation": "The 4th rank stands fast during Open Ranks.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "34": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "'Ready, FRONT' brings head and eyes back to the front.",
+        {
+          "q": "What action completes alignment after 'Dress Right, DRESS'?",
+          "imageUrl": "",
           "options": [
             "Returns head and eyes to the front",
             "Executes About Face",
             "Returns arms to sides",
             "Puts flight at ease"
           ],
-          "q": "What action completes alignment after 'Dress Right, DRESS'?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "'Ready, FRONT' brings head and eyes back to the front.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "35": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "Right Face is executed on the heel of the right foot and ball of left foot.",
+        {
+          "q": "On what pivot points is a Right Face executed?",
+          "imageUrl": "",
           "options": [
             "Left heel, right ball",
             "Both heels simultaneously",
             "Right heel, left ball",
             "Both balls of feet"
           ],
-          "q": "On what pivot points is a Right Face executed?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "Right Face is executed on the heel of the right foot and ball of left foot.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "36": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "Left Face turns the body 90 degrees to the left.",
+        {
+          "q": "How many degrees does the body turn during a Left Face?",
+          "imageUrl": "",
           "options": [
             "45 degrees",
             "90 degrees",
             "180 degrees",
             "360 degrees"
           ],
-          "q": "How many degrees does the body turn during a Left Face?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "Left Face turns the body 90 degrees to the left.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "37": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "About Face turns the body 180 degrees clockwise.",
+        {
+          "q": "How many degrees and in what direction is an About Face executed?",
+          "imageUrl": "",
           "options": [
             "90 degrees left",
             "90 degrees right",
             "180 degrees clockwise",
             "180 degrees counter-clockwise"
           ],
-          "q": "How many degrees and in what direction is an About Face executed?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "About Face turns the body 180 degrees clockwise.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "38": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "During About Face, the right toe is placed half-foot-length behind left heel.",
+        {
+          "q": "Where is the right foot placed initially during an About Face?",
+          "imageUrl": "",
           "options": [
             "Right toe behind left heel",
             "Left toe behind right heel",
             "Right heel beside left toe",
             "Both feet parallel"
           ],
-          "q": "Where is the right foot placed initially during an About Face?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "During About Face, the right toe is placed half-foot-length behind left heel.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "39": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "In Line Formation, element leaders are positioned on the extreme right of their element.",
+        {
+          "q": "Where are Element Leaders positioned in Line Formation?",
+          "imageUrl": "",
           "options": [
             "Extreme left",
             "Extreme right",
             "Center",
             "Behind the rank"
           ],
-          "q": "Where are Element Leaders positioned in Line Formation?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "In Line Formation, element leaders are positioned on the extreme right of their element.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "40": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "In Column Formation, element leaders lead the front of each column.",
+        {
+          "q": "Where are Element Leaders positioned in a Column Formation?",
+          "imageUrl": "",
           "options": [
             "At the rear",
             "To the left side",
             "At the front of each element",
             "In the center rank"
           ],
-          "q": "Where are Element Leaders positioned in a Column Formation?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "In Column Formation, element leaders lead the front of each column.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "41": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "Flight Sergeant positioning in line formation is 3 paces centered behind the flight.",
+        {
+          "q": "Where does the Flight Sergeant position when the Flight Commander takes over in line formation?",
+          "imageUrl": "",
           "options": [
             "3 paces centered in rear",
             "3 paces centered in front",
             "6 paces centered in front",
             "1 pace to the right"
           ],
-          "q": "Where does the Flight Sergeant position when the Flight Commander takes over in line formation?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "Flight Sergeant positioning in line formation is 3 paces centered behind the flight.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "42": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "Flight Commander position in line formation is 6 paces centered in front.",
+        {
+          "q": "Where does the Flight Commander stand relative to a flight in Line Formation?",
+          "imageUrl": "",
           "options": [
             "3 paces in front",
             "3 paces in rear",
             "6 paces centered in front",
             "1 pace to the left"
           ],
-          "q": "Where does the Flight Commander stand relative to a flight in Line Formation?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "Flight Commander position in line formation is 6 paces centered in front.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "43": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "'Incline to the Right' makes a slight directional adjustment under 45 degrees.",
+        {
+          "q": "What degree turn does an 'Incline' command describe?",
+          "imageUrl": "",
           "options": [
             "90-degree turn",
             "Slight direction shift under 45 degrees",
             "Complete 180-degree turn",
             "Oblique 45-degree turn"
           ],
-          "q": "What degree turn does an 'Incline' command describe?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "'Incline to the Right' makes a slight directional adjustment under 45 degrees.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "44": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "'Right Oblique, MARCH' executes a 45-degree turn.",
+        {
+          "q": "What degree angle turn is executed for 'Right Oblique, MARCH'?",
+          "imageUrl": "",
           "options": [
             "45 degrees",
             "90 degrees",
             "30 degrees",
             "60 degrees"
           ],
-          "q": "What degree angle turn is executed for 'Right Oblique, MARCH'?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "'Right Oblique, MARCH' executes a 45-degree turn.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "45": {
-          "answer": 3,
-          "downvotes": 0,
-          "explanation": "'Oblique, MARCH' is issued on the foot in the direction of turn.",
+        {
+          "q": "On which foot is 'Right Oblique, MARCH' called?",
+          "imageUrl": "",
           "options": [
             "Left foot only",
             "Right foot only",
             "Standing position",
             "Right foot for right oblique, left for left oblique"
           ],
-          "q": "On which foot is 'Right Oblique, MARCH' called?",
-          "upvotes": 0
+          "answer": 3,
+          "explanation": "'Oblique, MARCH' is issued on the foot in the direction of turn.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "46": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "'Resume, MARCH' returns marching from oblique to original line of advance.",
+        {
+          "q": "Which command resumes forward marching from an Oblique movement?",
+          "imageUrl": "",
           "options": [
             "Forward, MARCH",
             "Resume, MARCH",
             "Quick Time, MARCH",
             "As You Were"
           ],
-          "q": "Which command resumes forward marching from an Oblique movement?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "'Resume, MARCH' returns marching from oblique to original line of advance.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "47": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "Eyes Right angle is 45 degrees toward the reviewing officer.",
+        {
+          "q": "How many degrees turn of head and eyes is executed during 'EYES, RIGHT'?",
+          "imageUrl": "",
           "options": [
             "30 degrees",
             "90 degrees",
             "45 degrees",
             "60 degrees"
           ],
-          "q": "How many degrees turn of head and eyes is executed during 'EYES, RIGHT'?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "Eyes Right angle is 45 degrees toward the reviewing officer.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "48": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "The element leader on the right side does not turn head or eyes during Eyes Right.",
+        {
+          "q": "Who maintains head and eyes straightforward during 'EYES, RIGHT' in pass in review?",
+          "imageUrl": "",
           "options": [
             "Right element leader",
             "Flight commander",
             "Guidon bearer",
             "Left element leader"
           ],
-          "q": "Who maintains head and eyes straightforward during 'EYES, RIGHT' in pass in review?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "The element leader on the right side does not turn head or eyes during Eyes Right.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "49": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "Hand salute is rendered when reporting or when officers pass.",
+        {
+          "q": "At what distance is a hand salute rendered to an oncoming officer?",
+          "imageUrl": "",
           "options": [
             "2 paces away",
             "6 paces away",
             "10 paces away",
             "15 paces away"
           ],
-          "q": "At what distance is a hand salute rendered to an oncoming officer?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "Hand salute is rendered when reporting or when officers pass.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "50": {
-          "answer": 3,
-          "downvotes": 0,
-          "explanation": "The salute tip of forefinger touches the right eyebrow/glasses frame.",
+        {
+          "q": "Where does the tip of the right index finger touch during a proper Hand Salute?",
+          "imageUrl": "",
           "options": [
             "Center of forehead",
             "Left eyebrow",
             "Nose bridge",
             "Right eyebrow or corner of glasses frame"
           ],
-          "q": "Where does the tip of the right index finger touch during a proper Hand Salute?",
-          "upvotes": 0
+          "answer": 3,
+          "explanation": "The salute tip of forefinger touches the right eyebrow/glasses frame.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "51": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "Arm swing during Quick Time marching is 6 inches to front and 3 inches to rear.",
+        {
+          "q": "What is the standard arm swing distance when marching in Quick Time?",
+          "imageUrl": "",
           "options": [
             "6 inches front, 3 inches rear",
             "12 inches front, 6 inches rear",
             "9 inches front, 4 inches rear",
             "3 inches front, 3 inches rear"
           ],
-          "q": "What is the standard arm swing distance when marching in Quick Time?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "Arm swing during Quick Time marching is 6 inches to front and 3 inches to rear.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "52": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "Fingers are naturally cupped while marching in Quick Time.",
+        {
+          "q": "How are fingers held during Quick Time marching?",
+          "imageUrl": "",
           "options": [
             "Fists tightly clenched",
             "Palms flat against legs",
             "Cupped naturally with thumbs along seam lines",
             "Open flat fingers"
           ],
-          "q": "How are fingers held during Quick Time marching?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "Fingers are naturally cupped while marching in Quick Time.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "53": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "Count Cadence is executed for 8 counts.",
+        {
+          "q": "How many total counts are called out during 'Count Cadence, COUNT'?",
+          "imageUrl": "",
           "options": [
             "4 counts",
             "8 counts",
             "12 counts",
             "16 counts"
           ],
-          "q": "How many total counts are called out during 'Count Cadence, COUNT'?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "Count Cadence is executed for 8 counts.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "54": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "Cadence counts are 'ONE, TWO, THREE, FOUR, ONE, TWO, THREE, FOUR'.",
+        {
+          "q": "What is the exact vocalized response to 'Count Cadence, COUNT'?",
+          "imageUrl": "",
           "options": [
             "1, 2, 3, 4, 1, 2, 3, 4",
             "1, 2, 3, 4, 5, 6, 7, 8",
             "Left, Right, Left, Right",
             "1, 3, 5, 7, 2, 4, 6, 8"
           ],
-          "q": "What is the exact vocalized response to 'Count Cadence, COUNT'?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "Cadence counts are 'ONE, TWO, THREE, FOUR, ONE, TWO, THREE, FOUR'.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "55": {
-          "answer": 3,
-          "downvotes": 0,
-          "explanation": "'Route Step, MARCH' allows marching out of cadence.",
+        {
+          "q": "Which command permits cadets to break cadence and talk while marching?",
+          "imageUrl": "",
           "options": [
             "Double Time, MARCH",
             "Half Step, MARCH",
             "At Ease, MARCH",
             "Route Step, MARCH"
           ],
-          "q": "Which command permits cadets to break cadence and talk while marching?",
-          "upvotes": 0
+          "answer": 3,
+          "explanation": "'Route Step, MARCH' allows marching out of cadence.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "56": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "'At Ease, MARCH' breaks cadence but requires silence while marching.",
+        {
+          "q": "Which command permits breaking cadence but enforces silence while marching?",
+          "imageUrl": "",
           "options": [
             "Route Step, MARCH",
             "At Ease, MARCH",
             "Quick Time, MARCH",
             "Mark Time, MARCH"
           ],
-          "q": "Which command permits breaking cadence but enforces silence while marching?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "'At Ease, MARCH' breaks cadence but requires silence while marching.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "57": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "Change Step is executed by stepping up with the toe of the rear foot to the heel of lead foot.",
+        {
+          "q": "On which foot is 'Change Step, MARCH' called?",
+          "imageUrl": "",
           "options": [
             "Right foot",
             "Either foot",
             "Left foot or right depending on command striking foot",
             "Both feet"
           ],
-          "q": "On which foot is 'Change Step, MARCH' called?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "Change Step is executed by stepping up with the toe of the rear foot to the heel of lead foot.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "58": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "Close Ranks brings ranks back to 40-inch normal distance.",
+        {
+          "q": "Which command returns an opened formation to normal rank distance?",
+          "imageUrl": "",
           "options": [
             "Close Ranks, MARCH",
             "Normal Ranks, MARCH",
             "Form Flight, MARCH",
             "Assemble, MARCH"
           ],
-          "q": "Which command returns an opened formation to normal rank distance?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "Close Ranks brings ranks back to 40-inch normal distance.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "59": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "In 4-rank close ranks, 1st rank stands fast.",
+        {
+          "q": "In Close Ranks, what action does the 1st rank take?",
+          "imageUrl": "",
           "options": [
             "Takes 3 steps back",
             "Stands fast",
             "Takes 1 step back",
             "Takes 2 steps back"
           ],
-          "q": "In Close Ranks, what action does the 1st rank take?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "In 4-rank close ranks, 1st rank stands fast.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "60": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "The 2nd rank takes 1 step forward in Close Ranks.",
+        {
+          "q": "In Close Ranks, what action does the 2nd rank take?",
+          "imageUrl": "",
           "options": [
             "Stands fast",
             "Takes 2 steps forward",
             "Takes 1 step forward",
             "Takes 1 step backward"
           ],
-          "q": "In Close Ranks, what action does the 2nd rank take?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "The 2nd rank takes 1 step forward in Close Ranks.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "61": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "The 3rd rank takes 2 steps forward in Close Ranks.",
+        {
+          "q": "In Close Ranks, how many steps does the 3rd rank take forward?",
+          "imageUrl": "",
           "options": [
             "Takes 2 steps forward",
             "Takes 1 step forward",
             "Stands fast",
             "Takes 3 steps forward"
           ],
-          "q": "In Close Ranks, how many steps does the 3rd rank take forward?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "The 3rd rank takes 2 steps forward in Close Ranks.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "62": {
-          "answer": 3,
-          "downvotes": 0,
-          "explanation": "The 4th rank takes 3 steps forward in Close Ranks.",
+        {
+          "q": "In Close Ranks, how many steps does the 4th rank take forward?",
+          "imageUrl": "",
           "options": [
             "1 step forward",
             "2 steps forward",
             "Stands fast",
             "3 steps forward"
           ],
-          "q": "In Close Ranks, how many steps does the 4th rank take forward?",
-          "upvotes": 0
+          "answer": 3,
+          "explanation": "The 4th rank takes 3 steps forward in Close Ranks.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "63": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "Right Step is executed in 12-inch lateral steps.",
+        {
+          "q": "What is the step size for 'Right Step, MARCH'?",
+          "imageUrl": "",
           "options": [
             "6 inches",
             "12 inches",
             "18 inches",
             "24 inches"
           ],
-          "q": "What is the step size for 'Right Step, MARCH'?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "Right Step is executed in 12-inch lateral steps.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "64": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "Right Step command is given only from a halt.",
+        {
+          "q": "From what movement state can 'Right Step, MARCH' be commanded?",
+          "imageUrl": "",
           "options": [
             "Halt position only",
             "While marching quick time",
             "While marking time",
             "During double time"
           ],
-          "q": "From what movement state can 'Right Step, MARCH' be commanded?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "Right Step command is given only from a halt.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "65": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "To halt from Right Step, command 'Flight, HALT' as heels come together.",
+        {
+          "q": "When is 'Flight, HALT' commanded during Right Step?",
+          "imageUrl": "",
           "options": [
             "Left foot strikes",
             "Right foot strikes",
             "Heels come together",
             "Either toe touches"
           ],
-          "q": "When is 'Flight, HALT' commanded during Right Step?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "To halt from Right Step, command 'Flight, HALT' as heels come together.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "66": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "A mass formation reduces width and increases depth for large ceremonies.",
+        {
+          "q": "What formation compiles a squadron into a compact block of multiple flights?",
+          "imageUrl": "",
           "options": [
             "Column formation",
             "Mass formation",
             "Inverted line",
             "Echelon formation"
           ],
-          "q": "What formation compiles a squadron into a compact block of multiple flights?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "A mass formation reduces width and increases depth for large ceremonies.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "67": {
-          "answer": 3,
-          "downvotes": 0,
-          "explanation": "Squadron commander positions 12 paces in front of squadron.",
+        {
+          "q": "How many paces in front of the squadron does the Squadron Commander stand?",
+          "imageUrl": "",
           "options": [
             "3 paces",
             "6 paces",
             "9 paces",
             "12 paces"
           ],
-          "q": "How many paces in front of the squadron does the Squadron Commander stand?",
-          "upvotes": 0
+          "answer": 3,
+          "explanation": "Squadron commander positions 12 paces in front of squadron.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "68": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "Flight commanders stand 6 paces in front of their respective flights in line.",
+        {
+          "q": "In a squadron line of flights, how far in front stand Flight Commanders?",
+          "imageUrl": "",
           "options": [
             "6 paces",
             "3 paces",
             "12 paces",
             "1 pace"
           ],
-          "q": "In a squadron line of flights, how far in front stand Flight Commanders?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "Flight commanders stand 6 paces in front of their respective flights in line.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "69": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "Color Guard consists of 4 members minimum (2 rifle bearers, 2 flag bearers).",
+        {
+          "q": "What is the standard minimum size of a military Color Guard team?",
+          "imageUrl": "",
           "options": [
             "2 members",
             "3 members",
             "4 members",
             "6 members"
           ],
-          "q": "What is the standard minimum size of a military Color Guard team?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "Color Guard consists of 4 members minimum (2 rifle bearers, 2 flag bearers).",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "70": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "National Color is always positioned on the right of organizational colors.",
+        {
+          "q": "Where is the US National Flag carried relative to other flags in a Color Guard?",
+          "imageUrl": "",
           "options": [
             "On the left",
             "On the right",
             "In the rear",
             "In the exact center"
           ],
-          "q": "Where is the US National Flag carried relative to other flags in a Color Guard?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "National Color is always positioned on the right of organizational colors.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "71": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "The US Flag never dips to any person or object.",
+        {
+          "q": "Under what condition does the US National Flag dip in salute during drill?",
+          "imageUrl": "",
           "options": [
             "Never dips",
             "Dips to the reviewing officer",
             "Dips during national anthem",
             "Dips to squadron commander"
           ],
-          "q": "Under what condition does the US National Flag dip in salute during drill?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "The US Flag never dips to any person or object.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "72": {
-          "answer": 3,
-          "downvotes": 0,
-          "explanation": "Organizational flags dip in salute when rendering honors.",
+        {
+          "q": "Which flag dips during the playing of the National Anthem in ceremony?",
+          "imageUrl": "",
           "options": [
             "US Flag",
             "State Flag",
             "City Flag",
             "CAP Organizational Flag"
           ],
-          "q": "Which flag dips during the playing of the National Anthem in ceremony?",
-          "upvotes": 0
+          "answer": 3,
+          "explanation": "Organizational flags dip in salute when rendering honors.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "73": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "'Present, ARMS' renders a formal salute by formation.",
+        {
+          "q": "What command presents the flight in formal salute during ceremonies?",
+          "imageUrl": "",
           "options": [
             "Parade Rest",
             "Present, ARMS",
             "Hand Salute",
             "Order, ARMS"
           ],
-          "q": "What command presents the flight in formal salute during ceremonies?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "'Present, ARMS' renders a formal salute by formation.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "74": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "'Order, ARMS' cancels Present Arms.",
+        {
+          "q": "Which command terminates the position of Present Arms?",
+          "imageUrl": "",
           "options": [
             "Ready, FRONT",
             "At Ease",
             "Order, ARMS",
             "As You Were"
           ],
-          "q": "Which command terminates the position of Present Arms?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "'Order, ARMS' cancels Present Arms.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "75": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "An Inverted Line reverses front and rear facing of the formation.",
+        {
+          "q": "What is a flight called if it faces opposite to its original front in line?",
+          "imageUrl": "",
           "options": [
             "Inverted line",
             "Inverted column",
             "Reverse formation",
             "Counter march"
           ],
-          "q": "What is a flight called if it faces opposite to its original front in line?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "An Inverted Line reverses front and rear facing of the formation.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "76": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "'Counter, MARCH' reverses marching direction of a column in limited space.",
+        {
+          "q": "Which command reverses a column formation's direction in a narrow space?",
+          "imageUrl": "",
           "options": [
             "To the Rear, MARCH",
             "Counter, MARCH",
             "Column Around, MARCH",
             "About, MARCH"
           ],
-          "q": "Which command reverses a column formation's direction in a narrow space?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "'Counter, MARCH' reverses marching direction of a column in limited space.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "77": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "During Counter March, 1st element takes 3 steps past rear before turning.",
+        {
+          "q": "In Counter March execution, how many steps does the lead element advance before turning?",
+          "imageUrl": "",
           "options": [
             "1 step",
             "2 steps",
             "4 steps",
             "3 steps"
           ],
-          "q": "In Counter March execution, how many steps does the lead element advance before turning?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "During Counter March, 1st element takes 3 steps past rear before turning.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "78": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "Supplementary commands are given by element leaders or sub-unit commanders.",
+        {
+          "q": "Who issues Supplementary Commands within a formation?",
+          "imageUrl": "",
           "options": [
             "Element leaders",
             "Reviewing officer",
             "Guidon bearer",
             "First sergeant only"
           ],
-          "q": "Who issues Supplementary Commands within a formation?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "Supplementary commands are given by element leaders or sub-unit commanders.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "79": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "Informational commands direct action without preparatory pauses.",
+        {
+          "q": "What type of command is 'PREPARE FOR INSPECTION'?",
+          "imageUrl": "",
           "options": [
             "Combined command",
             "Informational command",
             "Supplementary command",
             "Mass command"
           ],
-          "q": "What type of command is 'PREPARE FOR INSPECTION'?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "Informational commands direct action without preparatory pauses.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "80": {
-          "answer": 3,
-          "downvotes": 0,
-          "explanation": "Combined commands combine preparatory and execution into one word.",
+        {
+          "q": "What class of command are 'FALL IN' and 'AT EASE'?",
+          "imageUrl": "",
           "options": [
             "Supplementary",
             "Directive",
             "Informational",
             "Combined command"
           ],
-          "q": "What class of command are 'FALL IN' and 'AT EASE'?",
-          "upvotes": 0
+          "answer": 3,
+          "explanation": "Combined commands combine preparatory and execution into one word.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "81": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "Interval is lateral distance between individuals side by side.",
+        {
+          "q": "What is the space between individuals side by side called?",
+          "imageUrl": "",
           "options": [
             "Distance",
             "Depth",
             "Interval",
             "Alignment"
           ],
-          "q": "What is the space between individuals side by side called?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "Interval is lateral distance between individuals side by side.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "82": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "Distance is front-to-back space between ranks.",
+        {
+          "q": "What is the space between personnel from front to back called?",
+          "imageUrl": "",
           "options": [
             "Distance",
             "Interval",
             "Width",
             "Flank"
           ],
-          "q": "What is the space between personnel from front to back called?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "Distance is front-to-back space between ranks.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "83": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "Alignment is dressing elements in a straight line.",
+        {
+          "q": "What term describes dressing elements laterally on a straight line?",
+          "imageUrl": "",
           "options": [
             "Covering",
             "Alignment",
             "Sizing",
             "Pacing"
           ],
-          "q": "What term describes dressing elements laterally on a straight line?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "Alignment is dressing elements in a straight line.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "84": {
-          "answer": 3,
-          "downvotes": 0,
-          "explanation": "Covering is aligning directly behind the person in front.",
+        {
+          "q": "What term describes positioning directly behind the person in front of you?",
+          "imageUrl": "",
           "options": [
             "Alignment",
             "Dressing",
             "Pacing",
             "Covering"
           ],
-          "q": "What term describes positioning directly behind the person in front of you?",
-          "upvotes": 0
+          "answer": 3,
+          "explanation": "Covering is aligning directly behind the person in front.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "85": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "Flight size ranges from 8 to 30 cadets under normal standard.",
+        {
+          "q": "What is the standard numerical size range of a single drill flight?",
+          "imageUrl": "",
           "options": [
             "8 to 30 cadets",
             "2 to 5 cadets",
             "40 to 60 cadets",
             "100 cadets"
           ],
-          "q": "What is the standard numerical size range of a single drill flight?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "Flight size ranges from 8 to 30 cadets under normal standard.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "86": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "The Guide is responsible for maintaining direction and cadence.",
+        {
+          "q": "Which cadet regulates direction and cadence of the flight while marching?",
+          "imageUrl": "",
           "options": [
             "Flight Sergeant",
             "Element Leader",
             "Flight Guide",
             "Commander"
           ],
-          "q": "Which cadet regulates direction and cadence of the flight while marching?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "The Guide is responsible for maintaining direction and cadence.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "87": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "Guide position in column is in front of the right element.",
+        {
+          "q": "Where is the Guide positioned when marching in Column Formation?",
+          "imageUrl": "",
           "options": [
             "Rear left",
             "Front right of element 1",
             "Center rank",
             "Behind commander"
           ],
-          "q": "Where is the Guide positioned when marching in Column Formation?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "Guide position in column is in front of the right element.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "88": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "'GUIDON, BEARER, DISMISSED' dismisses the guidon.",
+        {
+          "q": "What command dismisses the Guidon Bearer individually?",
+          "imageUrl": "",
           "options": [
             "GUIDON BEARER, DISMISSED",
             "RETURN GUIDON",
             "DROP GUIDON",
             "GUIDON AT EASE"
           ],
-          "q": "What command dismisses the Guidon Bearer individually?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "'GUIDON, BEARER, DISMISSED' dismisses the guidon.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "89": {
-          "answer": 3,
-          "downvotes": 0,
-          "explanation": "Carry Guidon is the standard position while marching.",
+        {
+          "q": "What is the standard marching position for holding the guidon staff?",
+          "imageUrl": "",
           "options": [
             "Order Guidon",
             "Present Guidon",
             "Rest Guidon",
             "Carry Guidon"
           ],
-          "q": "What is the standard marching position for holding the guidon staff?",
-          "upvotes": 0
+          "answer": 3,
+          "explanation": "Carry Guidon is the standard position while marching.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "90": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "At Order Guidon, ferrule rests on the ground beside right shoe.",
+        {
+          "q": "Where rests the base (ferrule) of the guidon staff at Order Guidon?",
+          "imageUrl": "",
           "options": [
             "Raised 6 inches",
             "Rests on ground by right toe",
             "Held horizontal",
             "Tucked under arm"
           ],
-          "q": "Where rests the base (ferrule) of the guidon staff at Order Guidon?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "At Order Guidon, ferrule rests on the ground beside right shoe.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "91": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "Parade Rest with guidon tilts staff forward 15 degrees.",
+        {
+          "q": "What angle is the guidon staff held at Parade Rest?",
+          "imageUrl": "",
           "options": [
             "Vertical",
             "30 degrees",
             "15 degrees forward",
             "Horizontal"
           ],
-          "q": "What angle is the guidon staff held at Parade Rest?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "Parade Rest with guidon tilts staff forward 15 degrees.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "92": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "Present Guidon lowers staff horizontally forward.",
+        {
+          "q": "How is Present Guidon executed during a salute?",
+          "imageUrl": "",
           "options": [
             "Staff lowered horizontally forward",
             "Staff held vertical overhead",
             "Staff behind back",
             "Staff touching left shoulder"
           ],
-          "q": "How is Present Guidon executed during a salute?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "Present Guidon lowers staff horizontally forward.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "93": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "Inspection Arms is required before handling or inspecting weapons.",
+        {
+          "q": "Which manual of arms command verifies a weapon is unloaded?",
+          "imageUrl": "",
           "options": [
             "Present Arms",
             "Inspection ARMS",
             "Port ARMS",
             "Order ARMS"
           ],
-          "q": "Which manual of arms command verifies a weapon is unloaded?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "Inspection Arms is required before handling or inspecting weapons.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "94": {
-          "answer": 3,
-          "downvotes": 0,
-          "explanation": "Port Arms positions rifle diagonally across chest.",
+        {
+          "q": "Where is the rifle positioned during 'Port, ARMS'?",
+          "imageUrl": "",
           "options": [
             "Vertical on right side",
             "Horizontal at waist",
             "Behind shoulder",
             "Diagonally across chest 4 inches away"
           ],
-          "q": "Where is the rifle positioned during 'Port, ARMS'?",
-          "upvotes": 0
+          "answer": 3,
+          "explanation": "Port Arms positions rifle diagonally across chest.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "95": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "Right Shoulder Arms rests rifle on right shoulder at 45 degrees.",
+        {
+          "q": "Where is the rifle carried during 'Right Shoulder, ARMS'?",
+          "imageUrl": "",
           "options": [
             "Right shoulder at 45 degrees",
             "Left shoulder vertically",
             "Under left arm",
             "Across stomach"
           ],
-          "q": "Where is the rifle carried during 'Right Shoulder, ARMS'?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "Right Shoulder Arms rests rifle on right shoulder at 45 degrees.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "96": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "Cadets size the flight tall on the right, short on left.",
+        {
+          "q": "How is a flight sized when forming in line?",
+          "imageUrl": "",
           "options": [
             "Short on right, tall on left",
             "Random order",
             "Tall on right, short on left",
             "By rank order"
           ],
-          "q": "How is a flight sized when forming in line?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "Cadets size the flight tall on the right, short on left.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "97": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "Sizing command is 'TALLEST IN FRONT/RIGHT, SHORTEST IN REAR/LEFT'.",
+        {
+          "q": "What command arranges cadets by height?",
+          "imageUrl": "",
           "options": [
             "FORM BY HEIGHT",
             "SIZE THE FLIGHT",
             "FALL IN BY RANK",
             "ALIGN HEIGHT"
           ],
-          "q": "What command arranges cadets by height?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "Sizing command is 'TALLEST IN FRONT/RIGHT, SHORTEST IN REAR/LEFT'.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "98": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "Mass Command gives cadets practice commanding as a group.",
+        {
+          "q": "What method has the entire flight vocalize commands simultaneously?",
+          "imageUrl": "",
           "options": [
             "Mass command",
             "Group voice",
             "Echo drill",
             "Cadence count"
           ],
-          "q": "What method has the entire flight vocalize commands simultaneously?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "Mass Command gives cadets practice commanding as a group.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "99": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "Ceremonial parade includes Trooping the Line, Pass in Review, and Awards.",
+        {
+          "q": "Which event formally displays unit discipline and honors visiting dignitaries?",
+          "imageUrl": "",
           "options": [
             "PT evaluation",
             "Classroom lecture",
             "Formal parade & pass in review",
             "Radio net check"
           ],
-          "q": "Which event formally displays unit discipline and honors visiting dignitaries?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "Ceremonial parade includes Trooping the Line, Pass in Review, and Awards.",
+          "upvotes": 0,
+          "downvotes": 0
         }
-      }
+      ]
     },
     "CAP_ESERVICES": {
       "branchName": "CAP eServices & Operations",
       "category": "eServices",
       "imageUrl": "https://www.gocivilairpatrol.com/media/photoalbums/eServices_Header_Image.jpg",
-      "manual": "CAPR 120-1",
-      "questions": {
-        "0": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "eServices is Civil Air Patrol's online administrative and operational portal.",
+      "publication": "CAPR 120-1",
+      "description": "Master Civil Air Patrol online administrative tools, operational qualifications, and WMIRS reporting under CAPR 120-1. Access eServices here: https://www.capnhq.gov/",
+      "questions": [
+        {
+          "q": "What primary function does eServices serve in CAP?",
+          "imageUrl": "",
           "options": [
             "Emergency Services Radio",
             "Online Portal System",
             "Electronic Flight Bag",
             "Cadet Exam Paper"
           ],
-          "q": "What primary function does eServices serve in CAP?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "eServices is Civil Air Patrol's online administrative and operational portal.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "1": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "WMIRS stands for Web Mission Information Reporting System.",
+        {
+          "q": "What does the acronym WMIRS stand for in eServices?",
+          "imageUrl": "",
           "options": [
             "Web Mission Information Reporting System",
             "Wing Management Inspection Review System",
             "Weekly Mission Inventory Tracking System",
             "Wireless Mobile Incident Rescue Software"
           ],
-          "q": "What does the acronym WMIRS stand for in eServices?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "WMIRS stands for Web Mission Information Reporting System.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "2": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "Cadet promotions and tracker records are managed under Cadet Interactive / AXIS.",
+        {
+          "q": "Where in eServices do cadets complete online module exams and track promotions?",
+          "imageUrl": "",
           "options": [
             "WMIRS",
             "OPERATIONS",
-            "Cadet Interactive / AXIS",
+            "Online Learning / AXIS",
             "LOGISTICS"
           ],
-          "q": "Where in eServices do cadets complete online module exams and track promotions?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "Cadet promotions and tracker records are managed under Cadet Interactive / AXIS.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "3": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "CAP ID numbers are 6-digit unique identifiers.",
+        {
+          "q": "How many digits make up a standard CAP ID number?",
+          "imageUrl": "",
           "options": [
-            "4-digit",
+            "SSN",
             "6-digit",
             "8-digit",
             "10-digit"
           ],
-          "q": "How many digits make up a standard CAP ID number?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "CAP ID numbers are 6-digit unique identifiers.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "4": {
-          "answer": 3,
-          "downvotes": 0,
-          "explanation": "OPSQUAL modules track pilot and emergency services qualifications.",
+        {
+          "q": "Which eServices module tracks operational ratings and emergency qualifications?",
+          "imageUrl": "",
           "options": [
             "Finance",
             "Public Affairs",
-            "Uniform sales",
-            "Operations Qualifications (OPSQUAL)"
+            "Online Learning / AXIS",
+            "Operations Qualifications (OPS QUAL)"
           ],
-          "q": "Which eServices module tracks operational ratings and emergency qualifications?",
-          "upvotes": 0
+          "answer": 3,
+          "explanation": "OPS QUAL modules track pilot and emergency services qualifications.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "5": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "Form 101 represents the Operational Qualifications Card.",
+        {
+          "q": "Which document printed from eServices proves Emergency Services qualification in the field?",
+          "imageUrl": "",
           "options": [
             "CAP Form 101",
             "CAP Form 60-80",
             "CAP Form 12",
             "CAP Form 5"
           ],
-          "q": "Which document printed from eServices proves Emergency Services qualification in the field?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "Form 101 represents the Operational Qualifications Card.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "6": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "General Emergency Services (GES) requires completing CAP Test 116.",
+        {
+          "q": "Which exam must be completed online in eServices to earn General Emergency Services (GES)?",
+          "imageUrl": "",
           "options": [
             "Test 100",
             "Form 5",
             "CAP Test 116",
             "ICUT Practical"
           ],
-          "q": "Which exam must be completed online in eServices to earn General Emergency Services (GES)?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "General Emergency Services (GES) requires completing CAP Test 116.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "7": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "ICUT stands for Introductory Communications User Training.",
+        {
+          "q": "What does ICUT stand for in eServices qualification tracking?",
+          "imageUrl": "",
           "options": [
             "International Cadet Training",
             "Introductory Communications User Training",
             "Incident Commander Tactical Unity",
             "Integrated Command Uniform Test"
           ],
-          "q": "What does ICUT stand for in eServices qualification tracking?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "ICUT stands for Introductory Communications User Training.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "8": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "Cadet Physical Fitness Testing (CPFT) scores are recorded in the Cadet Tracking module.",
+        {
+          "q": "Where are Cadet Physical Fitness Test (CPFT) scores entered in eServices?",
+          "imageUrl": "",
           "options": [
             "Cadet Tracking Module",
             "WMIRS",
             "Safety Module",
             "Communications Net"
           ],
-          "q": "Where are Cadet Physical Fitness Test (CPFT) scores entered in eServices?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "Cadet Physical Fitness Testing (CPFT) scores are recorded in the Cadet Tracking module.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "9": {
-          "answer": 3,
-          "downvotes": 0,
-          "explanation": "OPSEC and Safety briefings must be completed annually in eServices.",
+        {
+          "q": "How often must active CAP members complete mandatory Safety Education in eServices?",
+          "imageUrl": "",
           "options": [
             "Every 5 years",
             "Once lifetime",
             "Every 6 months",
             "Annually"
           ],
-          "q": "How often must active CAP members complete mandatory Safety Education in eServices?",
-          "upvotes": 0
+          "answer": 3,
+          "explanation": "OPSEC and Safety briefings must be completed annually in eServices.",
+          "upvotes": 0,
+          "downvotes": 0
         }
-      }
+      ]
     },
     "CAP_LEADERSHIP": {
       "branchName": "CAP Cadet Leadership",
       "category": "Leadership",
       "imageUrl": "https://www.gocivilairpatrol.com/media/photoalbums/cadet_leadership_header.jpg",
-      "manual": "Learn to Lead Vol 1-4",
-      "questions": {
-        "0": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "Integrity First, Volunteer Service, Excellence, and Respect are CAP Core Values.",
+      "publication": "Learn to Lead Vol 1-4",
+      "description": "Develop core cadet leadership, core values, and officer milestone readiness under Learn to Lead. Access Cadet Program resources here: https://www.gocivilairpatrol.com/programs/cadets/library",
+      "questions": [
+        {
+          "q": "What are the four Core Values of Civil Air Patrol?",
+          "imageUrl": "",
           "options": [
             "Integrity First, Volunteer Service, Excellence, Respect",
             "Honor, Courage, Commitment",
             "Loyalty, Duty, Respect, Selfless Service",
             "Leadership, Integrity, Service, Excellence"
           ],
-          "q": "What are the four Core Values of Civil Air Patrol?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "Integrity First, Volunteer Service, Excellence, and Respect are CAP Core Values.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "1": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "The Wright Brothers Award marks completion of Phase I (Learning Phase).",
+        {
+          "q": "Which milestone award earns promotion to Cadet Staff Sergeant and completes Phase I?",
+          "imageUrl": "",
           "options": [
             "Mitchell Award",
             "Earhart Award",
             "Wright Brothers Award",
             "Spaatz Award"
           ],
-          "q": "Which milestone award earns promotion to Cadet Staff Sergeant and completes Phase I?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "The Wright Brothers Award marks completion of Phase I (Learning Phase).",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "2": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "General Billy Mitchell Award earns promotion to Cadet Second Lieutenant (Phase II completion).",
+        {
+          "q": "Which milestone award transitions a cadet into the officer ranks as C/2d Lt?",
+          "imageUrl": "",
           "options": [
             "Wright Brothers",
             "Mitchell Award",
             "Earhart Award",
             "Eaker Award"
           ],
-          "q": "Which milestone award transitions a cadet into the officer ranks as C/2d Lt?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "General Billy Mitchell Award earns promotion to Cadet Second Lieutenant (Phase II completion).",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "3": {
-          "answer": 3,
-          "downvotes": 0,
-          "explanation": "Amelia Earhart Award earns promotion to Cadet Captain (Phase III completion).",
+        {
+          "q": "Which milestone award earns promotion to Cadet Captain?",
+          "imageUrl": "",
           "options": [
             "Mitchell Award",
             "Spaatz Award",
             "McCann Award",
             "Earhart Award"
           ],
-          "q": "Which milestone award earns promotion to Cadet Captain?",
-          "upvotes": 0
+          "answer": 3,
+          "explanation": "Amelia Earhart Award earns promotion to Cadet Captain (Phase III completion).",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "4": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "General Ira C. Eaker Award completes Phase IV (Executive Phase).",
+        {
+          "q": "Which award marks completion of Phase IV of the CAP Cadet Program?",
+          "imageUrl": "",
           "options": [
             "Eaker Award",
             "Spaatz Award",
             "Wright Brothers",
             "Curry Achievement"
           ],
-          "q": "Which award marks completion of Phase IV of the CAP Cadet Program?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "General Ira C. Eaker Award completes Phase IV (Executive Phase).",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "5": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "General Carl A. Spaatz Award is the highest award achievable by a CAP cadet.",
+        {
+          "q": "What is the highest achievement award in the CAP Cadet Program?",
+          "imageUrl": "",
           "options": [
             "Mitchell Award",
             "Spaatz Award",
             "Earhart Award",
             "Commander's Commendation"
           ],
-          "q": "What is the highest achievement award in the CAP Cadet Program?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "General Carl A. Spaatz Award is the highest award achievable by a CAP cadet.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "6": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "Servant leadership focuses on serving others rather than commanding authority.",
+        {
+          "q": "Which leadership style prioritizes serving team members above personal status?",
+          "imageUrl": "",
           "options": [
             "Autocratic Leadership",
             "Transactional Leadership",
             "Servant Leadership",
             "Laissez-faire Leadership"
           ],
-          "q": "Which leadership style prioritizes serving team members above personal status?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "Servant leadership focuses on serving others rather than commanding authority.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "7": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "The Warrior Spirit is a condition of heart, mind, and soul reflecting toughness and character.",
+        {
+          "q": "What concept in 'Learn to Lead' describes toughness, selflessness, and moral courage?",
+          "imageUrl": "",
           "options": [
             "Warrior Spirit",
             "Chain of Command",
             "Self-discipline",
             "Customs and Courtesies"
           ],
-          "q": "What concept in 'Learn to Lead' describes toughness, selflessness, and moral courage?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "The Warrior Spirit is a condition of heart, mind, and soul reflecting toughness and character.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "8": {
-          "answer": 3,
-          "downvotes": 0,
-          "explanation": "The Chain of Command enforces order, clarity, and accountability.",
+        {
+          "q": "What is the primary purpose of the Chain of Command?",
+          "imageUrl": "",
           "options": [
             "Bypasses staff",
-            "Creates confusion",
-            "Is optional",
+            "Obeying orders",
+            "To show Loyalty, Duty, Respect, Selfless Service",
             "Reinforces accountability and clear communication"
           ],
-          "q": "What is the primary purpose of the Chain of Command?",
-          "upvotes": 0
+          "answer": 3,
+          "explanation": "The Chain of Command enforces order, clarity, and accountability.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "9": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "Self-discipline is the ability to direct your thoughts, emotions, and actions toward goals.",
+        {
+          "q": "How does Civil Air Patrol define Self-Discipline?",
+          "imageUrl": "",
           "options": [
             "Obeying orders only when watched",
             "Ability to control thoughts, emotions, and behavior",
             "Punishing team members",
             "Memorizing regulations"
           ],
-          "q": "How does Civil Air Patrol define Self-Discipline?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "Self-discipline is the ability to direct your thoughts, emotions, and actions toward goals.",
+          "upvotes": 0,
+          "downvotes": 0
         }
-      }
+      ]
     },
     "CAP_STAFF": {
       "branchName": "Cadet Staff Roles & Duties",
       "category": "Cadet Roles",
       "imageUrl": "https://www.gocivilairpatrol.com/media/photoalbums/cadet_staff_roles.jpg",
-      "manual": "CAPP 60-31",
-      "questions": {
-        "0": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "Cadet Element Leaders directly manage and guide 3 to 5 element cadets.",
+      "publication": "CAPP 60-31",
+      "description": "Understand cadet staff positions, flight leadership structures, and functional staff responsibilities under CAPP 60-31. Access the staff handbook here: https://www.gocivilairpatrol.com/media/cms/P_6031_7942EA0042D3C.pdf",
+      "questions": [
+        {
+          "q": "Which cadet position directly leads individual cadets within a flight element?",
+          "imageUrl": "",
           "options": [
             "Cadet Commander",
             "Element Leader",
             "Flight Commander",
             "First Sergeant"
           ],
-          "q": "Which cadet position directly leads individual cadets within a flight element?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "Cadet Element Leaders directly manage and guide 3 to 5 element cadets.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "1": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "Cadet Flight Sergeant manages flight discipline, drill, and inspection readiness.",
+        {
+          "q": "Which NCO role is responsible for flight discipline, drill execution, and formation checks?",
+          "imageUrl": "",
           "options": [
             "Cadet Flight Sergeant",
             "Cadet Deputy Commander",
             "Cadet Aerospace Officer",
-            "Cadet S-4"
+            "Cadet First Sergeant"
           ],
-          "q": "Which NCO role is responsible for flight discipline, drill execution, and formation checks?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "Cadet Flight Sergeant manages flight discipline, drill, and inspection readiness.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "2": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "Cadet First Sergeant oversees NCO development across all squadron flights.",
+        {
+          "q": "Which senior NCO position acts as the bridge between cadet NCOs and the Cadet Commander?",
+          "imageUrl": "",
           "options": [
-            "Cadet Flight Commander",
-            "Cadet Supply NCO",
+            "Cadet Flight Sergeant",
+            "Cadet Deputy Commander for Operations",
             "Cadet First Sergeant",
             "Cadet Executive Officer"
           ],
-          "q": "Which senior NCO position acts as the bridge between cadet NCOs and the Cadet Commander?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "Cadet First Sergeant oversees NCO development across all squadron flights.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "3": {
-          "answer": 3,
-          "downvotes": 0,
-          "explanation": "Cadet Flight Commander plans training, commands the flight, and mentors Flight Sergeants.",
+        {
+          "q": "Which cadet officer directly commands a flight and manages its overall development?",
+          "imageUrl": "",
           "options": [
-            "Cadet S-1",
+            "Cadet Commander",
             "Cadet Element Leader",
             "Cadet First Sergeant",
             "Cadet Flight Commander"
           ],
-          "q": "Which cadet officer directly commands a flight and manages its overall development?",
-          "upvotes": 0
-        },
-        "4": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "Cadet S-1 manages personnel records, attendance, and administrative tracking.",
-          "options": [
-            "S-1 (Personnel / Admin)",
-            "S-2 (Intelligence / Security)",
-            "S-3 (Operations / Training)",
-            "S-4 (Logistics / Supply)"
-          ],
-          "q": "What staff function does the Cadet S-1 manage in a squadron?",
-          "upvotes": 0
-        },
-        "5": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "Cadet S-3 plans operational schedules, weekly training plans, and activities.",
-          "options": [
-            "S-1",
-            "S-2",
-            "S-3 (Operations)",
-            "S-4"
-          ],
-          "q": "Which staff officer handles training schedules and weekly activity planning?",
-          "upvotes": 0
-        },
-        "6": {
           "answer": 3,
-          "downvotes": 0,
-          "explanation": "Cadet S-4 oversees supply, equipment inventory, and uniform management.",
-          "options": [
-            "S-1",
-            "S-3",
-            "S-2",
-            "S-4 (Logistics / Supply)"
-          ],
-          "q": "Which staff section oversees uniforms, gear inventory, and logistics?",
-          "upvotes": 0
+          "explanation": "Cadet Flight Commander plans training, commands the flight, and mentors Flight Sergeants.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "7": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "Cadet Public Affairs Officer (PAO) produces newsletters and manages photos/media.",
+        {
+          "q": "Which staff section oversees uniforms, gear inventory, and logistics?",
+          "imageUrl": "",
+          "options": [
+            "Cadet First Sergeant",
+            "Cadet Commander",
+            "Cadet Flight Commander",
+            "Cadet Logistics / Supply NCO"
+          ],
+          "answer": 0,
+          "explanation": "Cadet First Sergeant oversees supply, equipment inventory, and uniform management.",
+          "upvotes": 0,
+          "downvotes": 0
+        },
+        {
+          "q": "Which staff cadet produces articles, captures photos, and manages unit media?",
+          "imageUrl": "",
           "options": [
             "Cadet Safety Officer",
             "Cadet Public Affairs Officer (PAO)",
             "Cadet Admin NCO",
             "Cadet Flight Commander"
           ],
-          "q": "Which staff cadet produces articles, captures photos, and manages unit media?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "Cadet Public Affairs Officer (PAO) produces newsletters and manages photos/media.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "8": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "Cadet Safety Officer delivers weekly safety briefings and monitors activity risks.",
+        {
+          "q": "Which staff role presents safety risk briefings prior to cadet activities?",
+          "imageUrl": "",
           "options": [
             "Cadet Safety Officer",
-            "Cadet S-1",
+            "Cadet Commander",
             "Cadet First Sergeant",
-            "Cadet Operations Officer"
+            "Cadet Deputy Commander for Operations"
           ],
-          "q": "Which staff role presents safety risk briefings prior to cadet activities?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "Cadet Safety Officer delivers weekly safety briefings and monitors activity risks.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "9": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "Cadet Commander holds ultimate cadet responsibility for unit operation and morale.",
+        {
+          "q": "Who holds primary cadet operational command over the entire cadet squadron?",
+          "imageUrl": "",
           "options": [
             "Cadet Flight Sergeant",
-            "Cadet S-3",
+            "Cadet Deputy Commander for Operations",
             "Cadet Commander",
-            "Senior Member Advisor"
+            "Deputy Commander for Cadets"
           ],
-          "q": "Who holds primary cadet operational command over the entire cadet squadron?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "Cadet Commander holds ultimate cadet responsibility for unit operation and morale.",
+          "upvotes": 0,
+          "downvotes": 0
         }
-      }
+      ]
     },
     "USA": {
       "branchName": "US Army",
       "category": "General",
       "imageUrl": "https://scontent-msp1-1.xx.fbcdn.net/v/t39.30808-6/639151599_1465367515255310_1434701721732409805_n.jpg?stp=dst-jpg_tt6&cstp=mx1367x2048&ctp=s1367x2048&_nc_cat=104&ccb=1-7&_nc_sid=127cfc&_nc_ohc=E_c0pXx47hQQ7kNvwEIXDyH&_nc_oc=AdoOenCl_HZXVDauPW8IwzI3uMfi5k3UTqpv57B2qhgkVJhuMHFrXJ2k8E7xmJMk0pQ&_nc_zt=23&_nc_ht=scontent-msp1-1.xx&_nc_gid=Wy5YKI_1gCyVVdqF0n-xqg&_nc_ss=7b2a8&oh=00_AQL6iB0IbboM0gcYYEf57GgXjW1GrXQEdQDaAy8V0vddrg&oe=6A9D1A05",
-      "manual": "TC 3-21.5",
-      "questions": {
-        "0": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "Commands consist of a Preparatory Command (what to do) and Command of Execution (when to do it).",
+      "publication": "TC 3-21.5",
+      "description": "Master United States Army drill and ceremonies standards under TC 3-21.5. Access the official publication here: https://armypubs.army.mil/epubs/DR_pubs/DR_a/pdf/web/TC%203-21x5.pdf",
+      "questions": [
+        {
+          "q": "According to Army TC 3-21.5, what are the two main parts of a standard drill command?",
+          "imageUrl": "",
           "options": [
             "Action and Directives",
             "Preparatory command and Command of execution",
             "Warning and Execution",
             "Primary and Secondary"
           ],
-          "q": "According to Army TC 3-21.5, what are the two main parts of a standard drill command?",
-          "upvotes": 0
-        },
-        "1": {
           "answer": 1,
-          "downvotes": 0,
-          "explanation": "Under TC 3-21.5, 'Rear, MARCH' is called on the right foot.",
+          "explanation": "Commands consist of a Preparatory Command (what to do) and Command of Execution (when to do it).",
+          "upvotes": 0,
+          "downvotes": 0
+        },
+        {
+          "q": "In Army drill, on which foot is the command 'Rear, MARCH' given while marching?",
+          "imageUrl": "",
           "options": [
             "Left foot",
             "Right foot",
             "Either foot",
             "Both feet simultaneously"
           ],
-          "q": "In Army drill, on which foot is the command 'Rear, MARCH' given while marching?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "Under TC 3-21.5, 'Rear, MARCH' is called on the right foot.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "2": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "Army Double Time cadence is exactly 180 steps per minute.",
+        {
+          "q": "What is the march cadence rate for 'Double Time' in Army drill?",
+          "imageUrl": "",
           "options": [
             "120 steps/min",
             "140 steps/min",
             "180 steps/min",
             "200 steps/min"
           ],
-          "q": "What is the march cadence rate for 'Double Time' in Army drill?",
-          "upvotes": 0
-        },
-        "3": {
           "answer": 2,
-          "downvotes": 0,
-          "explanation": "Army Quick Time step length is 30 inches.",
+          "explanation": "Army Double Time cadence is exactly 180 steps per minute.",
+          "upvotes": 0,
+          "downvotes": 0
+        },
+        {
+          "q": "What is the step length taken during normal Quick Time in Army drill?",
+          "imageUrl": "",
           "options": [
             "15 inches",
             "24 inches",
             "30 inches",
             "36 inches"
           ],
-          "q": "What is the step length taken during normal Quick Time in Army drill?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "Army Quick Time step length is 30 inches.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "4": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "Hands are cupped with thumbs along the trouser seam line.",
+        {
+          "q": "What is the correct position of hands at Attention under Army drill standards?",
+          "imageUrl": "",
           "options": [
             "Fists clenched firmly",
             "Cupped with thumbs along trouser seams",
             "Flat against thighs",
             "Relaxed open palm"
           ],
-          "q": "What is the correct position of hands at Attention under Army drill standards?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "Hands are cupped with thumbs along the trouser seam line.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "5": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "TC 3-21.5 governs US Army Drill and Ceremonies.",
+        {
+          "q": "Which Army publication serves as the official publication for Drill and Ceremonies?",
+          "imageUrl": "",
           "options": [
             "TC 3-21.5",
             "FM 7-22",
             "AR 670-1",
             "ADP 6-22"
           ],
-          "q": "Which Army publication serves as the official manual for Drill and Ceremonies?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "TC 3-21.5 governs US Army Drill and Ceremonies.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "6": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "Army Quick Time cadence is 120 steps per minute.",
+        {
+          "q": "What is the standard Quick Time cadence for the US Army?",
+          "imageUrl": "",
           "options": [
             "100 steps/min",
             "110 steps/min",
             "120 steps/min",
             "140 steps/min"
           ],
-          "q": "What is the standard Quick Time cadence for the US Army?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "Army Quick Time cadence is 120 steps per minute.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "7": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "Half step length in Army drill is 15 inches.",
+        {
+          "q": "What is the length of a Half Step in Army marching?",
+          "imageUrl": "",
           "options": [
             "12 inches",
             "15 inches",
             "18 inches",
             "20 inches"
           ],
-          "q": "What is the length of a Half Step in Army marching?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "Half step length in Army drill is 15 inches.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "8": {
-          "answer": 3,
-          "downvotes": 0,
-          "explanation": "Rest positions at the halt include Parade Rest, Stand at Ease, At Ease, and Rest.",
+        {
+          "q": "How many rest positions at the halt exist in Army drill?",
+          "imageUrl": "",
           "options": [
             "2 positions",
             "3 positions",
             "5 positions",
             "4 positions"
           ],
-          "q": "How many rest positions at the halt exist in Army drill?",
-          "upvotes": 0
+          "answer": 3,
+          "explanation": "Rest positions at the halt include Parade Rest, Stand at Ease, At Ease, and Rest.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "9": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "Parade Rest is commanded only from the position of Attention.",
+        {
+          "q": "From which position can 'Parade, REST' be commanded?",
+          "imageUrl": "",
           "options": [
             "Attention",
             "At Ease",
             "Rest",
             "Mark Time"
           ],
-          "q": "From which position can 'Parade, REST' be commanded?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "Parade Rest is commanded only from the position of Attention.",
+          "upvotes": 0,
+          "downvotes": 0
         }
-      }
+      ]
     },
     "USAF": {
       "branchName": "US Air Force / Space Force",
       "category": "General",
       "imageUrl": "https://www.airandspaceforces.com/app/uploads/2025/08/9133404-900x600.jpg",
-      "manual": "AFMAN 36-2203",
-      "questions": {
-        "0": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "AFMAN 36-2203 Ch. 1 defines Quick Time cadence as 100 to 120 steps per minute.",
+      "publication": "DAFPAM 34-1203",
+      "description": "Master United States Air Force & Space Force drill and ceremonies procedures. Access the official guide here: https://static.e-publishing.af.mil/production/1/af_a1/publication/dafpam34-1203/dafpam34-1203.pdf",
+      "questions": [
+        {
+          "q": "What is the standard cadence rate for Quick Time in USAF drill?",
+          "imageUrl": "",
           "options": [
             "100 to 110 steps per minute",
             "100 to 120 steps per minute",
             "120 to 130 steps per minute",
             "180 steps per minute"
           ],
-          "q": "What is the standard cadence rate for Quick Time in USAF drill?",
-          "upvotes": 1
-        },
-        "1": {
           "answer": 1,
-          "downvotes": 0,
-          "explanation": "In AFMAN 36-2203, 'TO THE REAR, MARCH' is issued as the right foot strikes the ground.",
+          "explanation": "DAFPAM 34-1203 defines Quick Time cadence as 100 to 120 steps per minute.",
+          "upvotes": 1,
+          "downvotes": 0
+        },
+        {
+          "q": "In USAF drill, on which foot is the command 'TO THE REAR, MARCH' called?",
+          "imageUrl": "",
           "options": [
             "Left foot",
             "Right foot",
             "Either foot",
             "Standing position only"
           ],
-          "q": "In USAF drill, on which foot is the command 'TO THE REAR, MARCH' called?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "In DAFPAM 34-1203, 'TO THE REAR, MARCH' is issued as the right foot strikes the ground.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "2": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "Standard step length for USAF Quick Time is 24 inches (measured heel to heel).",
+        {
+          "q": "What is the standard step length for Quick Time marching in USAF drill?",
+          "imageUrl": "",
           "options": [
             "12 inches",
             "18 inches",
             "24 inches",
             "30 inches"
           ],
-          "q": "What is the standard step length for Quick Time marching in USAF drill?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "Standard step length for USAF Quick Time is 24 inches (measured heel to heel).",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "3": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "'FALL OUT' permits personnel to relax and leave their position while staying nearby.",
+        {
+          "q": "Which command allows formation members to break position but remain in the immediate area?",
+          "imageUrl": "",
           "options": [
             "DISMISSED",
             "FALL OUT",
             "AT EASE",
             "REST"
           ],
-          "q": "Which command allows formation members to break position but remain in the immediate area?",
-          "upvotes": 0
-        },
-        "4": {
           "answer": 1,
-          "downvotes": 0,
-          "explanation": "Distance between ranks (measured from chest of rear airman to back of front airman) is 40 inches.",
+          "explanation": "'FALL OUT' permits personnel to relax and leave their position while staying nearby.",
+          "upvotes": 0,
+          "downvotes": 0
+        },
+        {
+          "q": "In a flight line formation, what is the distance between ranks?",
+          "imageUrl": "",
           "options": [
             "30 inches",
             "40 inches",
             "36 inches",
             "48 inches"
           ],
-          "q": "In a flight line formation, what is the distance between ranks?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "Distance between ranks (measured from chest of rear airman to back of front airman) is 40 inches.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "5": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "AFMAN 36-2203 governs Air Force Drill and Ceremonies.",
+        {
+          "q": "Which publication is the governing publication for Air Force Drill & Ceremonies?",
+          "imageUrl": "",
           "options": [
-            "AFMAN 36-2203",
+            "DAFPAM 34-1203",
             "AFI 36-2903",
             "AFPAM 34-1203",
             "AFH 1"
           ],
-          "q": "Which publication is the governing manual for Air Force Drill & Ceremonies?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "DAFPAM 34-1203 (which superseded AFMAN 36-2203) governs Air Force Drill and Ceremonies.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "6": {
-          "answer": 3,
-          "downvotes": 0,
-          "explanation": "Air Force Double Time cadence is 180 steps per minute.",
+        {
+          "q": "What is the Double Time cadence rate in Air Force drill?",
+          "imageUrl": "",
           "options": [
             "120 steps/min",
             "140 steps/min",
             "160 steps/min",
             "180 steps/min"
           ],
-          "q": "What is the Double Time cadence rate in Air Force drill?",
-          "upvotes": 0
+          "answer": 3,
+          "explanation": "Air Force Double Time cadence is 180 steps per minute.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "7": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "Half step length in USAF drill is 12 inches.",
+        {
+          "q": "What is the Half Step length in Air Force marching?",
+          "imageUrl": "",
           "options": [
             "6 inches",
             "10 inches",
             "12 inches",
             "15 inches"
           ],
-          "q": "What is the Half Step length in Air Force marching?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "Half step length in USAF drill is 12 inches.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "8": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "At Parade Rest, hands are held cupped behind the back with thumbs crossed.",
+        {
+          "q": "How are hands positioned behind the back at Parade Rest in Air Force drill?",
+          "imageUrl": "",
           "options": [
             "Fists on hips",
             "Hands clasped behind back with thumbs crossed",
             "Arms folded across chest",
             "Hands in pockets"
           ],
-          "q": "How are hands positioned behind the back at Parade Rest in Air Force drill?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "At Parade Rest, hands are held cupped behind the back with thumbs crossed.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "9": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "'Eyes Right' is executed on the right foot.",
+        {
+          "q": "On which foot is 'EYES, RIGHT' called in Air Force ceremonies?",
+          "imageUrl": "",
           "options": [
             "Right foot",
             "Left foot",
             "Either foot",
             "Both heels"
           ],
-          "q": "On which foot is 'EYES, RIGHT' called in Air Force ceremonies?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "'Eyes Right' is executed on the right foot.",
+          "upvotes": 0,
+          "downvotes": 0
         }
-      }
+      ]
     },
     "USMC": {
       "branchName": "US Marine Corps / US Navy",
       "category": "General",
       "imageUrl": "https://navalacademytourism.com/hubfs/marine%20officer.jpg",
-      "manual": "MCO 5060.2M",
-      "questions": {
-        "0": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "Distance between ranks in USMC drill is 40 inches.",
+      "publication": "MCO 5060.2M",
+      "description": "Master Marine Corps and Navy drill regulations and ceremonies under MCO 5060.2M. Access the full manual here: https://www.marines.mil/Portals/1/Publications/MCO%205060.2M.pdf",
+      "questions": [
+        {
+          "q": "Under MCO 5060.2M, what distance is maintained between ranks in column formation?",
+          "imageUrl": "",
           "options": [
             "30 inches",
             "36 inches",
             "40 inches",
             "48 inches"
           ],
-          "q": "Under MCO 5060.2M, what distance is maintained between ranks in column formation?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "Distance between ranks in USMC drill is 40 inches.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "1": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "Half Step in Marine Corps drill is 15 inches.",
+        {
+          "q": "What is the step length for Half Step in Marine Corps drill?",
+          "imageUrl": "",
           "options": [
             "12 inches",
             "15 inches",
             "18 inches",
             "20 inches"
           ],
-          "q": "What is the step length for Half Step in Marine Corps drill?",
-          "upvotes": 0
-        },
-        "2": {
           "answer": 1,
-          "downvotes": 0,
-          "explanation": "Right flank execution commands are called on the left foot in Navy/USMC drill.",
+          "explanation": "Half Step in Marine Corps drill is 15 inches.",
+          "upvotes": 0,
+          "downvotes": 0
+        },
+        {
+          "q": "On which foot is the command for 'Right Flank, MARCH' given while marching?",
+          "imageUrl": "",
           "options": [
             "Right foot",
             "Left foot",
             "Either foot",
             "Command of Execution on both"
           ],
-          "q": "On which foot is the command for 'Right Flank, MARCH' given while marching?",
-          "upvotes": 0
-        },
-        "3": {
           "answer": 1,
-          "downvotes": 0,
-          "explanation": "'DRESS RIGHT, DRESS' aligns elements with left arm extended horizontally.",
+          "explanation": "Right flank execution commands are called on the left foot in Navy/USMC drill.",
+          "upvotes": 0,
+          "downvotes": 0
+        },
+        {
+          "q": "What command aligns a Marine squad at normal interval?",
+          "imageUrl": "",
           "options": [
             "COVER",
             "DRESS RIGHT, DRESS",
             "ALIGNMENT, MARCH",
             "SQUAD, DRESS"
           ],
-          "q": "What command aligns a Marine squad at normal interval?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "'DRESS RIGHT, DRESS' aligns elements with left arm extended horizontally.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "4": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "MCO 5060.2M is the Marine Corps Drill and Ceremonies Manual.",
+        {
+          "q": "Which publication governs Marine Corps and Navy Drill and Ceremonies?",
+          "imageUrl": "",
           "options": [
             "MCO 5060.2M",
             "NAVMC 2691",
             "MCO 1020.34H",
             "SECNAVINST 5216.5"
           ],
-          "q": "Which manual governs Marine Corps and Navy Drill and Ceremonies?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "MCO 5060.2M is the Marine Corps Drill and Ceremonies Order.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "5": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "USMC Quick Time marching step length is 30 inches.",
+        {
+          "q": "What is the standard step length for Quick Time in Marine Corps drill?",
+          "imageUrl": "",
           "options": [
             "24 inches",
             "28 inches",
             "30 inches",
             "36 inches"
           ],
-          "q": "What is the standard step length for Quick Time in Marine Corps drill?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "USMC Quick Time marching step length is 30 inches.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "6": {
-          "answer": 1,
-          "downvotes": 0,
-          "explanation": "USMC Quick Time cadence rate is 112 to 120 steps per minute.",
+        {
+          "q": "What is the standard Quick Time cadence range for Marine Corps drill?",
+          "imageUrl": "",
           "options": [
             "100 to 110 steps/min",
             "112 to 120 steps/min",
             "120 to 130 steps/min",
             "180 steps/min"
           ],
-          "q": "What is the standard Quick Time cadence range for Marine Corps drill?",
-          "upvotes": 0
+          "answer": 1,
+          "explanation": "USMC Quick Time cadence rate is 112 to 120 steps per minute.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "7": {
-          "answer": 3,
-          "downvotes": 0,
-          "explanation": "USMC Double Time cadence rate is 180 steps per minute.",
+        {
+          "q": "What is the Double Time cadence rate in Marine Corps drill?",
+          "imageUrl": "",
           "options": [
             "120 steps/min",
             "140 steps/min",
             "160 steps/min",
             "180 steps/min"
           ],
-          "q": "What is the Double Time cadence rate in Marine Corps drill?",
-          "upvotes": 0
+          "answer": 3,
+          "explanation": "USMC Double Time cadence rate is 180 steps per minute.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "8": {
-          "answer": 0,
-          "downvotes": 0,
-          "explanation": "At Attention, feet form a 45-degree angle in USMC drill.",
+        {
+          "q": "At what angle are heels brought together at the position of Attention in USMC drill?",
+          "imageUrl": "",
           "options": [
             "45 degrees",
             "60 degrees",
             "30 degrees",
             "Parallel"
           ],
-          "q": "At what angle are heels brought together at the position of Attention in USMC drill?",
-          "upvotes": 0
+          "answer": 0,
+          "explanation": "At Attention, feet form a 45-degree angle in USMC drill.",
+          "upvotes": 0,
+          "downvotes": 0
         },
-        "9": {
-          "answer": 2,
-          "downvotes": 0,
-          "explanation": "'To the Rear, MARCH' is executed on the right foot in USMC drill.",
+        {
+          "q": "On which foot is 'To the Rear, MARCH' called in USMC drill?",
+          "imageUrl": "",
           "options": [
             "Left foot",
             "Either foot",
             "Right foot",
             "Both feet simultaneously"
           ],
-          "q": "On which foot is 'To the Rear, MARCH' called in USMC drill?",
-          "upvotes": 0
+          "answer": 2,
+          "explanation": "'To the Rear, MARCH' is executed on the right foot in USMC drill.",
+          "upvotes": 0,
+          "downvotes": 0
         }
-      }
+      ]
     }
   },
   "scores": {
@@ -2176,77 +2315,77 @@
     "-P0PDZ4JjSZ3nMuIUqYI": {
       "branch": "CAP",
       "date": "8/31/2026",
-      "name": "CAP",
+      "name": "Anonymous",
       "pct": 33,
       "score": "1/3"
     },
     "-P0RYhqE6moQ-Ed47-N4": {
       "branch": "CAP",
       "date": "9/1/2026",
-      "name": "C/Capt YaltaFan",
+      "name": "YaltaFan",
       "pct": 67,
       "score": "2/3"
     },
     "-P0RYkirYa92tvFRRdHM": {
       "branch": "CAP",
       "date": "9/1/2026",
-      "name": "C/Capt YaltaFan",
+      "name": "YaltaFan",
       "pct": 67,
       "score": "2/3"
     },
     "-P0RYn7pk-id9xDMETA7": {
       "branch": "CAP",
       "date": "9/1/2026",
-      "name": "C/Capt YaltaFan",
+      "name": "YaltaFan",
       "pct": 100,
       "score": "3/3"
     },
     "-P0RZSTYx5qFpPolYOSt": {
       "branch": "USAF",
       "date": "9/1/2026",
-      "name": "C/Capt YaltaFan",
+      "name": "YaltaFan",
       "pct": 100,
       "score": "5/5"
     },
     "-P0RZam5qqLrCDnrHVbD": {
       "branch": "USA",
       "date": "9/1/2026",
-      "name": "C/Capt YaltaFan",
+      "name": "YaltaFan",
       "pct": 80,
       "score": "4/5"
     },
     "-P0RZd-C1_JuYhWiXtXx": {
       "branch": "USA",
       "date": "9/1/2026",
-      "name": "C/Capt YaltaFan",
+      "name": "YaltaFan",
       "pct": 100,
       "score": "5/5"
     },
     "-P0RZk4lIahBaWdAjG7Z": {
       "branch": "USMC",
       "date": "9/1/2026",
-      "name": "C/Capt YaltaFan",
+      "name": "YaltaFan",
       "pct": 25,
       "score": "1/4"
     },
     "-P0RZokWi95gq32TITrh": {
       "branch": "USMC",
       "date": "9/1/2026",
-      "name": "C/Capt YaltaFan",
+      "name": "YaltaFan",
       "pct": 75,
       "score": "3/4"
     },
     "-P0RZrbkPco-okVDF_ss": {
       "branch": "USMC",
       "date": "9/1/2026",
-      "name": "C/Capt YaltaFan",
+      "name": "YaltaFan",
       "pct": 100,
       "score": "4/4"
     },
     "-P0SoQ7py3BLre_wOGY9": {
       "branch": "USA",
       "date": "9/1/2026",
-      "name": "James Ruddat",
+      "name": "Ruddat",
       "pct": 0,
       "score": "0/2"
     },
@@ -2260,9 +2399,46 @@
     "-P0baSiARwNN1vG2zQ1j": {
       "branch": "CAP",
       "date": "9/3/2026",
-      "name": "James Ruddat",
+      "name": "Ruddat",
       "pct": 100,
       "score": "1/1"
+    },
+    "-P0cWcORLbynPkNQQfJz": {
+      "branch": "CAP",
+      "date": "9/3/2026",
+      "name": "Anonymous",
+      "pct": 100,
+      "score": "3/3"
+    },
+    "-P0d0d3jKk1FWk9rbEhA": {
+      "branch": "CAP",
+      "callsign": "Ruddat",
+      "date": "9/3/2026",
+      "name": "Viper-6",
+      "pct": 100,
+      "score": "3/3",
+      "timestamp": 1788468433066,
+      "uid": "e8cCmxtEqMN4pr9i3DCkl2yo2iz2"
+    },
+    "-P0dLRZWHhe1l3rwSo53": {
+      "branch": "CAP",
+      "callsign": "Ruddat",
+      "date": "9/3/2026",
+      "name": "Ruddat",
+      "pct": 90,
+      "score": "9/10",
+      "timestamp": 1788473886843,
+      "uid": "e8cCmxtEqMN4pr9i3DCkl2yo2iz2"
+    }
+  },
+  "users": {
+    "e8cCmxtEqMN4pr9i3DCkl2yo2iz2": {
+      "badges": {
+        "PROTOSTAR": "2026-09-07T13:25:46.963Z"
+      },
+      "callsign": "Ruddat",
+      "createdAt": "2026-09-03T20:06:19.306Z",
+      "points": 170
     }
   }
 }
