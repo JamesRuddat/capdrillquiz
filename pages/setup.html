@@ -14,7 +14,7 @@
     <!-- Load Component Partials -->
     <script type="module" src="/js/components/header.js"></script>
     <script type="module" src="/js/components/footer.js"></script>
-    <script type="module" src="/js/components/modal-element.js"></script>
+    <script type="module" src="/js/pages/modal-element.js"></script>
 </head>
 
 <body>
@@ -28,7 +28,6 @@
                 <div class="banner-overlay"></div>
                 <h1 class="banner-title">Subject Configuration</h1>
             </div>
-
             <!-- Main Content Layout Grid -->
             <div class="setup-grid">
                 <!-- Left Column: Settings -->
@@ -36,8 +35,18 @@
                     <label for="quiz-select" class="form-label">Subject:</label>
                     <select id="quiz-select"></select>
 
-                    <label for="name" class="form-label">Callsign (Leaderboard):</label>
-                    <input type="text" id="name" placeholder="Auto-synced to callsign" readonly style="opacity: 0.8; cursor: not-allowed;">
+                
+    <label for="eval-time-select" class="form-label">
+        Duration (Milestone Mode):
+    </label>
+    <select id="eval-time-select" class="form-control" style="padding: 0.5em; width: 100%;">
+        <option value="15">15 Minutes</option>
+        <option value="20">20 Minutes</option>
+        <option value="25" >25 Minutes</option>
+        <option value="30" selected>30 Minutes (Standard)</option>
+        <option value="45">45 Minutes</option>
+        <option value="60">60 Minutes (Milestone)</option>
+    </select>
 
                     <div class="slider-wrapper">
                         <div class="slider-header">
@@ -63,6 +72,10 @@
                     </button>
                 </div>
             </div>
+            <hr>
+            <br>
+            <div id="subject-desc"></div>
+            <br>
         </section>
 
         <section id="select-view" class="col">

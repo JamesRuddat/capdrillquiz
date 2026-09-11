@@ -1,5 +1,62 @@
-import { database } from '../config.js';
+import { database, SUPER_UID } from '../config.js';
 import { state } from '../state.js';
+
+/**
+ * Assigns a role ('admin', 'mod', or 'user') to a target user UID
+ * @param {string} targetUid 
+ * @param {string} newRole - 'admin' | 'mod' | 'user'
+ */
+export async function updateUserRole(targetUid, newRole) {
+    if (!state.currentUser) {
+        showToast("You must be logged in!", "error");
+        return;
+    }
+
+    const userUid = state.currentUser.uid;
+    const isSuperAdmin = userUid === SUPER_UID;
+    const currentRole = state.userRole || (isSuperAdmin ? "admin" : "user");
+
+    if (currentRole !== "admin" && !isSuperAdmin) {
+        showToast("Only Admins can modify user roles!", "error");
+        return;
+    }
+
+    if (!["admin", "mod", "user"].includes(newRole)) {
+        showToast("Invalid role specified.", "error");
+        return;
+    }
+
+    try {
+        await database.ref(`users/${targetUid}/role`).set(newRole);
+        showToast(`User role updated to '${newRole.toUpperCase()}'`, "success");
+    } catch (err) {
+        showToast("Failed to update role: " + err.message, "error");
+    }
+}
+
+/**
+ * Searches users node by email or callsign to find target UID
+ * @param {string} query 
+ */
+export async function findUserByQuery(query) {
+    const cleanQuery = query.trim().toLowerCase();
+    try {
+        const snapshot = await database.ref("users").once("value");
+        const users = snapshot.val() || {};
+
+        for (const [uid, userData] of Object.entries(users)) {
+            const email = (userData.email || "").toLowerCase();
+            const callsign = (userData.callsign || "").toLowerCase();
+
+            if (email === cleanQuery || callsign === cleanQuery || uid === query) {
+                return { uid, ...userData };
+            }
+        }
+    } catch (err) {
+        console.error("Error searching users:", err);
+    }
+    return null;
+}
 
 /**
  * Awards points to the logged-in user or triggers a prompt to non-logged-in guests.

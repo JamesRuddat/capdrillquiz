@@ -3,34 +3,20 @@ import { sanitizeInput } from './navigation.js';
 import { saveScoreToDB } from '../services/db-service.js';
 import { updateDashboardMetrics } from './leaderboard.js';
 import { awardPoints, showToast } from '../services/user-service.js';
-import { showConfirm } from './modal.js';
+import { showConfirm } from '../pages/modal.js';
 import { checkAndAwardBadges } from '../services/badge-service.js';
 
-export function initQuizPage() {
-    loadQuestion();
+let evalTimerInterval = null;
 
-    const nextBtn = document.getElementById("next-question-btn");
-    if (nextBtn) {
-        nextBtn.addEventListener("click", advanceQuestion);
-    }
-
-    const exitBtn = document.getElementById("btn-quiz-exit");
-    if (exitBtn) {
-        exitBtn.addEventListener("click", exitQuizSession);
-    }
-}
-
-export function initResultsPage() {
-    renderResults();
-
-    const anotherBtn = document.getElementById("btn-res-another");
-    if (anotherBtn) anotherBtn.addEventListener("click", () => window.location.href = "setup.html");
-
-    const leaderboardBtn = document.getElementById("btn-res-leaderboard");
-    if (leaderboardBtn) leaderboardBtn.addEventListener("click", () => window.location.href = "leaderboard.html");
-
-    const homeBtn = document.getElementById("btn-res-home");
-    if (homeBtn) homeBtn.addEventListener("click", () => window.location.href = "index.html");
+/**
+ * Utility: Converts URLs in text to active links
+ */
+function formatTextWithLinks(text = "") {
+    if (!text) return "";
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    return text.replace(urlRegex, (url) => {
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: var(--primary-color, #4ea8de); text-decoration: underline;">${url}</a>`;
+    });
 }
 
 function shuffleArray(array) {
@@ -51,27 +37,108 @@ function extractValidQuestions(rawQuestions) {
     return rawItems.filter(q => q && typeof q === 'object' && typeof q.q === 'string' && q.q.trim() !== '');
 }
 
+/**
+ * Controller: Quiz Page Runner
+ */
+export function initQuizPage() {
+    loadQuestion();
+
+    // Wire Exit Button
+    const exitBtn = document.getElementById("btn-quiz-exit");
+    if (exitBtn) {
+        exitBtn.onclick = exitQuizSession;
+    }
+
+    // Wire Previous Button
+    const prevBtn = document.getElementById("prev-question-btn");
+    if (prevBtn) {
+        prevBtn.onclick = () => {
+            const session = JSON.parse(localStorage.getItem("activeQuizSession"));
+            if (session && session.currentIdx > 0) {
+                session.currentIdx--;
+                localStorage.setItem("activeQuizSession", JSON.stringify(session));
+                loadQuestion();
+            }
+        };
+    }
+
+    // Wire Next / Submit Button
+    const nextBtn = document.getElementById("next-question-btn");
+    if (nextBtn) {
+        nextBtn.onclick = () => {
+            const session = JSON.parse(localStorage.getItem("activeQuizSession"));
+            if (!session) return;
+
+            if (session.currentIdx < session.activeQuestions.length - 1) {
+                session.currentIdx++;
+                localStorage.setItem("activeQuizSession", JSON.stringify(session));
+                loadQuestion();
+            } else {
+                finishQuiz();
+            }
+        };
+    }
+}
+
+/**
+ * Controller: Results Page
+ */
+export function initResultsPage() {
+    renderResults();
+
+    const anotherBtn = document.getElementById("btn-res-another");
+    if (anotherBtn) anotherBtn.onclick = () => window.location.href = "setup.html";
+
+    const leaderboardBtn = document.getElementById("btn-res-leaderboard");
+    if (leaderboardBtn) leaderboardBtn.onclick = () => window.location.href = "leaderboard.html";
+
+    const homeBtn = document.getElementById("btn-res-home");
+    if (homeBtn) homeBtn.onclick = () => window.location.href = "index.html";
+}
+
+/**
+ * Sync Subject Banner on Setup Page
+ */
 export function updateBannerImage() {
     const selectEl = document.getElementById("quiz-select");
     const bannerEl = document.getElementById("subject-banner");
     const bannerTitleEl = document.querySelector("#subject-banner .banner-title");
+    const descEl = document.getElementById("subject-desc") || document.getElementById("subject-banner-desc");
     
     if (!selectEl || !bannerEl) return;
 
     const activeBranchKey = selectEl.value;
-    const registryEntry = state.QUESTION_REGISTRY[activeBranchKey];
+    const registryEntry = state.QUESTION_REGISTRY ? state.QUESTION_REGISTRY[activeBranchKey] : null;
 
     const defaultImage = "https://www.gocivilairpatrol.com/media/photoalbums/67190384_2450135768383102_536700487_A2E9342E843CE.jpg?dimensions=950x633";
-    const imageUrl = (registryEntry && registryEntry.imageUrl) ? registryEntry.imageUrl : defaultImage;
+    
+    const imageUrl = (registryEntry && registryEntry.imageUrl && registryEntry.imageUrl.trim() !== "") 
+        ? registryEntry.imageUrl 
+        : defaultImage;
+        
     const subjectTitle = (registryEntry && registryEntry.branchName) ? registryEntry.branchName : "Subject Configuration";
+    const rawDescription = (registryEntry && registryEntry.description) ? registryEntry.description : "";
 
     bannerEl.style.backgroundImage = `url('${imageUrl}')`;
 
     if (bannerTitleEl) {
         bannerTitleEl.innerText = subjectTitle;
     }
+
+    if (descEl) {
+        if (rawDescription.trim() !== "") {
+            descEl.innerHTML = formatTextWithLinks(rawDescription);
+            descEl.style.display = "block";
+        } else {
+            descEl.innerHTML = "";
+            descEl.style.display = "none";
+        }
+    }
 }
 
+/**
+ * Starts Quiz or Study Session
+ */
 export function startQuiz(mode = 'test') {
     const selectEl = document.getElementById("quiz-select");
     if (!selectEl || !selectEl.value) {
@@ -99,9 +166,11 @@ export function startQuiz(mode = 'test') {
     const randomizedPool = shuffleArray(pool);
     const activeQuestions = randomizedPool.slice(0, Math.min(requestedCount, pool.length));
 
-    // Resolve name/callsign
     const nameInput = document.getElementById("name")?.value.trim();
     const activeName = state.userCallsign || nameInput || (state.currentUser ? state.currentUser.displayName : "Anonymous Cadet");
+
+    const evalTimeSelect = document.getElementById("eval-time-select");
+    const evalDuration = (mode === 'eval' && evalTimeSelect) ? parseInt(evalTimeSelect.value, 10) : null;
 
     const quizSession = {
         mode,
@@ -110,7 +179,9 @@ export function startQuiz(mode = 'test') {
         branchName: registryEntry.branchName || activeBranchKey,
         activeQuestions,
         currentIdx: 0,
-        score: 0
+        score: 0,
+        userAnswers: [],
+        evalDurationMinutes: evalDuration
     };
 
     localStorage.setItem("activeQuizSession", JSON.stringify(quizSession));
@@ -122,6 +193,9 @@ export function startQuiz(mode = 'test') {
     }
 }
 
+/**
+ * Renders Active Question into DOM
+ */
 export function loadQuestion() {
     const sessionRaw = localStorage.getItem("activeQuizSession");
     if (!sessionRaw) {
@@ -130,46 +204,175 @@ export function loadQuestion() {
     }
 
     const session = JSON.parse(sessionRaw);
-
     if (!session.activeQuestions || session.activeQuestions.length === 0) {
         window.location.href = "setup.html";
         return;
     }
 
-    const q = session.activeQuestions[session.currentIdx];
+    const currentIdx = session.currentIdx;
+    const q = session.activeQuestions[currentIdx];
 
     if (!q || !q.q) {
-        console.error("Invalid question payload at index:", session.currentIdx);
+        console.error("Invalid question payload at index:", currentIdx);
         window.location.href = "setup.html";
         return;
     }
+
+    // Ensure Exit Button listener is cleanly bound every time a question loads
+    const exitBtn = document.getElementById("btn-quiz-exit");
+if (exitBtn) {
+    exitBtn.onclick = (e) => {
+        e.preventDefault();
+        exitQuizSession();
+    };
+}
+
+// Timer setup for evaluation mode (only start if interval is null)
+const evalBanner = document.getElementById("eval-timer-banner");
+if (session.mode === 'eval' && session.evalDurationMinutes) {
+    if (evalBanner) evalBanner.style.display = "flex";
+    if (!evalTimerInterval) {
+        startEvaluationTimer(session.evalDurationMinutes);
+    }
+} else {
+    if (evalBanner) evalBanner.style.display = "none";
+    if (evalTimerInterval) {
+        clearInterval(evalTimerInterval);
+        evalTimerInterval = null;
+    }
+}
 
     const badgeEl = document.getElementById("quiz-standard-badge");
     const trackerEl = document.getElementById("question-tracker");
     const textEl = document.getElementById("question-text");
     const container = document.getElementById("options-container");
     const feedbackPanel = document.getElementById("feedback-panel");
-    const nextBtn = document.getElementById("next-question-btn");
 
     if (!textEl || !container) return; 
 
     if (badgeEl) badgeEl.innerText = `[MODULE: ${session.branchName}] (${session.mode.toUpperCase()} MODE)`;
-    if (trackerEl) trackerEl.innerText = `Question ${session.currentIdx + 1} of ${session.activeQuestions.length}`;
+    if (trackerEl) trackerEl.innerText = `Question ${currentIdx + 1} of ${session.activeQuestions.length}`;
     if (textEl) textEl.innerText = q.q;
 
-    container.innerHTML = "";
-    if (feedbackPanel) feedbackPanel.className = "hidden";
-    if (nextBtn) nextBtn.classList.add("hidden");
+    // Render Visual Cue Image
+    let imgEl = document.getElementById("question-visual-cue");
+    if (q.imageUrl && q.imageUrl.trim() !== "") {
+        if (!imgEl) {
+            imgEl = document.createElement("img");
+            imgEl.id = "question-visual-cue";
+            imgEl.style.cssText = "max-width: 100%; max-height: 250px; border-radius: 8px; margin: 1em auto; display: block; object-fit: contain;";
+            textEl.parentNode.insertBefore(imgEl, container);
+        }
+        imgEl.src = q.imageUrl;
+        imgEl.style.display = "block";
+    } else if (imgEl) {
+        imgEl.style.display = "none";
+    }
 
+    container.innerHTML = "";
+    if (feedbackPanel) {
+        feedbackPanel.className = "hidden";
+        feedbackPanel.innerHTML = "";
+    }
+
+    const hasAnswered = session.userAnswers && session.userAnswers[currentIdx] !== undefined;
+    const selectedIdx = hasAnswered ? session.userAnswers[currentIdx] : null;
+
+    // Render Answer Buttons
     q.options.forEach((opt, idx) => {
         const btn = document.createElement("button");
         btn.className = "option-btn";
         btn.innerText = `${idx + 1}. ${opt}`;
-        btn.onclick = () => selectOption(idx);
+
+        if (session.mode === 'study') {
+            // In Study mode, freeze buttons and show instant feedback
+            if (hasAnswered) {
+                btn.disabled = true;
+                if (idx === q.answer) btn.classList.add("correct");
+                if (idx === selectedIdx && selectedIdx !== q.answer) btn.classList.add("incorrect");
+            } else {
+                btn.onclick = () => selectOption(idx);
+            }
+        } else {
+            // In Test/Eval mode, KEEP buttons ENABLED so answers can be changed freely
+            if (hasAnswered && idx === selectedIdx) {
+                btn.style.borderColor = "var(--alert-color)";
+                btn.style.backgroundColor = "rgba(255, 205, 0, 0.25)";
+                btn.style.fontWeight = "bold";
+            }
+            btn.onclick = () => selectOption(idx);
+        }
+
         container.appendChild(btn);
     });
+
+    // Render Explanation Panel for Study Mode
+    if (hasAnswered && session.mode === 'study' && feedbackPanel) {
+        feedbackPanel.classList.remove("hidden");
+        if (selectedIdx === q.answer) {
+            feedbackPanel.className = "correct-panel";
+            feedbackPanel.innerHTML = `<strong>[CORRECT]</strong> ${q.explanation || ''}`;
+        } else {
+            feedbackPanel.className = "incorrect-panel";
+            feedbackPanel.innerHTML = `<strong>[INCORRECT]</strong> ${q.explanation || ''}`;
+        }
+    }
+
+    updateNavigationControls(session);
 }
 
+/**
+ * Updates Jump Dropdown, Back, and Next Button States
+ */
+export function updateNavigationControls(session) {
+    const jumpSelect = document.getElementById("question-jump-select");
+    const prevBtn = document.getElementById("prev-question-btn");
+    const nextBtn = document.getElementById("next-question-btn");
+
+    if (!session || !session.activeQuestions) return;
+
+    const total = session.activeQuestions.length;
+    const currentIdx = session.currentIdx;
+
+    // Populate Jump Select with Color Status Indicators
+    if (jumpSelect) {
+        let optionsHTML = "";
+        session.activeQuestions.forEach((_, idx) => {
+            const isAnswered = session.userAnswers && session.userAnswers[idx] !== undefined;
+            const statusIcon = isAnswered ? "🟢" : "⚪";
+            const selected = idx === currentIdx ? "selected" : "";
+            optionsHTML += `<option value="${idx}" ${selected}>${statusIcon} ${idx + 1}</option>`;
+        });
+        jumpSelect.innerHTML = optionsHTML;
+
+        jumpSelect.onchange = (e) => {
+            const targetIdx = parseInt(e.target.value, 10);
+            session.currentIdx = targetIdx;
+            localStorage.setItem("activeQuizSession", JSON.stringify(session));
+            loadQuestion();
+        };
+    }
+
+    // Previous Button Disabled State
+    if (prevBtn) {
+        prevBtn.disabled = currentIdx === 0;
+    }
+
+    // Next / Submit Button Text & Style
+    if (nextBtn) {
+        if (currentIdx === total - 1) {
+            nextBtn.innerText = "Submit Exam";
+            nextBtn.className = "btn-tactical btn-lg btn-gold";
+        } else {
+            nextBtn.innerText = "Next ▶";
+            nextBtn.className = "btn-tactical btn-lg btn-blue";
+        }
+    }
+}
+
+/**
+ * Handles Option Selection
+ */
 export function selectOption(selectedIdx) {
     const sessionRaw = localStorage.getItem("activeQuizSession");
     if (!sessionRaw) return;
@@ -178,33 +381,16 @@ export function selectOption(selectedIdx) {
     const q = session.activeQuestions[session.currentIdx];
     const buttons = document.querySelectorAll("#options-container .option-btn");
 
-    buttons.forEach(btn => btn.disabled = true);
-
-    if (selectedIdx === q.answer) {
-        session.score++;
-    }
-
     if (!session.userAnswers) session.userAnswers = [];
     session.userAnswers[session.currentIdx] = selectedIdx;
 
     localStorage.setItem("activeQuizSession", JSON.stringify(session));
 
     const feedbackPanel = document.getElementById("feedback-panel");
-    const nextBtn = document.getElementById("next-question-btn");
 
-    if (session.mode === 'test') {
-        buttons[selectedIdx].style.borderColor = "var(--alert-color)";
-        buttons[selectedIdx].style.backgroundColor = "rgba(255, 205, 0, 0.15)";
-
-        if (feedbackPanel) {
-            feedbackPanel.className = "hidden";
-            feedbackPanel.innerHTML = "";
-        }
-
-        if (nextBtn) {
-            nextBtn.classList.remove("hidden");
-        }
-    } else {
+    if (session.mode === 'study') {
+        // Freeze options for Study mode once selected
+        buttons.forEach(btn => btn.disabled = true);
         if (feedbackPanel) feedbackPanel.classList.remove("hidden");
 
         if (selectedIdx === q.answer) {
@@ -221,39 +407,89 @@ export function selectOption(selectedIdx) {
                 feedbackPanel.innerHTML = `<strong>[INCORRECT]</strong> ${q.explanation || ''}`;
             }
         }
-
-        if (nextBtn) {
-            nextBtn.classList.remove("hidden");
-        }
-    }
-}
-
-export function advanceQuestion() {
-    const session = JSON.parse(localStorage.getItem("activeQuizSession"));
-    session.currentIdx++;
-    localStorage.setItem("activeQuizSession", JSON.stringify(session));
-
-    if (session.currentIdx < session.activeQuestions.length) {
-        loadQuestion();
     } else {
-        finishQuiz();
+        // Test / Eval Mode: Update active selection highlights without disabling buttons
+        buttons.forEach((btn, idx) => {
+            if (idx === selectedIdx) {
+                btn.style.borderColor = "var(--alert-color)";
+                btn.style.backgroundColor = "rgba(255, 205, 0, 0.25)";
+                btn.style.fontWeight = "bold";
+            } else {
+                btn.style.borderColor = "";
+                btn.style.backgroundColor = "";
+                btn.style.fontWeight = "normal";
+            }
+        });
     }
+
+    updateNavigationControls(session);
 }
 
-export async function finishQuiz() {
-    const session = JSON.parse(localStorage.getItem("activeQuizSession"));
-    if (!session) return;
+/**
+ * Timer Controller for Evaluation Mode
+ */
+export function startEvaluationTimer(durationMinutes) {
+    let totalSeconds = durationMinutes * 60;
+    const timerDisplay = document.getElementById("quiz-countdown-timer");
 
-    const total = session.activeQuestions.length;
-    const pct = Math.round((session.score / total) * 100);
+    if (evalTimerInterval) clearInterval(evalTimerInterval);
+
+    const updateTimer = () => {
+        const mins = Math.floor(totalSeconds / 60);
+        const secs = totalSeconds % 60;
+
+        if (timerDisplay) {
+            timerDisplay.innerText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            if (totalSeconds <= 120) timerDisplay.style.color = "#f85149";
+        }
+
+        if (totalSeconds <= 0) {
+            clearInterval(evalTimerInterval);
+            showToast("Time expired! Submitting exam...", "error");
+            finishQuiz();
+        } else {
+            totalSeconds--;
+        }
+    };
+
+    updateTimer();
+    evalTimerInterval = setInterval(updateTimer, 1000);
+}
+
+/**
+ * Finalizes Quiz Session & Calculates Score
+ */
+export async function finishQuiz() {
+    if (evalTimerInterval) {
+        clearInterval(evalTimerInterval);
+        evalTimerInterval = null;
+    }
+
+    const sessionRaw = localStorage.getItem("activeQuizSession");
+    if (!sessionRaw) return;
+
+    const session = JSON.parse(sessionRaw);
+    const questions = session.activeQuestions || [];
+    let correctCount = 0;
+
+    // Calculate Score (Unanswered items remain undefined and count as 0)
+    questions.forEach((q, idx) => {
+        const userChoice = session.userAnswers ? session.userAnswers[idx] : undefined;
+        if (userChoice !== undefined && userChoice === q.answer) {
+            correctCount++;
+        }
+    });
+
+    const total = questions.length;
+    const pct = total > 0 ? Math.round((correctCount / total) * 100) : 0;
     const cleanName = sanitizeInput(state.userCallsign || session.activeName);
 
     let pointsEarned = 0;
 
-    if (session.mode === 'test') {
-        pointsEarned = session.score * 10;
+    if (session.mode === 'test' || session.mode === 'eval') {
+        pointsEarned = correctCount * 10;
         if (pointsEarned > 0) {
-            awardPoints(pointsEarned, "Test Evaluation");
+            awardPoints(pointsEarned, session.mode === 'eval' ? "Timed Exam Evaluation" : "Test Evaluation");
         }
     } else if (session.mode === 'study') {
         pointsEarned = 50;
@@ -264,25 +500,25 @@ export async function finishQuiz() {
         cleanName,
         activeBranchKey: session.activeBranchKey,
         branchName: session.branchName,
-        score: session.score,
+        score: `${correctCount}/${total}`,
         total,
         pct,
         mode: session.mode,
-        questions: session.activeQuestions,
+        questions,
         userAnswers: session.userAnswers || [],
         date: new Date().toLocaleDateString()
     };
 
     localStorage.setItem("lastQuizResult", JSON.stringify(scoreResult));
 
-    if (session.mode === 'test') {
+    if (session.mode === 'test' || session.mode === 'eval') {
         try {
             await saveScoreToDB({
                 uid: state.currentUser ? state.currentUser.uid : null,
                 callsign: state.userCallsign || cleanName,
                 name: cleanName,
                 branch: session.activeBranchKey,
-                score: `${session.score}/${total}`,
+                score: `${correctCount}/${total}`,
                 pct: pct,
                 date: scoreResult.date
             });
@@ -292,13 +528,12 @@ export async function finishQuiz() {
         }
     }
 
-    // Evaluate and unlock badges for the logged-in user
     if (state.currentUser) {
         try {
             await checkAndAwardBadges({
-                correctCount: session.score,
-                pct: pct,
-                pointsEarned: pointsEarned,
+                correctCount,
+                pct,
+                pointsEarned,
                 mode: session.mode
             });
         } catch (err) {
@@ -310,6 +545,9 @@ export async function finishQuiz() {
     window.location.href = "results.html";
 }
 
+/**
+ * Renders Results Breakdown
+ */
 export function renderResults() {
     const resultRaw = localStorage.getItem("lastQuizResult");
     if (!resultRaw) {
@@ -328,11 +566,11 @@ export function renderResults() {
     }
 
     if (summaryEl) {
-        summaryEl.innerText = `Evaluatee scored ${res.score} out of ${res.total} correct under ${res.branchName || res.activeBranchKey} regulations (${(res.mode || 'test').toUpperCase()} MODE).`;
+        summaryEl.innerText = `Evaluatee scored ${res.score} correct under ${res.branchName || res.activeBranchKey} regulations (${(res.mode || 'test').toUpperCase()} MODE).`;
     }
 
     if (advisoryEl) {
-        if (res.mode === 'test') {
+        if (res.mode === 'test' || res.mode === 'eval') {
             advisoryEl.innerText = "[EVALUATION COMPLETE] Assessment recorded to leaderboard.";
         } else {
             advisoryEl.innerText = "[PRACTICE COMPLETE] Study evaluation results below.";
@@ -347,8 +585,8 @@ export function renderResults() {
         `;
 
         res.questions.forEach((q, idx) => {
-            const userChoiceIdx = res.userAnswers[idx];
-            const isCorrect = (userChoiceIdx === q.answer);
+            const userChoiceIdx = res.userAnswers ? res.userAnswers[idx] : undefined;
+            const isCorrect = (userChoiceIdx !== undefined && userChoiceIdx === q.answer);
 
             const card = document.createElement("div");
             card.className = "col";
@@ -373,14 +611,19 @@ export function renderResults() {
                 optionsHtml += `<div style="${style}">${optIdx + 1}. ${opt}${badge}</div>`;
             });
 
+            const visualCueHtml = (q.imageUrl && q.imageUrl.trim() !== "")
+                ? `<div style="margin: 0.5em 0;"><img src="${q.imageUrl}" alt="Visual Cue" style="max-width: 100%; max-height: 200px; border-radius: 4px; border: 1px solid var(--border-color);"></div>`
+                : '';
+
             card.innerHTML = `
                 <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 0.85rem; margin-bottom: 0.5em;">
                     <span>Item ${idx + 1}</span>
                     <span style="color: ${isCorrect ? '#2ea043' : '#f85149'};">
-                        ${isCorrect ? '[CORRECT]' : '[INCORRECT]'}
+                        ${isCorrect ? '[CORRECT]' : userChoiceIdx === undefined ? '[UNANSWERED]' : '[INCORRECT]'}
                     </span>
                 </div>
                 <p style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.6em;">${q.q}</p>
+                ${visualCueHtml}
                 <div>${optionsHtml}</div>
                 ${q.explanation ? `<div style="font-size: 0.8rem; color: var(--light-text-color); margin-top: 0.6em; font-style: italic;">Note: ${q.explanation}</div>` : ''}
             `;
@@ -390,7 +633,16 @@ export function renderResults() {
     }
 }
 
+/**
+ * Quits Quiz Session Safely
+ */
 export async function exitQuizSession() {
+    // 1. Pause active timer
+    if (evalTimerInterval) {
+        clearInterval(evalTimerInterval);
+        evalTimerInterval = null;
+    }
+
     const sessionRaw = localStorage.getItem("activeQuizSession");
     if (!sessionRaw) {
         window.location.href = "setup.html";
@@ -399,14 +651,28 @@ export async function exitQuizSession() {
 
     const session = JSON.parse(sessionRaw);
 
-    if (session.mode === 'test') {
-        const confirmed = await showConfirm(
-            "Exiting early will cancel your test and your score will NOT be saved to the leaderboard. Are you sure you want to exit?",
-            "Exit Test Session"
-        );
-        if (!confirmed) return;
+    // 2. Perform confirmation with native fallback if overlay element is missing
+    let confirmed = true;
+    if (session.mode === 'test' || session.mode === 'eval') {
+        const modalOverlay = document.getElementById("custom-modal-overlay");
+        if (modalOverlay) {
+            confirmed = await showConfirm(
+                "Exiting early will cancel your assessment and your score will NOT be saved. Exit session?",
+                "Exit Assessment"
+            );
+        } else {
+            confirmed = window.confirm("Exiting early will cancel your assessment and your score will NOT be saved. Exit session?");
+        }
     }
 
-    localStorage.removeItem("activeQuizSession");
-    window.location.href = "setup.html";
+    // 3. Complete Exit Action
+    if (confirmed) {
+        localStorage.removeItem("activeQuizSession");
+        window.location.href = "setup.html";
+    } else {
+        // Resume timer if user decided to stay
+        if (session.mode === 'eval' && session.evalDurationMinutes) {
+            startEvaluationTimer(session.evalDurationMinutes);
+        }
+    }
 }

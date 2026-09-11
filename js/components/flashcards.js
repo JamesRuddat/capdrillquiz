@@ -29,7 +29,7 @@ export function initFlashcards() {
     const btnFlip = document.getElementById("btn-fc-flip");
     const btnExit = document.getElementById("btn-fc-exit");
 
-    if (badgeEl) badgeEl.innerText = `[MODULE: ${session.branchName}]`;
+    if (badgeEl) badgeEl.innerText = `${session.branchName}`;
 
     function renderCard(index) {
         if (cardEl) {
@@ -46,6 +46,25 @@ export function initFlashcards() {
 
         if (trackerEl) trackerEl.innerText = `Card ${index + 1} of ${questions.length}`;
         if (questionTextEl) questionTextEl.innerText = q.q;
+
+        // Render Question Visual Cue Image if available
+        const frontContainer = questionTextEl ? questionTextEl.parentNode : null;
+        let imgEl = document.getElementById("flashcard-visual-cue");
+
+        if (q.imageUrl && q.imageUrl.trim() !== "") {
+            if (!imgEl && frontContainer) {
+                imgEl = document.createElement("img");
+                imgEl.id = "flashcard-visual-cue";
+                imgEl.style.cssText = "max-width: 100%; max-height: 160px; border-radius: 6px; margin: 0.8em 0; object-fit: contain;";
+                frontContainer.insertBefore(imgEl, questionTextEl.nextSibling);
+            }
+            if (imgEl) {
+                imgEl.src = q.imageUrl;
+                imgEl.style.display = "block";
+            }
+        } else if (imgEl) {
+            imgEl.style.display = "none";
+        }
 
         let rawAnswer = (q.options && q.options[q.answer] !== undefined)
             ? q.options[q.answer]

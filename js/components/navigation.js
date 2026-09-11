@@ -1,6 +1,6 @@
 import { state } from '../state.js';
 import { updateDashboardMetrics, renderLeaderboard } from './leaderboard.js';
-import { renderUnifiedHub } from './hub.js';
+import { renderUnifiedHub } from '../pages/hub-page.js';
 
 // Helper function to extract valid, non-null questions from arrays or sparse Firebase objects
 function getValidQuestionsCount(questionsPayload) {
@@ -86,7 +86,7 @@ export function populateBranchDropdowns() {
 
     moduleKeys.forEach((key) => {
         const item = state.QUESTION_REGISTRY[key];
-        const label = `${item.branchName || key} (${item.manual || 'Standard'})`;
+        const label = `${item.branchName || key} (${item.publication || 'Standard'})`;
 
         const opt1 = document.createElement("option");
         opt1.value = key;
@@ -140,7 +140,7 @@ export function populateBranchDropdowns() {
 }
 
 export function renderModuleList() {
-    const treeContainer = document.getElementById("dynamic-manuals-tree");
+    const treeContainer = document.getElementById("dynamic-publications-tree");
     if (!treeContainer) return;
 
     const moduleKeys = Object.keys(state.QUESTION_REGISTRY || {});
@@ -156,7 +156,7 @@ export function renderModuleList() {
         const count = getValidQuestionsCount(item.questions);
 
         html += `
-            <li><strong>${item.branchName || key} — ${item.manual || 'N/A'}</strong>
+            <li><strong>${item.branchName || key} — ${item.publication || 'N/A'}</strong>
                 <ul>
                     <li>Category: ${item.category || 'General'}</li>
                     <li>Registered Questions: ${count}</li>
@@ -257,7 +257,7 @@ export function renderModuleCards() {
                     </div>
                     <div class="quiz-card-title">${data.branchName || key}</div>
                     <div class="quiz-card-meta" style="color: ${data.imageUrl ? '#eee' : 'inherit'};">
-                        <strong>Manual:</strong> ${data.manual || 'Standard Regulation'}
+                        <strong>Publication:</strong> ${data.publication || 'Standard Regulation'}
                     </div>
                 </div>
                 <div class="quiz-card-footer" style="margin-top: 0.8em;">

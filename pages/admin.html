@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/assets/images/emblems/icon.svg">
+    <title>PROP - Personnel Management</title>
+    <link rel="stylesheet" href="../styles.css">
+
+    <!-- Web Components -->
+    <script type="module" src="/js/components/header.js"></script>
+    <script type="module" src="/js/components/footer.js"></script>
+    <script type="module" src="/js/pages/modal-element.js"></script>
+</head>
+
+<body>
+
+    <site-header></site-header>
+
+    <main>
+        <section id="admin-view" class="col">
+            <h1>Personnel &amp; Moderation Hub</h1>
+            <p style="font-size: 0.85rem; color: var(--light-text-color);">
+                Look up cadets, review performance logs, inspect user-submitted questions, or adjust authorization roles.
+            </p>
+
+            <div id="admin-auth-guard" class="advisory" style="margin-bottom: 1.5em;">
+                Checking authorization privileges...
+            </div>
+
+            <!-- Search Panel -->
+            <div class="quiz-card" style="margin-bottom: 1.5em; padding: 1.2em;">
+                <h3 style="margin-top: 0;">🔍 Inspector</h3>
+                <div style="display: flex; gap: 0.5em; flex-wrap: wrap;">
+                    <input type="text" id="admin-user-search" placeholder="Enter Email, Callsign, or UID..." style="flex: 1; min-width: 140px;">
+                    <button id="btn-admin-search" class="btn-tactical btn-gold">Search</button>
+                </div>
+            </div>
+
+            <!-- Results Container -->
+            <div id="admin-user-profile-container"></div>
+        </section>
+    </main>
+
+    <custom-modal></custom-modal>
+    <site-footer></site-footer>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script type="module" src="/js/app.js"></script>
+</body>
+
+</html>

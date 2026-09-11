@@ -1,7 +1,7 @@
 import { auth, googleProvider, database } from '../config.js';
 import { state } from '../state.js';
 import { showToast } from './user-service.js';
-import { showPrompt } from '../components/modal.js';
+import { showPrompt } from '../pages/modal.js';
 import { renderLeaderboard } from '../components/leaderboard.js';
 
 const CALLSIGNS = [

@@ -1,5 +1,7 @@
-import { database } from '../config.js';
+import { database, SUPER_UID } from '../config.js';
 import { state } from '../state.js';
+import { showToast } from './user-service.js';
+import { showConfirm } from '../pages/modal.js';
 
 /**
  * Saves completed quiz score to Firebase Realtime Database
@@ -9,7 +11,7 @@ import { state } from '../state.js';
 export function saveScoreToDB(scoreData) {
     const payload = {
         ...scoreData,
-        callsign: state.userCallsign || scoreData.name || "Anonymous Cadet",
+        callsign: state.userCallsign || scoreData.name || "Anonymous",
         uid: state.currentUser ? state.currentUser.uid : null,
         timestamp: Date.now()
     };
@@ -62,4 +64,94 @@ export function fetchScoresOrderedByPct(callback) {
         console.error("Error fetching ordered scores:", error);
         callback([]);
     });
+}
+
+/**
+ * Registers or toggles an 'up' or 'down' vote on a question
+ * @param {string} branchKey 
+ * @param {string} questionId 
+ * @param {string} voteType - 'up' or 'down'
+ */
+export async function voteQuestion(branchKey, questionId, voteType) {
+    if (!state.currentUser) {
+        showToast("You must be logged in to vote on questions!", "error");
+        return;
+    }
+
+    const uid = state.currentUser.uid;
+    const voteRef = database.ref(`subjects/${branchKey}/questions/${questionId}/votes/${uid}`);
+    const snapshot = await voteRef.once("value");
+
+    if (snapshot.exists() && snapshot.val() === voteType) {
+        await voteRef.remove();
+        showToast("Vote removed", "info");
+    } else {
+        await voteRef.set(voteType);
+        showToast(voteType === "up" ? "Upvoted question!" : "Downvoted question", "info");
+    }
+}
+
+/**
+ * Toggles a report/flag on a question for moderator review
+ * @param {string} branchKey 
+ * @param {string} questionId 
+ */
+export async function toggleQuestionFlag(branchKey, questionId) {
+    if (!state.currentUser) {
+        showToast("You must be logged in to flag questions!", "error");
+        return;
+    }
+
+    const uid = state.currentUser.uid;
+    const flagRef = database.ref(`subjects/${branchKey}/questions/${questionId}/flags/${uid}`);
+    const snapshot = await flagRef.once("value");
+
+    if (snapshot.exists()) {
+        await flagRef.remove();
+        showToast("Flag removed", "info");
+    } else {
+        await flagRef.set(true);
+        showToast("Question flagged for moderator review", "warning");
+    }
+}
+
+/**
+ * Sets verified status on a question (Admins & Mods only)
+ * @param {string} branchKey 
+ * @param {string} questionId 
+ */
+export async function verifyQuestion(branchKey, questionId) {
+    const userRole = state.userRole || (state.currentUser?.uid === SUPER_UID ? "admin" : "user");
+    if (userRole !== "admin" && userRole !== "mod") {
+        showToast("Only moderators can verify questions!", "error");
+        return;
+    }
+
+    try {
+        await database.ref(`subjects/${branchKey}/questions/${questionId}`).update({
+            verified: true,
+            verifiedBy: state.currentUser.uid,
+            verifiedAt: new Date().toISOString()
+        });
+        showToast("Question verified successfully!", "success");
+    } catch (err) {
+        showToast("Failed to verify question: " + err.message, "error");
+    }
+}
+
+/**
+ * Permanently deletes a question card from a subject module
+ * @param {string} branchKey 
+ * @param {string} questionId 
+ */
+export async function deleteQuestion(branchKey, questionId) {
+    const confirmed = await showConfirm("Permanently delete this question?", "Delete Question");
+    if (confirmed) {
+        try {
+            await database.ref(`subjects/${branchKey}/questions/${questionId}`).remove();
+            showToast("Question deleted", "info");
+        } catch (err) {
+            showToast("Delete failed: " + err.message, "error");
+        }
+    }
 }

@@ -14,7 +14,7 @@
     <!-- Load Component Partials -->
     <script type="module" src="/js/components/header.js"></script>
     <script type="module" src="/js/components/footer.js"></script>
-    <script type="module" src="/js/components/modal-element.js"></script>
+    <script type="module" src="/js/pages/modal-element.js"></script>
 </head>
 
 <body>
@@ -24,15 +24,21 @@
     <main>
         <!-- FLASHCARD CONTAINER VIEW -->
         <section id="flashcard-view" class="col">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
-                <span id="flashcard-module-badge" class="quiz-card-badge">[MODULE: UNSET]</span>
-                <div style="display: flex; align-items: center; gap: 1em;">
-                    <span id="flashcard-tracker" style="font-weight: bold; font-size: 0.85rem;">Card 1 of X</span>
-                    <button id="btn-fc-exit" class="btn-tactical btn-red btn-sm" type="button">
-                        Exit Session
-                    </button>
-                </div>
-            </div>
+    <!-- Header Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1em; gap: 0.5em;">
+        <!-- Left Cluster: Badge & Exit Button Underneath -->
+        <div style="display: flex; flex-direction: column; gap: 0.4em; align-items: flex-start;">
+            <span id="flashcard-module-badge" class="quiz-card-badge">[MODULE: UNSET]</span>
+            <button id="btn-fc-exit" class="btn-tactical btn-red btn-sm" type="button">
+                Exit Session
+            </button>
+        </div>
+
+        <!-- Right Cluster: Card Counter -->
+        <div style="display: flex; align-items: center;">
+            <span id="flashcard-tracker" style="font-weight: bold; font-size: 0.85rem;">Card 1 of X</span>
+        </div>
+    </div>
 
             <!-- 3D FLIP CARD STAGE -->
             <div class="flashcard-stage">
