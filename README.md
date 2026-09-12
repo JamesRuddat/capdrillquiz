@@ -1,25 +1,41 @@
-# Evaluator (v3.0)
+# Evaluator (v4.0.1 - Shadowfox)
 
-A lightweight, student-focused, free-to-use study and assessment platform designed to help cadets and service members master official marching regulations, command structures, and ceremony procedures.
+A lightweight, student-focused, free-to-use study and assessment platform designed to help Civil Air Patrol (CAP) cadets and service members master official marching regulations, command structures, aerospace topics, and ceremony procedures.
 
-Built using plain JavaScript (ES Modules), HTML5, CSS3, and Firebase Realtime Database.
+Built using native vanilla JavaScript (ES Modules), HTML5, CSS3, and Firebase Realtime Database without heavy frameworks or build tool overhead.
 
 ---
 
-js/
-├── config.js
-├── state.js
-├── app.js                   <-- Global Auth & Router ONLY (~35 lines)
-├── components/
-│   ├── header.js            <-- Encapsulates avatar/menu/dropdown behavior
-│   ├── modal.js             <-- Encapsulates custom promise dialogs
-│   ├── quiz-engine.js       <-- Quiz/Test pages
-│   ├── flashcards.js        <-- Flashcards page
-│   ├── leaderboard.js       <-- Leaderboard page
-│   └── hub.js               <-- Question creation/edit page
-└── services/
-    ├── auth-service.js
-    └── user-service.js
+## 📁 Repository Structure
+
+├── index.html
+├── setup.html
+├── quiz.html
+├── flashcards.html
+├── leaderboard.html
+├── hub.html
+├── results.html
+├── styles.css
+└── js/
+    ├── config.js               <-- Firebase initialization & global config
+    ├── state.js                <-- Centralized application state
+    ├── app.js                  <-- Application entry point & router (~35 lines)
+    ├── components/
+    │   ├── header.js           <-- Site header Web Component (site-header>)
+    │   ├── footer.js           <-- Site footer Web Component (site-footer>) with commit history
+    │   ├── modal-element.js    <-- Custom modal Web Component (custom-modal>)
+    │   ├── quiz-engine.js      <-- Quiz runner, Study, and Timed Evaluation modes
+    │   ├── flashcards.js       <-- Study Flashcard engine
+    │   ├── leaderboard.js      <-- Individual & Flight Battle standings
+    │   └── hub-page.js         <-- Personnel Hub & question moderation
+    ├── pages/
+    │   ├── modal.js            <-- Promise-based showModal, showConfirm, showPrompt dialogs
+    │   └── navigation.js       <-- Input sanitization & view routing
+    └── services/
+        ├── auth-service.js     <-- Firebase Authentication & Google OAuth handlers
+        ├── db-service.js       <-- Firebase Realtime Database read/write operations
+        ├── user-service.js     <-- User profiles, callsigns, & points allocation
+        └── badge-service.js    <-- Achievement badge checks & awards
 
 ## Features
 

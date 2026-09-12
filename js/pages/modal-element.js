@@ -4,7 +4,9 @@ class CustomModal extends HTMLElement {
             <div id="custom-modal-overlay" class="modal-overlay hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 9999;">
                 <div class="quiz-card" style="max-width: 420px; width: 90%; padding: 1.5em; background: var(--card-bg, #fff); border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
                     <h3 id="modal-title" style="margin-top: 0; margin-bottom: 0.5em; font-size: 1.2rem;">Notice</h3>
-                    <p id="modal-message" style="font-size: 0.9rem; color: var(--text-color, #333); margin-bottom: 1em; line-height: 1.4;"></p>
+                    
+                    <!-- CHANGED FROM <p> TO <div> -->
+                    <div id="modal-message" style="font-size: 0.9rem; color: var(--text-color, #333); margin-bottom: 1em; line-height: 1.4;"></div>
 
                     <div id="modal-input-group" class="hidden" style="margin-bottom: 1em;">
                         <div style="display: flex; gap: 0.5em;">

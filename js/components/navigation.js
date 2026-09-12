@@ -14,7 +14,6 @@ function getValidQuestionsCount(questionsPayload) {
 }
 
 export function showView(viewId) {
-    // Top-level views (Multi-page DOM fallback)
     const views = ['home-view', 'setup-view', 'quiz-view', 'results-view', 'leaderboard-view', 'hub-view'];
     
     views.forEach(id => {
@@ -22,7 +21,6 @@ export function showView(viewId) {
         if (el) el.classList.toggle('hidden', id !== viewId);
     });
 
-    // Control 'select-view' visibility explicitly
     const selectView = document.getElementById('select-view');
     if (selectView) {
         const isAllowedView = (viewId === 'home-view' || viewId === 'setup-view');
@@ -36,13 +34,11 @@ export function showView(viewId) {
         'hub-view': 'nav-hub'
     };
 
-    // Update active navbar tab
     document.querySelectorAll('#navbar a').forEach(a => a.classList.remove('active-nav'));
     if (navMap[viewId] && document.getElementById(navMap[viewId])) {
         document.getElementById(navMap[viewId]).classList.add('active-nav');
     }
 
-    // View-specific initializations
     if (viewId === 'home-view') {
         updateDashboardMetrics();
         renderLeaderboard();
@@ -61,10 +57,8 @@ export function populateBranchDropdowns() {
     const inspectSelect = document.getElementById("bank-inspect-select");
     const leaderboardSelect = document.getElementById("filter-leaderboard");
 
-    // 1. Retrieve pre-selected subject passed from multi-page card redirect
     const savedCardSubject = sessionStorage.getItem("selectedSubjectKey");
 
-    // 2. Save active choices
     const savedSetup = setupSelect ? (savedCardSubject || setupSelect.value) : savedCardSubject;
     const savedBuilder = builderTargetSelect ? builderTargetSelect.value : "";
     const savedInspect = inspectSelect ? inspectSelect.value : "";
@@ -112,7 +106,6 @@ export function populateBranchDropdowns() {
         }
     });
 
-    // 3. Apply active selection
     if (inspectSelect && savedInspect && state.QUESTION_REGISTRY[savedInspect]) {
         inspectSelect.value = savedInspect;
     }
@@ -133,7 +126,6 @@ export function populateBranchDropdowns() {
         state.activeBranchKey = setupSelect.value;
     }
 
-    // Clean consumed session selection key
     sessionStorage.removeItem("selectedSubjectKey");
 
     updateSliderLimits();
@@ -269,7 +261,6 @@ export function renderModuleCards() {
         `;
     }).join('');
 
-    // Multi-page navigation redirect handler
     gridContainer.querySelectorAll(".btn-card-start").forEach(btn => {
         btn.onclick = (e) => {
             const selectedKey = e.currentTarget.dataset.key;

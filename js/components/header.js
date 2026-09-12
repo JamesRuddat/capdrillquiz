@@ -32,7 +32,7 @@ class SiteHeader extends HTMLElement {
                     <a href="leaderboard.html">Leaderboard</a>
                 </div>
 
-<!-- Embedded Search Bar -->
+                <!-- Embedded Search Bar -->
                 <div class="nav-search-wrapper" style="position: relative; max-width: 220px; width: 100%; margin: 0 8px;">
                     <input 
                         type="text" 
@@ -83,7 +83,7 @@ class SiteHeader extends HTMLElement {
         });
     }
 
-filterQuizCards(searchTerm) {
+    filterQuizCards(searchTerm) {
         const gridContainer = document.querySelector(".cards-grid") || document.querySelector("#quiz-cards-container");
         const cards = document.querySelectorAll(".quiz-card");
         if (!gridContainer || cards.length === 0) return;
@@ -91,7 +91,6 @@ filterQuizCards(searchTerm) {
         let visibleCount = 0;
 
         cards.forEach(card => {
-            // Ignore the empty state card if it's already in the grid
             if (card.id === "search-empty-state-card") return;
 
             const title = card.querySelector(".quiz-card-title")?.innerText.toLowerCase() || "";
@@ -112,7 +111,6 @@ filterQuizCards(searchTerm) {
             }
         });
 
-        // Handle Empty State Card
         let emptyStateCard = document.getElementById("search-empty-state-card");
 
         if (visibleCount === 0 && searchTerm !== "") {
@@ -143,7 +141,6 @@ filterQuizCards(searchTerm) {
 
                 gridContainer.appendChild(emptyStateCard);
             } else {
-                // Ensure card remains visible and update query text
                 emptyStateCard.style.display = "";
                 emptyStateCard.classList.remove("hidden");
                 const queryText = emptyStateCard.querySelector("strong");
@@ -212,15 +209,15 @@ filterQuizCards(searchTerm) {
         if (!controls) return;
 
         controls.innerHTML = `
-            <button id="google-auth-btn" class="btn-tactical btn-gold btn-sm" type="button">
-                Sign In with Google
+            <button id="auth-signin-btn" class="btn-tactical btn-gold btn-sm" type="button">
+                Sign In
             </button>
         `;
 
-        const btn = controls.querySelector("#google-auth-btn");
+        const btn = controls.querySelector("#auth-signin-btn");
         if (btn) {
             btn.onclick = () => {
-                import('../services/auth-service.js').then(m => m.handleGoogleAuth());
+                import('../services/auth-service.js').then(m => m.triggerAuthFlow());
             };
         }
     }
@@ -246,7 +243,7 @@ filterQuizCards(searchTerm) {
 
         if (signoutBtn) {
             signoutBtn.onclick = () => {
-                import('../services/auth-service.js').then(m => m.handleGoogleAuth());
+                import('../services/auth-service.js').then(m => m.handleSignOut());
             };
         }
     }

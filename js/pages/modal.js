@@ -1,5 +1,5 @@
 /**
- * Custom Promise-based Alert Popup
+ * Custom Promise-based Alert / Content Popup
  */
 export function showModal(message, title = "Notice") {
     return new Promise((resolve) => {
@@ -13,7 +13,17 @@ export function showModal(message, title = "Notice") {
         if (!overlay) return resolve();
 
         titleEl.innerText = title;
-        messageEl.innerText = message;
+        
+        // Support both string HTML and appended DOM Nodes
+        if (typeof message === 'string') {
+            messageEl.innerHTML = message;
+        } else if (message instanceof HTMLElement) {
+            messageEl.innerHTML = "";
+            messageEl.appendChild(message);
+        } else {
+            messageEl.innerText = String(message);
+        }
+
         if (cancelBtn) cancelBtn.classList.add("hidden");
         if (inputGroup) inputGroup.classList.add("hidden");
         if (confirmBtn) confirmBtn.innerText = "OK";
@@ -46,7 +56,16 @@ export function showConfirm(message, title = "Confirm Action") {
         if (!overlay) return resolve(false);
 
         titleEl.innerText = title;
-        messageEl.innerText = message;
+        
+        if (typeof message === 'string') {
+            messageEl.innerHTML = message;
+        } else if (message instanceof HTMLElement) {
+            messageEl.innerHTML = "";
+            messageEl.appendChild(message);
+        } else {
+            messageEl.innerText = String(message);
+        }
+
         if (confirmBtn) confirmBtn.innerText = "Confirm";
         if (cancelBtn) cancelBtn.classList.remove("hidden");
         if (inputGroup) inputGroup.classList.add("hidden");
@@ -87,7 +106,16 @@ export function showPrompt(message, defaultValue = "", title = "Enter Callsign")
         if (!overlay) return resolve(null);
 
         titleEl.innerText = title;
-        messageEl.innerText = message;
+        
+        if (typeof message === 'string') {
+            messageEl.innerHTML = message;
+        } else if (message instanceof HTMLElement) {
+            messageEl.innerHTML = "";
+            messageEl.appendChild(message);
+        } else {
+            messageEl.innerText = String(message);
+        }
+
         if (confirmBtn) confirmBtn.innerText = "Confirm";
         if (cancelBtn) cancelBtn.classList.remove("hidden");
         

@@ -1,8 +1,14 @@
 import { auth, googleProvider, database } from '../config.js';
 import { state } from '../state.js';
 import { showToast } from './user-service.js';
-import { showPrompt } from '../pages/modal.js';
+import { showPrompt, showModal, showConfirm } from '../pages/modal.js';
 import { renderLeaderboard } from '../components/leaderboard.js';
+
+// Instantiate Microsoft OAuth Provider
+const microsoftProvider = new firebase.auth.OAuthProvider('microsoft.com');
+microsoftProvider.setCustomParameters({
+    prompt: 'select_account'
+});
 
 const CALLSIGNS = [
     // --- Tactical, Unit & Patrol Handles ---
@@ -51,18 +57,55 @@ auth.onAuthStateChanged(async (user) => {
 });
 
 /**
- * Toggles Google Auth sign-in and sign-out via Popup Flow
+ * Common sign-out handler for all auth providers
+ */
+export async function handleSignOut() {
+    try {
+        await auth.signOut();
+        resetAuthState();
+        showToast("Signed out successfully.", "info");
+        renderLeaderboard();
+    } catch (error) {
+        showToast(`Error signing out: ${error.message}`, "error");
+    }
+}
+
+/**
+ * Universal handler to resolve duplicate account credentials across all OAuth providers
+ */
+async function handleAccountCollision(error, attemptedProviderName) {
+    const pendingCredential = error.credential;
+    const email = error.email;
+
+    const shouldLink = await showConfirm(
+        `An account registered with ${email} already exists using a different sign-in method. Would you like to sign in with Google to link your ${attemptedProviderName} account?`,
+        "Account Already Exists"
+    );
+
+    if (shouldLink) {
+        try {
+            // Sign in with original provider (e.g. Google)
+            const result = await auth.signInWithPopup(googleProvider);
+            
+            // Link the attempted provider credential to the logged-in user
+            if (result?.user && pendingCredential) {
+                await result.user.linkWithCredential(pendingCredential);
+                showToast(`${attemptedProviderName} successfully linked to your account!`, "success");
+                await initializeUserCallsign(result.user);
+            }
+        } catch (linkError) {
+            console.error("Account linking error:", linkError);
+            showToast(`Failed to link account: ${linkError.message}`, "error");
+        }
+    }
+}
+
+/**
+ * Handles Google Auth sign-in popup flow
  */
 export async function handleGoogleAuth() {
     if (state.currentUser) {
-        try {
-            await auth.signOut();
-            resetAuthState();
-            showToast("Signed out successfully.", "info");
-            renderLeaderboard();
-        } catch (error) {
-            showToast(`Error signing out: ${error.message}`, "error");
-        }
+        await handleSignOut();
     } else {
         try {
             const result = await auth.signInWithPopup(googleProvider);
@@ -70,12 +113,84 @@ export async function handleGoogleAuth() {
                 await initializeUserCallsign(result.user);
             }
         } catch (error) {
-            if (error.code !== 'auth/popup-closed-by-user') {
+            if (error.code === 'auth/account-exists-with-different-credential') {
+                await handleAccountCollision(error, "Google");
+            } else if (error.code !== 'auth/popup-closed-by-user') {
                 console.error("Google Auth Error:", error);
                 showToast(`Authentication Failed: ${error.message}`, "error");
             }
         }
     }
+}
+
+/**
+ * Handles Microsoft Auth sign-in popup flow
+ */
+export async function handleMicrosoftAuth() {
+    if (state.currentUser) {
+        await handleSignOut();
+    } else {
+        try {
+            const result = await auth.signInWithPopup(microsoftProvider);
+            if (result?.user) {
+                await initializeUserCallsign(result.user);
+            }
+        } catch (error) {
+            if (error.code === 'auth/account-exists-with-different-credential') {
+                await handleAccountCollision(error, "Microsoft");
+            } else if (error.code !== 'auth/popup-closed-by-user') {
+                console.error("Microsoft Auth Error:", error);
+                showToast(`Authentication Failed: ${error.message}`, "error");
+            }
+        }
+    }
+}
+
+/**
+ * Prompts user to select an OAuth provider (Google / Microsoft)
+ * or executes sign-out if already logged in.
+ */
+export async function triggerAuthFlow() {
+    if (state.currentUser) {
+        await handleSignOut();
+        return;
+    }
+
+    const container = document.createElement("div");
+    container.style.cssText = "display: flex; flex-direction: column; gap: 0.8em; width: 100%;";
+
+    const googleBtn = document.createElement("button");
+    googleBtn.type = "button";
+    googleBtn.className = "btn-tactical btn-blue";
+    googleBtn.style.cssText = "width: 100%; justify-content: flex-start; gap: 10px; padding: 0.8em;";
+    googleBtn.innerHTML = `
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style="width: 18px; height: 18px; pointer-events: none;">
+        <span>Sign in with Google</span>
+    `;
+    googleBtn.onclick = () => {
+        const overlay = document.getElementById("custom-modal-overlay");
+        if (overlay) overlay.classList.add("hidden");
+        handleGoogleAuth();
+    };
+
+    const msBtn = document.createElement("button");
+    msBtn.type = "button";
+    msBtn.className = "btn-tactical btn-blue";
+    msBtn.style.cssText = "width: 100%; justify-content: flex-start; gap: 10px; padding: 0.8em;";
+    msBtn.innerHTML = `
+        <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft" style="width: 18px; height: 18px; pointer-events: none;">
+        <span>Sign in with Microsoft</span>
+    `;
+    msBtn.onclick = () => {
+        const overlay = document.getElementById("custom-modal-overlay");
+        if (overlay) overlay.classList.add("hidden");
+        handleMicrosoftAuth();
+    };
+
+    container.appendChild(googleBtn);
+    container.appendChild(msBtn);
+
+    await showModal(container, "Select Authentication Provider");
 }
 
 /**
@@ -136,6 +251,7 @@ export async function initializeUserCallsign(user) {
 
             await userRef.update({
                 callsign: finalCallsign,
+                provider: user.providerData[0]?.providerId || 'unknown',
                 createdAt: new Date().toISOString()
             });
         }

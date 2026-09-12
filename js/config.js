@@ -1,3 +1,14 @@
+// Add Microsoft Provider export
+export const microsoftProvider = new firebase.auth.OAuthProvider('microsoft.com');
+export const googleProvider = new firebase.auth.GoogleAuthProvider();
+
+// Set custom parameters to force account prompts or specify tenant handling
+microsoftProvider.setCustomParameters({
+    prompt: 'select_account',
+    authority: 'https://login.microsoftonline.com/consumers',
+    tenant: 'consumers'
+});
+
 // Firebase initialized via compat SDKs loaded in index.html
 const firebaseConfig = {
     apiKey: "AIzaSyBr9AkWSSW7_qesMsj3nBwluLWjfjOULVY",
@@ -14,5 +25,4 @@ firebase.initializeApp(firebaseConfig);
 
 export const database = firebase.database();
 export const auth = firebase.auth();
-export const googleProvider = new firebase.auth.GoogleAuthProvider();
 export const SUPER_UID = 'e8cCmxtEqMN4pr9i3DCkl2yo2iz2';
