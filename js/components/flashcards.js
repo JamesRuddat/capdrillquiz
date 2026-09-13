@@ -18,7 +18,7 @@ export function initFlashcards() {
     const questions = session.activeQuestions;
 
     const cardEl = document.getElementById("flashcard");
-    const badgeEl = document.getElementById("flashcard-module-badge");
+    const badgeEl = document.getElementById("flashcard-subject-badge");
     const trackerEl = document.getElementById("flashcard-tracker");
     const questionTextEl = document.getElementById("flashcard-question-text");
     const answerTextEl = document.getElementById("flashcard-answer-text");
@@ -36,7 +36,7 @@ export function initFlashcards() {
             cardEl.classList.add("no-transition");
             currentRotation = 0;
             cardEl.style.transform = "rotateY(0deg)";
-            
+
             void cardEl.offsetHeight; // Force browser repaint
             cardEl.classList.remove("no-transition");
         }

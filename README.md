@@ -6,7 +6,7 @@ Built using native vanilla JavaScript (ES Modules), HTML5, CSS3, and Firebase Re
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ├── index.html
 ├── setup.html
@@ -41,10 +41,10 @@ Built using native vanilla JavaScript (ES Modules), HTML5, CSS3, and Firebase Re
 
 * **100% Free & Open Access:** No paywalls, subscription tiers, or hidden charges.
 * **Modular ES Architecture:** Clean, maintainable codebase separated into state, services, and UI component modules.
-* **Community Quiz Engine:** Select any registered study module, choose how many randomized questions to evaluate, and practice recall.
+* **Community Quiz Engine:** Select any registered study subject, choose how many randomized questions to evaluate, and practice recall.
 * **Author & Reputation System:** Community members can add questions, receive community upvotes/downvotes, and build their profile score.
 * **Dynamic Leaderboard:** Automated scoring leaderboard with gold, silver, and bronze podium styling, tie-breaker sorting by date, and zebra-striped rows.
-* **Admin & Creator Inspector:** Dedicated management panel for creating quiz modules, appending citation-backed questions, and updating records.
+* **Admin & Creator Inspector:** Dedicated management panel for creating quiz subjects, appending citation-backed questions, and updating records.
 
 ---
 
@@ -55,27 +55,27 @@ The application relies on three core cloud services:
 1. **Google Cloud Console** ([console.cloud.google.com](https://console.cloud.google.com/))
    * Handles Google OAuth 2.0 authentication credentials and authorized JavaScript origins/redirect URIs.
 2. **Firebase Console** ([console.firebase.google.com](https://console.firebase.google.com/))
-   * Controls the **Firebase Realtime Database** for storing modules, user-submitted questions, scores, and star transactions.
+   * Controls the **Firebase Realtime Database** for storing subjects, user-submitted questions, scores, and star transactions.
    * Manages database security rules and Google Authentication user logs.
 3. **Netlify** ([app.netlify.com](https://app.netlify.com/))
    * Provides continuous deployment and free production web hosting directly connected to the repository.
 
 ---
 
-## ⚙️ How the Application Works
+## How the Application Works
 
 ### 1. Client-Side ES Modules Architecture
 
 The frontend runs natively in the browser without build tools or bundlers. The entry point is `js/app.js` loaded via `<script type="module">`.
 
 * `js/config.js` — Initializes Firebase SDK instances and global constants.
-* `js/state.js` — Holds mutable global state (e.g., loaded modules, active session score, current user).
+* `js/state.js` — Holds mutable global state (e.g., loaded subjects, active session score, current user).
 * `js/services/` — Contains database and auth handlers (`auth-service.js`, `db-service.js`).
 * `js/components/` — Isolated UI logic for views (`navigation.js`, `quiz-engine.js`, `leaderboard.js`, `hub.js`).
 
 ### 2. Quiz Evaluation Flow
 
-1. **Setup:** The user selects a target module. The dynamic slider automatically reads the module size and updates its `max` bounds.
+1. **Setup:** The user selects a target subject. The dynamic slider automatically reads the subject size and updates its `max` bounds.
 2. **Execution:** The quiz engine uses a Fisher-Yates shuffle algorithm to randomly order the question set and slices it to match the requested slider count.
 3. **Scoring:** Answers are checked in real-time with citation feedback. Completed scores are saved directly to Firebase (`/scores`) and automatically update the honor roll.
 

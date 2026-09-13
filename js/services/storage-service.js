@@ -5,7 +5,7 @@ export const Cache = {
     get ActiveUid() {
         return localStorage.getItem("active_uid");
     },
-    
+
     getUserData(uid) {
         if (!uid) return null;
         return {

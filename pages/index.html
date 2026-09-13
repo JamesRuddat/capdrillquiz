@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-adsense-account" content="ca-pub-1864969470317711">
     <link rel="icon" type="image/x-icon" href="/assets/images/emblems/icon.svg">
-    <title>PROP - Home</title>
+    <title>Home</title>
     <link rel="stylesheet" href="/styles.css">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1864969470317711"
         crossorigin="anonymous"></script>
@@ -24,7 +24,7 @@
     <main>
         <!-- 1. OPERATIONAL COMMAND DASHBOARD -->
         <section id="home-view" class="col">
-            
+
             <!-- Universal Briefing Banner -->
             <div class="briefing-card">
                 <div class="briefing-header">
@@ -32,23 +32,25 @@
                     <span class="briefing-status">Status: Active</span>
                 </div>
                 <p class="briefing-text">
-                    Welcome to <strong>PROP</strong>. Master aerospace, leadership, emergency services, and STEM concepts with community-built evaluations. Open 100% free for all students, cadets, and self-directed learners nationwide.
+                    Welcome to <strong>PROP</strong>. Master aerospace, leadership, emergency services, and STEM
+                    concepts with community-built evaluations. Open 100% free for all students, cadets, and
+                    self-directed learners nationwide.
                 </p>
             </div>
 
             <!-- Two-Column Grid: Daily Challenge + Quick Dispatch -->
             <div class="dashboard-grid">
-                
+
                 <!-- Daily Readiness Question Widget -->
-                <div class="quiz-card daily-challenge-card">
+                <div id="daily-challenge-card" class="quiz-card daily-challenge-card">
                     <div>
-                        <div class="daily-challenge-header">
-                            <span class="daily-challenge-badge">🎯 Daily Knowledge Challenge</span>
-                            <span class="daily-pts-badge">+25 PTS</span>
+                        <div class="daily-challenge-header flex-row-between">
+                            <span class="daily-challenge-badge">Daily Knowledge Challenge</span>
+                            <span class="daily-pts-badge badge-status badge-verified">+25 PTS</span>
                         </div>
-                        <h4 id="daily-question-text" class="daily-question-title">Loading daily challenge... FIX ME</h4>
+                        <h4 id="daily-question-text" class="daily-question-title">Loading daily challenge...</h4>
                         <div id="daily-options-container" class="daily-options-stack">
-                            <!-- Dynamically loaded via app.js -->
+                            <!-- Options dynamically loaded via daily-challenge.js -->
                         </div>
                     </div>
                     <div id="daily-feedback" class="daily-feedback-panel hidden"></div>
@@ -62,29 +64,29 @@
                             <span class="stat-label">Tests Completed</span>
                             <div class="stat-action-wrapper">
                                 <a href="setup.html" class="btn-tactical btn-blue width-full">
-    🎯 Take a Test
-</a>
+                                    Take a Test
+                                </a>
                             </div>
                         </div>
-                        
+
                         <div class="stat-card">
                             <span id="stat-modules-count" class="stat-number">0</span>
                             <span class="stat-label">Active Subjects</span>
                             <div class="stat-action-wrapper">
                                 <a href="hub.html" class="btn-tactical btn-gold width-full">
-    ➕ Create Subject
-</a>
+                                    Create Subject
+                                </a>
                             </div>
                         </div>
                     </div>
 
                     <!-- Universal Operator Level Status Card -->
                     <div class="rank-card">
-                        <div class="rank-icon">🏅</div>
+                        <div class="rank-icon"></div>
                         <div class="rank-info flex-1">
                             <div class="rank-header-row">
-                                <span id="home-user-rank">Trainee I</span>
-                                <span id="home-user-pts">0 PTS</span>
+                                <span id="home-user-rank">Guest Operator</span>
+                                <span id="home-user-pts">Sign In to Track Progress</span>
                             </div>
                             <div class="rank-progress-track">
                                 <div id="home-rank-progress" class="rank-progress-fill"></div>
@@ -99,17 +101,17 @@
         <!-- 2. HONOR ROLL / LEADERBOARD SECTION -->
         <section id="leaderboard-view" class="col">
             <div class="section-header-row">
-                <h1 class="margin-none">TOP HONOR ROLL</h1>
-                <a href="leaderboard.html" class="btn-tactical btn-sm">Full Leaderboard ➔</a>
+                <h2>TOP HONORs</h2>
+                <a href="leaderboard.html" class="btn-tactical btn-sm">Full Leaderboard ➔ </a>
             </div>
 
             <table id="leaderboard-table">
                 <thead id="leaderboard-thead">
                     <tr>
-                        <th class="sortable" data-sort="name">Callsign <span class="sort-icon">↕</span></th>
-                        <th class="sortable" data-sort="module">Subject <span class="sort-icon">↕</span></th>
-                        <th class="sortable" data-sort="score">Score <span class="sort-icon">↕</span></th>
-                        <th class="sortable" data-sort="date">Date <span class="sort-icon">↕</span></th>
+                        <th class="sortable" data-sort="name">Callsign</span></th>
+                        <th class="sortable" data-sort="module">Subject</span></th>
+                        <th class="sortable" data-sort="score">Score</span></th>
+                        <th class="sortable" data-sort="date">Date</span></th>
                     </tr>
                 </thead>
                 <tbody id="home-top-scores-body">
@@ -124,7 +126,6 @@
 
         <!-- 3. SUBJECTS & QUIZZES GRID -->
         <section id="select-view" class="col">
-            <h1>Subjects &amp; Quizzes</h1>
             <div id="quiz-cards-grid" class="cards-grid">
                 <div class="text-center">Loading available subjects...</div>
             </div>

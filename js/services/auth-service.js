@@ -216,7 +216,7 @@ export async function initializeUserCallsign(user) {
         if (!hasBeenWelcomedDb) {
             localStorage.setItem(`welcomed_${user.uid}`, "true");
             state.authInitialized = true;
-            const welcomeMsg = isNewUser 
+            const welcomeMsg = isNewUser
                 ? `Welcome, ${finalCallsign}! Tactical handle initialized.`
                 : `Welcome back, ${finalCallsign}! Ready for duty.`;
             showToast(welcomeMsg, "success");

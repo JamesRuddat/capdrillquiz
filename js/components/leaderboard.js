@@ -1,5 +1,6 @@
 import { state } from '../state.js';
 import { database } from '../config.js';
+import { updateRankCardUI } from '../services/badge-service.js';
 
 let currentSortCol = null;
 let currentSortAsc = true;
@@ -13,14 +14,14 @@ function parseCorrectCount(item) {
     if (typeof item.correctCount === 'number') {
         return item.correctCount;
     }
-    
+
     const scoreStr = String(item.score || item || '');
     if (scoreStr.includes('/')) {
         const parts = scoreStr.split('/');
         const parsed = parseInt(parts[0], 10);
         if (!isNaN(parsed)) return parsed;
     }
-    
+
     const directNum = parseInt(scoreStr, 10);
     return isNaN(directNum) ? 0 : directNum;
 }
@@ -30,10 +31,10 @@ function parseCorrectCount(item) {
  */
 function formatCallsignDisplay(item, currentUid, currentUserCallsign) {
     const rawName = item.callsign || item.name || '';
-    
+
     // Check if entry belongs to the logged-in user via UID or callsign fallback
-    const isMe = (currentUid && item.uid && item.uid === currentUid) || 
-                 (currentUserCallsign && rawName === currentUserCallsign);
+    const isMe = (currentUid && item.uid && item.uid === currentUid) ||
+        (currentUserCallsign && rawName === currentUserCallsign);
 
     // If it's the current user, always display their active callsign + YOU badge
     if (isMe) {
@@ -88,10 +89,12 @@ export function initLeaderboardPage() {
  * Updates Dashboard Stat Counters and Top 3 High Scores Preview (Index Page)
  */
 export function updateDashboardMetrics() {
-    // 1. Update active modules counter
-    const modulesCountEl = document.getElementById("stat-modules-count");
-    if (modulesCountEl) {
-        modulesCountEl.innerText = Object.keys(state.QUESTION_REGISTRY || {}).length;
+    updateRankCardUI();
+
+    // 1. Update active subjects counter
+    const subjectsCountEl = document.getElementById("stat-subjects-count");
+    if (subjectsCountEl) {
+        subjectsCountEl.innerText = Object.keys(state.QUESTION_REGISTRY || {}).length;
     }
 
     // 2. Fetch and render top 3 high scores for index page
@@ -125,7 +128,7 @@ export function updateDashboardMetrics() {
 
         // Take top 3 scores for index page
         const top3 = scoreList.slice(0, 3);
-        const currentUid = (state.currentUser && state.currentUser.uid) || state.userUid || null;
+        const currentUid = state.userUid || (state.currentUser && state.currentUser.uid) || null;
         const currentUserCallsign = state.userCallsign || null;
 
         homeTopBody.innerHTML = top3.map((item, idx) => {
@@ -171,16 +174,20 @@ export async function renderLeaderboard() {
 
     const mode = modeSelect ? modeSelect.value : 'test-scores';
     const selectedSubject = subjectSelect ? subjectSelect.value : 'ALL';
-    
-    const currentUid = (state.currentUser && state.currentUser.uid) || state.userUid || null;
+
+    const currentUid = state.userUid || (state.currentUser && state.currentUser.uid) || null;
     const currentUserCallsign = state.userCallsign || null;
 
     // 1. RENDER: Lifetime Points Leaderboard (Pulls from /users)
     if (mode === 'user-points' && !isHomePage) {
         thead.innerHTML = `
             <tr>
-                <th class="sortable" data-sort="name">Callsign <span class="sort-icon">↕</span></th>
-                <th class="text-center sortable" data-sort="score">Lifetime Points <span class="sort-icon">↕</span></th>
+                <th class="sortable" data-sort="name">
+                    Callsign <span class="arrow-icon arrow-sort"></span>
+                </th>
+                <th class="text-center sortable" data-sort="score">
+                    Lifetime Points <span class="arrow-icon arrow-sort"></span>
+                </th>
             </tr>
         `;
 
@@ -206,8 +213,8 @@ export async function renderLeaderboard() {
             }
 
             tbody.innerHTML = userList.slice(0, limitCount).map(user => {
-                const isMe = (currentUid && user.uid === currentUid) || 
-                             (currentUserCallsign && user.callsign === currentUserCallsign);
+                const isMe = (currentUid && user.uid === currentUid) ||
+                    (currentUserCallsign && user.callsign === currentUserCallsign);
                 const highlightClass = isMe ? 'rank-active-user' : '';
                 const callsignLabel = formatCallsignDisplay(user, currentUid, currentUserCallsign);
 
@@ -224,14 +231,22 @@ export async function renderLeaderboard() {
             tbody.innerHTML = `<tr><td colspan="2" class="text-center text-dim">Unable to load user points.</td></tr>`;
         }
 
-    // 2. RENDER: Top Test Scores (Pulls from /scores)
+        // 2. RENDER: Top Test Scores (Pulls from /scores)
     } else {
         thead.innerHTML = `
             <tr>
-                <th class="sortable" data-sort="name">Callsign <span class="sort-icon">↕</span></th>
-                <th class="sortable" data-sort="module">Subject <span class="sort-icon">↕</span></th>
-                <th class="sortable" data-sort="score">Score <span class="sort-icon">↕</span></th>
-                <th class="sortable" data-sort="date">Date <span class="sort-icon">↕</span></th>
+                <th class="sortable" data-sort="name">
+                    Callsign <span class="arrow-icon arrow-sort"></span>
+                </th>
+                <th class="sortable" data-sort="subject">
+                    Subject <span class="arrow-icon arrow-sort"></span>
+                </th>
+                <th class="sortable" data-sort="score">
+                    Score <span class="arrow-icon arrow-sort"></span>
+                </th>
+                <th class="sortable" data-sort="date">
+                    Date <span class="arrow-icon arrow-sort"></span>
+                </th>
             </tr>
         `;
 
@@ -263,9 +278,9 @@ export async function renderLeaderboard() {
 
             tbody.innerHTML = scoreList.slice(0, limitCount).map((item, idx) => {
                 const rawName = item.callsign || item.name;
-                const isMe = (currentUid && item.uid && item.uid === currentUid) || 
-                             (currentUserCallsign && rawName === currentUserCallsign);
-                
+                const isMe = (currentUid && item.uid && item.uid === currentUid) ||
+                    (currentUserCallsign && rawName === currentUserCallsign);
+
                 // Gold / Silver / Bronze accent backgrounds for Home Preview top 3
                 let rankClass = "";
                 if (isHomePage) {
@@ -324,13 +339,15 @@ export function initTableSorting(tableId) {
             }
 
             headers.forEach(h => {
-                const icon = h.querySelector(".sort-icon");
-                if (icon) icon.innerText = "↕";
+                const icon = h.querySelector(".arrow-icon");
+                if (icon) icon.className = "arrow-icon arrow-sort";
                 h.classList.remove("sort-asc", "sort-desc");
             });
 
-            const activeIcon = th.querySelector(".sort-icon");
-            if (activeIcon) activeIcon.innerText = currentSortAsc ? "▲" : "▼";
+            const activeIcon = th.querySelector(".arrow-icon");
+            if (activeIcon) {
+                activeIcon.className = `arrow-icon ${currentSortAsc ? 'arrow-up' : 'arrow-down'}`;
+            }
             th.classList.add(currentSortAsc ? "sort-asc" : "sort-desc");
 
             const sortKey = th.dataset.sort || "text";

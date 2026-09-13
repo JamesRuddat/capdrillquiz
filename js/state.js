@@ -59,9 +59,9 @@ export const state = {
         if (this.userUid) {
             localStorage.setItem(`points_${this.userUid}`, newPoints);
         }
-        
-        window.dispatchEvent(new CustomEvent("app:points-updated", { 
-            detail: { points: newPoints, uid: this.userUid } 
+
+        window.dispatchEvent(new CustomEvent("app:points-updated", {
+            detail: { points: newPoints, uid: this.userUid }
         }));
 
         this.broadcastStateChange();

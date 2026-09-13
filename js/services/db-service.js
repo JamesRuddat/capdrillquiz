@@ -137,7 +137,7 @@ export async function toggleQuestionFlag(branchKey, questionId) {
 export async function verifyQuestion(branchKey, questionId) {
     const uid = state.userUid;
     const userRole = state.userRole || (uid === SUPER_UID ? "admin" : "user");
-    
+
     if (userRole !== "admin" && userRole !== "mod") {
         showToast("Only moderators can verify questions!", "error");
         return;
@@ -156,7 +156,7 @@ export async function verifyQuestion(branchKey, questionId) {
 }
 
 /**
- * Permanently deletes a question card from a subject module
+ * Permanently deletes a question card from a subject
  * @param {string} branchKey 
  * @param {string} questionId 
  */

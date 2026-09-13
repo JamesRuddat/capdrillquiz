@@ -95,7 +95,7 @@ export async function awardPoints(pointsToEarn, reason = "completing an activity
  */
 function showGuestPointPrompt(points, reason) {
     showToast(
-        `💡 Log in to claim ${points} points for ${reason}!`,
+        `Log in to claim ${points} points for ${reason}!`,
         "info"
     );
 

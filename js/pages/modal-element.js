@@ -11,7 +11,7 @@ class CustomModal extends HTMLElement {
                     <div id="modal-input-group" class="hidden" style="margin-bottom: 1em;">
                         <div style="display: flex; gap: 0.5em;">
                             <input type="text" id="modal-input" style="flex: 1; padding: 0.5em; border: 1px solid var(--border-color, #ccc); border-radius: 4px;">
-                            <button type="button" id="modal-btn-random" class="btn-tactical btn-gold btn-sm">🎲 Random</button>
+                            <button type="button" id="modal-btn-random" class="btn-tactical btn-gold btn-sm">Random</button>
                         </div>
                         <div id="modal-error-msg" class="hidden" style="color: #f85149; font-size: 0.8rem; margin-top: 0.4em; font-weight: bold;"></div>
                     </div>

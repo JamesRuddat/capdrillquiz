@@ -70,10 +70,10 @@ export function initHubPage() {
         inspectSelect.addEventListener("change", handleSubjectSelectChange);
     }
 
-    const deleteModBtn = document.getElementById("btn-delete-module");
+    const deleteModBtn = document.getElementById("btn-delete-subject");
     if (deleteModBtn) {
-        deleteModBtn.removeEventListener("click", deleteQuizModule);
-        deleteModBtn.addEventListener("click", deleteQuizModule);
+        deleteModBtn.removeEventListener("click", deleteQuizSubject);
+        deleteModBtn.addEventListener("click", deleteQuizSubject);
     }
 
     const addQuestionBtn = document.getElementById("btn-add-question-card");
@@ -88,9 +88,9 @@ export function initHubPage() {
         };
     }
 
-    const createCardBtn = document.getElementById("btn-create-module-card");
+    const createCardBtn = document.getElementById("btn-create-subject-card");
     if (createCardBtn) {
-        createCardBtn.onclick = () => toggleCreateModuleCard(true);
+        createCardBtn.onclick = () => toggleCreateSubjectCard(true);
     }
 
     // Dynamic Click & Change Handler
@@ -105,12 +105,12 @@ export function initHubPage() {
             const qid = btn.dataset.qid;
 
             switch (action) {
-                case "submit-new-module": submitNewModuleCard(); break;
-                case "cancel-create-module": toggleCreateModuleCard(false); break;
-                case "edit-module": toggleEditModule(branch); break;
-                case "save-module": saveModuleEdit(branch); break;
-                case "cancel-edit-module": toggleEditModule(null); break;
-                case "launch-module":
+                case "submit-new-subject": submitNewSubjectCard(); break;
+                case "cancel-create-subject": toggleCreateSubjectCard(false); break;
+                case "edit-subject": toggleEditSubject(branch); break;
+                case "save-subject": saveSubjectEdit(branch); break;
+                case "cancel-edit-subject": toggleEditSubject(null); break;
+                case "launch-subject":
                     const selectEl = document.getElementById("quiz-select") || document.getElementById("bank-inspect-select");
                     if (selectEl) selectEl.value = branch;
                     window.location.href = "setup.html";
@@ -126,7 +126,7 @@ export function initHubPage() {
                 case "verify-q":
                     verifyQuestion(branch, qid);
                     break;
-                case "trigger-create-from-blank": toggleCreateModuleCard(true); break;
+                case "trigger-create-from-blank": toggleCreateSubjectCard(true); break;
                 case "trigger-file-upload":
                     const targetInputId = btn.dataset.target;
                     const fileInput = document.getElementById(`${targetInputId}-file`);
@@ -149,7 +149,7 @@ export function initHubPage() {
     database.ref('subjects').once('value', (snapshot) => {
         state.QUESTION_REGISTRY = snapshot.val() || {};
         isInitialLoadComplete = true;
-        
+
         populateInspectSelectOptions();
         processUrlRouteParameters();
     });
@@ -178,13 +178,13 @@ function processUrlRouteParameters() {
 
     if (editSubjectKey && state.QUESTION_REGISTRY[editSubjectKey]) {
         if (inspectSelect) inspectSelect.value = editSubjectKey;
-        state.isCreatingNewModule = false;
+        state.isCreatingNewSubject = false;
         renderUnifiedHub();
         return;
     }
 
     if (searchQuery) {
-        state.isCreatingNewModule = true;
+        state.isCreatingNewSubject = true;
         if (inspectSelect) inspectSelect.value = "";
         renderUnifiedHub();
 
@@ -196,39 +196,39 @@ function processUrlRouteParameters() {
             }
         }, 50);
 
-        showToast(`Creating new module for "${searchQuery}"`, "info");
+        showToast(`Creating new subject for "${searchQuery}"`, "info");
         return;
     }
 
     // Default: Blank State
     if (inspectSelect) inspectSelect.value = "";
-    state.isCreatingNewModule = false;
+    state.isCreatingNewSubject = false;
     renderUnifiedHub();
 }
 
 function handleSubjectSelectChange(e) {
-    state.isCreatingNewModule = false;
-    state.editingModuleKey = null;
+    state.isCreatingNewSubject = false;
+    state.editingSubjectKey = null;
     renderUnifiedHub();
 }
 
-export function toggleEditModule(key) {
-    state.isCreatingNewModule = false;
-    state.editingModuleKey = state.editingModuleKey === key ? null : key;
+export function toggleEditSubject(key) {
+    state.isCreatingNewSubject = false;
+    state.editingSubjectKey = state.editingSubjectKey === key ? null : key;
     renderUnifiedHub();
 }
 
-export function toggleCreateModuleCard(show) {
-    state.editingModuleKey = null;
-    state.isCreatingNewModule = show;
-    
+export function toggleCreateSubjectCard(show) {
+    state.editingSubjectKey = null;
+    state.isCreatingNewSubject = show;
+
     const inspectSelect = document.getElementById("bank-inspect-select");
     if (show && inspectSelect) inspectSelect.value = "";
-    
+
     renderUnifiedHub();
 }
 
-export function saveModuleEdit(key) {
+export function saveSubjectEdit(key) {
     const catVal = document.getElementById("edit-mod-category")?.value.trim();
     const titleVal = document.getElementById("edit-mod-title")?.value.trim();
     const publicationVal = document.getElementById("edit-mod-publication")?.value.trim();
@@ -255,16 +255,16 @@ export function saveModuleEdit(key) {
             if (state.QUESTION_REGISTRY[key]) {
                 Object.assign(state.QUESTION_REGISTRY[key], updatedData);
             }
-            state.editingModuleKey = null;
+            state.editingSubjectKey = null;
             renderUnifiedHub();
-            showToast("Module updated successfully!", "success");
+            showToast("Subject updated successfully!", "success");
         })
-        .catch(err => showToast("Failed to save module: " + err.message, "error"));
+        .catch(err => showToast("Failed to save subject: " + err.message, "error"));
 }
 
-export function submitNewModuleCard() {
+export function submitNewSubjectCard() {
     if (!state.currentUser) {
-        showToast("You must be logged in to create a module!", "error");
+        showToast("You must be logged in to create a subject!", "error");
         return;
     }
 
@@ -278,7 +278,7 @@ export function submitNewModuleCard() {
     const cleanKey = keyVal.toUpperCase().replace(/[^A-Z0-9_]/g, '');
 
     if (!cleanKey || !titleVal) {
-        showToast("Please enter a Module Key ID and Title.", "error");
+        showToast("Please enter a Subject Key ID and Title.", "error");
         return;
     }
 
@@ -292,7 +292,7 @@ export function submitNewModuleCard() {
         return;
     }
 
-    const newModuleData = {
+    const newSubjectData = {
         branchName: titleVal,
         category: catVal,
         publication: publicationVal,
@@ -302,19 +302,19 @@ export function submitNewModuleCard() {
         questions: {}
     };
 
-    database.ref(`subjects/${cleanKey}`).set(newModuleData)
+    database.ref(`subjects/${cleanKey}`).set(newSubjectData)
         .then(() => {
-            state.isCreatingNewModule = false;
-            state.editingModuleKey = cleanKey;
+            state.isCreatingNewSubject = false;
+            state.editingSubjectKey = cleanKey;
 
             const selectEl = document.getElementById("bank-inspect-select");
             if (selectEl) selectEl.value = cleanKey;
 
-            awardPoints(100, "Creating a New Subject Module");
+            awardPoints(100, "Creating a New Subject Subject");
             renderUnifiedHub();
             showToast("New subject published!", "success");
         })
-        .catch(err => showToast("Failed to publish module: " + err.message, "error"));
+        .catch(err => showToast("Failed to publish subject: " + err.message, "error"));
 }
 
 export function addBlankQuestionCard(branchKey) {
@@ -326,7 +326,7 @@ export function addBlankQuestionCard(branchKey) {
     const userUid = state.currentUser.uid;
     const isSuper = userUid === SUPER_UID;
     const userRole = state.userRole || (isSuper ? "admin" : "user");
-    
+
     // Verified Authors (Admins & Moderators) auto-verify their creations
     const isVerifiedAuthor = isSuper || userRole === "admin" || userRole === "mod";
 
@@ -355,7 +355,7 @@ export function addBlankQuestionCard(branchKey) {
 export function renderUnifiedHub() {
     const inspectSelect = document.getElementById("bank-inspect-select");
     const container = document.getElementById("bank-inspector-list");
-    const deleteModBtn = document.getElementById("btn-delete-module");
+    const deleteModBtn = document.getElementById("btn-delete-subject");
     const authStatus = document.getElementById("hub-auth-status");
 
     if (!container) return;
@@ -378,7 +378,7 @@ export function renderUnifiedHub() {
                 <span>Status: <strong>${roleBadge}</strong> (${state.userCallsign || state.currentUser?.email || 'Read-Only'})</span>
                 ${isModOrAdmin ? `
                     <button id="btn-manage-roles" class="btn-tactical btn-gold btn-sm btn-padding-compact">
-                        ⚙️ Open Personnel Panel
+                        Open Personnel Panel
                     </button>
                 ` : ''}
             </div>
@@ -394,13 +394,13 @@ export function renderUnifiedHub() {
     }
 
     // 1. Create New Subject View
-    if (state.isCreatingNewModule) {
+    if (state.isCreatingNewSubject) {
         container.innerHTML = `
             <div class="quiz-card hub-create-card">
-                <h3 class="hub-create-title">➕ Create New Subject</h3>
+                <h3 class="hub-create-title">Create New Subject</h3>
                 <div class="hub-form-stack">
-                    <input type="text" id="create-mod-key" placeholder="Module Key ID (e.g., CAP_AERO_CH1)">
-                    <input type="text" id="create-mod-title" placeholder="Module Title (e.g., Aerospace Chapter 1)">
+                    <input type="text" id="create-mod-key" placeholder="Subject Key ID (e.g., CAP_AERO_CH1)">
+                    <input type="text" id="create-mod-title" placeholder="Subject Title (e.g., Aerospace Chapter 1)">
                     <input type="text" id="create-mod-category" placeholder="Category (e.g., Leadership, Drill, Aero)">
                     <input type="text" id="create-mod-publication" placeholder="Publication Citation (e.g., CAPP 60-33)">
                     <textarea id="create-mod-description" placeholder="Subject Description & Study Links (http://...)" rows="3" class="hub-textarea"></textarea>
@@ -408,12 +408,12 @@ export function renderUnifiedHub() {
                     <div class="hub-file-upload-row">
                         <input type="text" id="create-mod-bg" placeholder="Background Image URL or Upload Image" class="flex-1">
                         <input type="file" id="create-mod-bg-file" data-text-target="create-mod-bg" accept="image/*" class="hidden">
-                        <button type="button" class="btn-tactical btn-gold" data-action="trigger-file-upload" data-target="create-mod-bg">📁 Upload</button>
+                        <button type="button" class="btn-tactical btn-gold" data-action="trigger-file-upload" data-target="create-mod-bg">Upload</button>
                     </div>
                 </div>
                 <div class="quiz-card-footer hub-card-footer">
-                    <button class="btn-tactical flex-1" data-action="submit-new-module">Publish Subject</button>
-                    <button class="btn-tactical btn-clear flex-1" data-action="cancel-create-module">Cancel</button>
+                    <button class="btn-tactical flex-1" data-action="submit-new-subject">Publish Subject</button>
+                    <button class="btn-tactical btn-clear flex-1" data-action="cancel-create-subject">Cancel</button>
                 </div>
             </div>
         `;
@@ -422,9 +422,9 @@ export function renderUnifiedHub() {
 
     const branch = inspectSelect ? inspectSelect.value : "";
     const data = state.QUESTION_REGISTRY[branch];
-    const isModuleOwner = data && data.createdBy && data.createdBy === userUid;
+    const isSubjectOwner = data && data.createdBy && data.createdBy === userUid;
 
-    if (deleteModBtn) deleteModBtn.classList.toggle("hidden", !(isSuper || isModuleOwner));
+    if (deleteModBtn) deleteModBtn.classList.toggle("hidden", !(isSuper || isSubjectOwner));
 
     // 2. Blank State View
     if (!branch || !data) {
@@ -432,9 +432,9 @@ export function renderUnifiedHub() {
             <div class="quiz-card hub-blank-card">
                 <h3 class="hub-blank-title">Subject Hub Manager</h3>
                 <p class="hub-blank-desc">
-                    Select an existing subject from the dropdown above to manage its question bank, or click below to publish a brand-new module.
+                    Select an existing subject from the dropdown above to manage its question bank, or click below to publish a brand-new subject.
                 </p>
-                <button class="btn-tactical btn-gold" data-action="trigger-create-from-blank">➕ Create New Subject</button>
+                <button class="btn-tactical btn-gold" data-action="trigger-create-from-blank">Create New Subject</button>
             </div>
         `;
         return;
@@ -443,14 +443,14 @@ export function renderUnifiedHub() {
     // 3. Selected Subject View
     const rawQs = data.questions || {};
     const totalQs = Array.isArray(rawQs) ? rawQs.length : Object.keys(rawQs).length;
-    const isEditingModule = state.editingModuleKey === branch;
+    const isEditingSubject = state.editingSubjectKey === branch;
 
     const bgClass = data.imageUrl ? 'hub-card-custom-bg' : '';
     const bgStyleAttr = data.imageUrl ? `style="background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url('${data.imageUrl}');"` : '';
 
-    let moduleCardHTML = "";
-    if (isEditingModule) {
-        moduleCardHTML = `
+    let subjectCardHTML = "";
+    if (isEditingSubject) {
+        subjectCardHTML = `
             <div class="quiz-card hub-edit-card ${bgClass}" ${bgStyleAttr}>
                 <div>
                     <div class="quiz-card-header hub-card-header-row">
@@ -459,7 +459,7 @@ export function renderUnifiedHub() {
                     </div>
                     
                     <div class="hub-field-margin">
-                        <input type="text" id="edit-mod-title" value="${(data.branchName || branch).replace(/"/g, '&quot;')}" placeholder="Module Title" class="hub-title-input">
+                        <input type="text" id="edit-mod-title" value="${(data.branchName || branch).replace(/"/g, '&quot;')}" placeholder="Subject Title" class="hub-title-input">
                     </div>
                     
                     <div class="hub-field-margin-sm">
@@ -474,21 +474,21 @@ export function renderUnifiedHub() {
                     <div class="hub-file-upload-row hub-field-margin-xs">
                         <input type="text" id="edit-mod-bg" value="${(data.imageUrl || '').replace(/"/g, '&quot;')}" placeholder="Card Background Image URL or Upload Image" class="hub-bg-input flex-1">
                         <input type="file" id="edit-mod-bg-file" data-text-target="edit-mod-bg" accept="image/*" class="hidden">
-                        <button type="button" class="btn-tactical btn-gold" data-action="trigger-file-upload" data-target="edit-mod-bg">📁 Upload</button>
+                        <button type="button" class="btn-tactical btn-gold" data-action="trigger-file-upload" data-target="edit-mod-bg">Upload</button>
                     </div>
                 </div>
 
                 <div class="quiz-card-footer hub-card-footer">
-                    <button class="btn-tactical flex-1" data-action="save-module" data-key="${branch}">Save Info</button>
-                    <button class="btn-tactical btn-clear flex-1" data-action="cancel-edit-module">Cancel</button>
+                    <button class="btn-tactical flex-1" data-action="save-subject" data-key="${branch}">Save Info</button>
+                    <button class="btn-tactical btn-clear flex-1" data-action="cancel-edit-subject">Cancel</button>
                 </div>
             </div>
         `;
     } else {
-        const canEditModule = isSuper || isModuleOwner;
+        const canEditSubject = isSuper || isSubjectOwner;
         const formattedDescription = formatTextWithLinks(data.description || '');
 
-        moduleCardHTML = `
+        subjectCardHTML = `
             <div class="quiz-card hub-display-card ${bgClass}" ${bgStyleAttr}>
                 <div>
                     <div class="quiz-card-header">
@@ -506,27 +506,27 @@ export function renderUnifiedHub() {
                     ` : ''}
                 </div>
                 <div class="quiz-card-footer hub-card-footer flex-wrap">
-                    ${canEditModule ? `<button class="btn-tactical flex-1" data-action="edit-module" data-key="${branch}">Edit Info</button>` : ''}
-                    <button class="btn-tactical btn-blue flex-1" data-action="launch-module" data-key="${branch}">Take Quiz</button>
+                    ${canEditSubject ? `<button class="btn-tactical flex-1" data-action="edit-subject" data-key="${branch}">Edit Info</button>` : ''}
+                    <button class="btn-tactical btn-blue flex-1" data-action="launch-subject" data-key="${branch}">Take Quiz</button>
                 </div>
             </div>
         `;
     }
 
-    if (state.activeModuleListenerRef) state.activeModuleListenerRef.off();
+    if (state.activeSubjectListenerRef) state.activeSubjectListenerRef.off();
 
-    state.activeModuleListenerRef = database.ref(`subjects/${branch}/questions`);
-    state.activeModuleListenerRef.on("value", (snapshot) => {
+    state.activeSubjectListenerRef = database.ref(`subjects/${branch}/questions`);
+    state.activeSubjectListenerRef.on("value", (snapshot) => {
         const qSnap = snapshot.val() || {};
         const questionsList = Array.isArray(qSnap)
             ? qSnap.map((q, idx) => ({ id: idx, ...q }))
             : Object.keys(qSnap).map(k => ({ id: k, ...qSnap[k] }));
 
-        let questionsHTML = questionsList.length === 0 
-            ? `<div class="hub-no-questions">No questions exist in subject '${branch}' yet. Tap '➕ Add Question Card' above to create one!</div>`
-            : questionsList.map((q, idx) => renderQuestionItem(q, idx, branch, isSuper || isModuleOwner, userUid)).join('');
+        let questionsHTML = questionsList.length === 0
+            ? `<div class="hub-no-questions">No questions exist in subject '${branch}' yet. Tap 'Add Question Card' above to create one!</div>`
+            : questionsList.map((q, idx) => renderQuestionItem(q, idx, branch, isSuper || isSubjectOwner, userUid)).join('');
 
-        container.innerHTML = moduleCardHTML + questionsHTML;
+        container.innerHTML = subjectCardHTML + questionsHTML;
     });
 }
 
@@ -552,7 +552,7 @@ function renderQuestionItem(q, idx, branch, canEditSubject, userUid) {
     const userRole = state.userRole || (userUid === SUPER_UID ? "admin" : "user");
     const isModOrAdmin = userRole === "admin" || userRole === "mod";
 
-    const verificationBadge = isVerified 
+    const verificationBadge = isVerified
         ? `<span class="badge-verified">VERIFIED</span>`
         : `<span class="badge-unverified">UNVERIFIED</span>`;
 
@@ -560,7 +560,7 @@ function renderQuestionItem(q, idx, branch, canEditSubject, userUid) {
         ? `<div class="hub-q-img-wrapper"><img src="${q.imageUrl}" alt="Visual Cue" class="hub-q-img"></div>`
         : '';
 
-const actionControlsHTML = `
+    const actionControlsHTML = `
     <div class="hub-q-controls flex-row-between width-full">
         <!-- Left Side: Voting Controls -->
         <div class="hub-voting-controls">
@@ -586,8 +586,8 @@ const actionControlsHTML = `
     </div>
 `;
 
-if (canEditQuestion) {
-    return `
+    if (canEditQuestion) {
+        return `
         <div class="hub-q-card ${isVerified ? 'hub-q-card-verified' : 'hub-q-card-unverified'}">
             <div class="hub-q-header">
                 <div class="hub-q-title-group">
@@ -601,7 +601,7 @@ if (canEditQuestion) {
                 <div class="hub-file-upload-row">
                     <input type="text" id="edit-qimg-${q.id}" placeholder="Image URL or Upload Image" value="${q.imageUrl ? q.imageUrl.replace(/"/g, '&quot;') : ''}" class="flex-1">
                     <input type="file" id="edit-qimg-${q.id}-file" data-text-target="edit-qimg-${q.id}" accept="image/*" class="hidden">
-                    <button type="button" class="btn-tactical btn-gold btn-sm" data-action="trigger-file-upload" data-target="edit-qimg-${q.id}">📁 Upload</button>
+                    <button type="button" class="btn-tactical btn-gold btn-sm" data-action="trigger-file-upload" data-target="edit-qimg-${q.id}">Upload</button>
                 </div>
 
                 <input type="text" id="edit-opt0-${q.id}" value="${optsArray[0] ? optsArray[0].replace(/"/g, '&quot;') : ''}">
@@ -636,7 +636,7 @@ if (canEditQuestion) {
             </div>
         </div>
     `;
-}
+    }
 
     return `
         <div class="hub-q-card ${isVerified ? 'hub-q-card-verified' : 'hub-q-card-unverified'}">
@@ -706,15 +706,15 @@ export async function saveQuestionEdit(branchKey, questionId) {
         .catch(err => showToast("Update failed: " + err.message, "error"));
 }
 
-export async function deleteQuizModule() {
+export async function deleteQuizSubject() {
     const selectEl = document.getElementById("bank-inspect-select");
     if (!selectEl || !selectEl.value) return;
 
     const branchKey = selectEl.value;
-    const confirmed = await showConfirm(`CRITICAL WARNING: Delete subject '${branchKey}' and ALL questions?`, "Delete Subject Module");
+    const confirmed = await showConfirm(`CRITICAL WARNING: Delete subject '${branchKey}' and ALL questions?`, "Delete Subject Subject");
     if (confirmed) {
         database.ref(`subjects/${branchKey}`).remove()
-            .then(() => showToast(`Module '${branchKey}' deleted`, "info"))
-            .catch(err => showToast("Module delete failed: " + err.message, "error"));
+            .then(() => showToast(`Subject '${branchKey}' deleted`, "info"))
+            .catch(err => showToast("Subject delete failed: " + err.message, "error"));
     }
 }

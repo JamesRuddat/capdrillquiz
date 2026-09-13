@@ -30,8 +30,8 @@ function shuffleArray(array) {
 
 function extractValidQuestions(rawQuestions) {
     if (!rawQuestions) return [];
-    const rawItems = Array.isArray(rawQuestions) 
-        ? rawQuestions 
+    const rawItems = Array.isArray(rawQuestions)
+        ? rawQuestions
         : Object.values(rawQuestions);
 
     return rawItems.filter(q => q && typeof q === 'object' && typeof q.q === 'string' && q.q.trim() !== '');
@@ -104,18 +104,18 @@ export function updateBannerImage() {
     const bannerEl = document.getElementById("subject-banner");
     const bannerTitleEl = document.querySelector("#subject-banner .banner-title");
     const descEl = document.getElementById("subject-desc") || document.getElementById("subject-banner-desc");
-    
+
     if (!selectEl || !bannerEl) return;
 
     const activeBranchKey = selectEl.value;
     const registryEntry = state.QUESTION_REGISTRY ? state.QUESTION_REGISTRY[activeBranchKey] : null;
 
     const defaultImage = "https://www.gocivilairpatrol.com/media/photoalbums/67190384_2450135768383102_536700487_A2E9342E843CE.jpg?dimensions=950x633";
-    
-    const imageUrl = (registryEntry && registryEntry.imageUrl && registryEntry.imageUrl.trim() !== "") 
-        ? registryEntry.imageUrl 
+
+    const imageUrl = (registryEntry && registryEntry.imageUrl && registryEntry.imageUrl.trim() !== "")
+        ? registryEntry.imageUrl
         : defaultImage;
-        
+
     const subjectTitle = (registryEntry && registryEntry.branchName) ? registryEntry.branchName : "Subject Configuration";
     const rawDescription = (registryEntry && registryEntry.description) ? registryEntry.description : "";
 
@@ -248,7 +248,7 @@ export function loadQuestion() {
     const container = document.getElementById("options-container");
     const feedbackPanel = document.getElementById("feedback-panel");
 
-    if (!textEl || !container) return; 
+    if (!textEl || !container) return;
 
     if (badgeEl) badgeEl.innerText = `${session.branchName} (${session.mode.toUpperCase()} MODE)`;
     if (trackerEl) trackerEl.innerText = `Question ${currentIdx + 1} of ${session.activeQuestions.length}`;
@@ -374,7 +374,7 @@ export function updateNavigationControls(session) {
 export function selectOption(selectedIdx) {
     const sessionRaw = localStorage.getItem("activeQuizSession");
     if (!sessionRaw) return;
-    
+
     const session = JSON.parse(sessionRaw);
     const q = session.activeQuestions[session.currentIdx];
     const buttons = document.querySelectorAll("#options-container .option-btn");

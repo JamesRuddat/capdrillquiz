@@ -6,8 +6,8 @@ import { renderUnifiedHub } from '../pages/hub-page.js';
 function getValidQuestionsCount(questionsPayload) {
     if (!questionsPayload) return 0;
 
-    const items = Array.isArray(questionsPayload) 
-        ? questionsPayload 
+    const items = Array.isArray(questionsPayload)
+        ? questionsPayload
         : Object.values(questionsPayload);
 
     return items.filter(q => q && typeof q === 'object' && typeof q.q === 'string' && q.q.trim() !== '').length;
@@ -15,7 +15,7 @@ function getValidQuestionsCount(questionsPayload) {
 
 export function showView(viewId) {
     const views = ['home-view', 'setup-view', 'quiz-view', 'results-view', 'leaderboard-view', 'hub-view'];
-    
+
     views.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.toggle('hidden', id !== viewId);
@@ -42,7 +42,7 @@ export function showView(viewId) {
     if (viewId === 'home-view') {
         updateDashboardMetrics();
         renderLeaderboard();
-        renderModuleCards();
+        renderSubjectCards();
     }
     if (viewId === 'setup-view') {
         populateBranchDropdowns();
@@ -65,21 +65,21 @@ export function populateBranchDropdowns() {
     const savedInspect = inspectSelect ? inspectSelect.value : "";
     const currentFilter = leaderboardSelect ? leaderboardSelect.value : "ALL";
 
-    const moduleKeys = Object.keys(state.QUESTION_REGISTRY || {});
+    const subjectKeys = Object.keys(state.QUESTION_REGISTRY || {});
 
     if (setupSelect) setupSelect.innerHTML = "";
     if (builderTargetSelect) builderTargetSelect.innerHTML = "";
     if (inspectSelect) inspectSelect.innerHTML = "";
     if (leaderboardSelect) leaderboardSelect.innerHTML = `<option value="ALL">All Subjects</option>`;
 
-    if (moduleKeys.length === 0) {
+    if (subjectKeys.length === 0) {
         if (setupSelect) setupSelect.innerHTML = `<option value="">No Subjects Available</option>`;
         if (builderTargetSelect) builderTargetSelect.innerHTML = `<option value="">No Subjects Available</option>`;
         if (inspectSelect) inspectSelect.innerHTML = `<option value="">No Subjects Available</option>`;
         return;
     }
 
-    moduleKeys.forEach((key) => {
+    subjectKeys.forEach((key) => {
         const item = state.QUESTION_REGISTRY[key];
         const label = `${item.branchName || key} (${item.publication || 'Standard'})`;
 
@@ -132,19 +132,19 @@ export function populateBranchDropdowns() {
     updateSliderLimits();
 }
 
-export function renderModuleList() {
+export function renderSubjectList() {
     const treeContainer = document.getElementById("dynamic-publications-tree");
     if (!treeContainer) return;
 
-    const moduleKeys = Object.keys(state.QUESTION_REGISTRY || {});
+    const subjectKeys = Object.keys(state.QUESTION_REGISTRY || {});
 
-    if (moduleKeys.length === 0) {
+    if (subjectKeys.length === 0) {
         treeContainer.innerHTML = `<span class="text-dim">No subjects registered in database yet.</span>`;
         return;
     }
 
     let html = `<ul class="tree">`;
-    moduleKeys.forEach((key) => {
+    subjectKeys.forEach((key) => {
         const item = state.QUESTION_REGISTRY[key];
         const count = getValidQuestionsCount(item.questions);
 
@@ -170,9 +170,9 @@ export function updateSliderLimits() {
     if (!selectEl || !slider || !label) return;
 
     const selectedKey = selectEl.value;
-    const module = state.QUESTION_REGISTRY ? state.QUESTION_REGISTRY[selectedKey] : null;
+    const subject = state.QUESTION_REGISTRY ? state.QUESTION_REGISTRY[selectedKey] : null;
 
-    if (!module || !module.questions) {
+    if (!subject || !subject.questions) {
         slider.min = 1;
         slider.max = 1;
         slider.value = 1;
@@ -180,7 +180,7 @@ export function updateSliderLimits() {
         return;
     }
 
-    const totalAvailable = getValidQuestionsCount(module.questions);
+    const totalAvailable = getValidQuestionsCount(subject.questions);
 
     if (totalAvailable === 0) {
         slider.min = 1;
@@ -222,18 +222,18 @@ export function sanitizeInput(str) {
     })[m]);
 }
 
-export function renderModuleCards() {
+export function renderSubjectCards() {
     const gridContainer = document.getElementById("quiz-cards-grid");
     if (!gridContainer) return;
 
-    const moduleKeys = Object.keys(state.QUESTION_REGISTRY || {});
+    const subjectKeys = Object.keys(state.QUESTION_REGISTRY || {});
 
-    if (moduleKeys.length === 0) {
+    if (subjectKeys.length === 0) {
         gridContainer.innerHTML = `<div class="text-center text-dim grid-span-full">No active subjects available.</div>`;
         return;
     }
 
-    gridContainer.innerHTML = moduleKeys.map(key => {
+    gridContainer.innerHTML = subjectKeys.map(key => {
         const data = state.QUESTION_REGISTRY[key];
         const totalQs = getValidQuestionsCount(data.questions);
 

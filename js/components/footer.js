@@ -9,14 +9,6 @@ export class SiteFooter extends HTMLElement {
                         <p class="margin-none">
                             <strong>Build:</strong> <code>v4.0.1 (Shadowfox)</code>
                         </p>
-                        <p class="footer-subtext">
-                            <a href="https://github.com/JamesRuddat/capdrillquiz/commits/main/" 
-                               target="_blank" 
-                               rel="noopener noreferrer" 
-                               class="text-link font-bold">
-                            GitHub
-                            </a>
-                        </p>
                     </div>
 
                     <!-- Middle: Reference Disclaimer Text -->
@@ -26,14 +18,18 @@ export class SiteFooter extends HTMLElement {
 
                     <!-- Right: Developer Credit & Expertise -->
                     <div class="text-right">
+                    
                         <p class="footer-dev-title">
-                            Architected &amp; Developed by <span class="footer-accent-text">Mr. Ruddat</span>
+                            Developed by <span class="footer-accent-text"><a href="https://github.com/JamesRuddat/capdrillquiz/commits/main/" 
+                               target="_blank" 
+                               rel="noopener noreferrer" 
+                               class="text-link font-bold">Mr. Ruddat</a></span>
                         </p>
                         <p class="footer-subtext">
                             Full-Stack Developer &amp; Domain SME
                         </p>
                     </div>
-
+ 
                 </div>
             </footer>
         `;

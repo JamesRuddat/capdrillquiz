@@ -1,7 +1,7 @@
 export class SiteHeader extends HTMLElement {
     connectedCallback() {
         this.renderShell();
-        
+
         // 1. Listen for global reactive state changes (Auth/Profile updates)
         window.addEventListener("app:state-changed", (e) => {
             const { callsign, points, user } = e.detail;
@@ -95,7 +95,7 @@ export class SiteHeader extends HTMLElement {
             if (e.key === "Enter") {
                 const query = searchInput.value.trim();
                 const isSetupPage = window.location.pathname.endsWith("setup.html");
-                
+
                 if (!isSetupPage && query) {
                     window.location.href = `setup.html?search=${encodeURIComponent(query)}`;
                 }
@@ -117,9 +117,9 @@ export class SiteHeader extends HTMLElement {
             const badge = card.querySelector(".quiz-card-badge")?.innerText.toLowerCase() || "";
             const meta = card.querySelector(".quiz-card-meta")?.innerText.toLowerCase() || "";
 
-            const isMatch = title.includes(searchTerm) || 
-                            badge.includes(searchTerm) || 
-                            meta.includes(searchTerm);
+            const isMatch = title.includes(searchTerm) ||
+                badge.includes(searchTerm) ||
+                meta.includes(searchTerm);
 
             if (isMatch) {
                 card.classList.remove("hidden");

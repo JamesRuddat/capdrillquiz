@@ -5,17 +5,18 @@ import { initQuizPage, initResultsPage, updateBannerImage, startQuiz } from './c
 import { initFlashcards } from './components/flashcards.js';
 import { initLeaderboardPage, updateDashboardMetrics, initTableSorting } from './components/leaderboard.js';
 import { initHubPage, renderUnifiedHub } from './pages/hub-page.js';
-import { populateBranchDropdowns, renderModuleList, renderModuleCards, updateSliderLimits } from './components/navigation.js';
+import { populateBranchDropdowns, renderSubjectList, renderSubjectCards, updateSliderLimits } from './components/navigation.js';
 import { initAdminPage } from './pages/admin-page.js';
+import { initDailyChallenge } from './components/daily-challenge.js';
 
 document.addEventListener("DOMContentLoaded", () => {
-    
+
     // 1. IMMEDIATE OPTIMISTIC RENDERING (0ms Delay from Cache)
     if (document.getElementById("quiz-select")) {
         populateBranchDropdowns();
     }
     if (document.getElementById("quiz-cards-grid")) {
-        renderModuleCards();
+        renderSubjectCards();
     }
 
     // 2. ROUTER: Initialize view controllers
@@ -53,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
-        // Mode Action Buttons (Attached via Event Listeners for ES Module Scope)
+        // Mode Action Buttons (Attached via Event Listeners for ES Subject Scope)
         const btnTest = document.getElementById("btn-mode-test");
         const btnStudy = document.getElementById("btn-mode-study");
         const btnFlashcards = document.getElementById("btn-mode-flashcards");
@@ -97,8 +98,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         requestAnimationFrame(() => {
             populateBranchDropdowns();
-            renderModuleList();
-            renderModuleCards();
+            renderSubjectList();
+            renderSubjectCards();
 
             if (document.getElementById("home-view") || document.getElementById("home-top-scores-body")) {
                 updateDashboardMetrics();
@@ -111,6 +112,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (document.getElementById("bank-inspector-list")) {
                 renderUnifiedHub();
+            }
+
+            if (document.getElementById("daily-question-text")) {
+                initDailyChallenge();
             }
         });
     });

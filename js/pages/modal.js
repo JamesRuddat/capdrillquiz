@@ -13,7 +13,7 @@ export function showModal(message, title = "Notice") {
         if (!overlay) return resolve();
 
         titleEl.innerText = title;
-        
+
         // Support both string HTML and appended DOM Nodes
         if (typeof message === 'string') {
             messageEl.innerHTML = message;
@@ -56,7 +56,7 @@ export function showConfirm(message, title = "Confirm Action") {
         if (!overlay) return resolve(false);
 
         titleEl.innerText = title;
-        
+
         if (typeof message === 'string') {
             messageEl.innerHTML = message;
         } else if (message instanceof HTMLElement) {
@@ -97,7 +97,7 @@ export function showPrompt(message, defaultValue = "", title = "Enter Callsign")
         const messageEl = document.getElementById("modal-message");
         const confirmBtn = document.getElementById("modal-btn-confirm");
         const cancelBtn = document.getElementById("modal-btn-cancel");
-        
+
         const inputGroup = document.getElementById("modal-input-group");
         const inputEl = document.getElementById("modal-input");
         const randomBtn = document.getElementById("modal-btn-random");
@@ -106,7 +106,7 @@ export function showPrompt(message, defaultValue = "", title = "Enter Callsign")
         if (!overlay) return resolve(null);
 
         titleEl.innerText = title;
-        
+
         if (typeof message === 'string') {
             messageEl.innerHTML = message;
         } else if (message instanceof HTMLElement) {
@@ -118,7 +118,7 @@ export function showPrompt(message, defaultValue = "", title = "Enter Callsign")
 
         if (confirmBtn) confirmBtn.innerText = "Confirm";
         if (cancelBtn) cancelBtn.classList.remove("hidden");
-        
+
         if (inputGroup) inputGroup.classList.remove("hidden");
         if (inputEl) {
             inputEl.value = defaultValue;

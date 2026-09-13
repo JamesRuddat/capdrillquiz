@@ -121,7 +121,7 @@ function renderUserProfile(uid, userData, scores, questions) {
     const isAdmin = isSuper || state.userRole === "admin";
 
     // Format Scores Table
-    let scoresHTML = scores.length === 0 
+    let scoresHTML = scores.length === 0
         ? `<p class="admin-empty-text">No quiz activity recorded for this user.</p>`
         : `
             <table class="admin-table">
@@ -156,10 +156,10 @@ function renderUserProfile(uid, userData, scores, questions) {
                     <div class="admin-q-header">
                         <span class="admin-q-branch">${q.branchName}</span>
                         <div>
-                            ${isVerified 
-                                ? `<span class="admin-badge-verified">✓ VERIFIED</span>` 
-                                : `<button data-admin-action="verify-q" data-branch="${q.branchKey}" data-qid="${q.qid}" class="btn-tactical btn-blue btn-sm">Verify</button>`
-                            }
+                            ${isVerified
+                    ? `<span class="admin-badge-verified">VERIFIED</span>`
+                    : `<button data-admin-action="verify-q" data-branch="${q.branchKey}" data-qid="${q.qid}" class="btn-tactical btn-blue btn-sm">Verify</button>`
+                }
                             <button data-admin-action="delete-q" data-branch="${q.branchKey}" data-qid="${q.qid}" class="btn-tactical btn-clear btn-sm btn-margin-left">Delete</button>
                         </div>
                     </div>
@@ -195,12 +195,12 @@ function renderUserProfile(uid, userData, scores, questions) {
 
             <!-- Tabs / Sections -->
             <div class="admin-section-spacing">
-                <h3 class="admin-section-heading">📊 Quiz Performance History (${scores.length})</h3>
+                <h3 class="admin-section-heading">Performance History (${scores.length})</h3>
                 ${scoresHTML}
             </div>
 
             <div>
-                <h3 class="admin-section-heading">✏️ Created Questions (${questions.length})</h3>
+                <h3 class="admin-section-heading">Created Questions (${questions.length})</h3>
                 ${questionsHTML}
             </div>
         </div>
