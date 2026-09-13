@@ -57,7 +57,8 @@ export function populateBranchDropdowns() {
     const inspectSelect = document.getElementById("bank-inspect-select");
     const leaderboardSelect = document.getElementById("filter-leaderboard");
 
-    const savedCardSubject = sessionStorage.getItem("selectedSubjectKey");
+    // Standardized to localStorage
+    const savedCardSubject = localStorage.getItem("selectedSubjectKey");
 
     const savedSetup = setupSelect ? (savedCardSubject || setupSelect.value) : savedCardSubject;
     const savedBuilder = builderTargetSelect ? builderTargetSelect.value : "";
@@ -126,7 +127,7 @@ export function populateBranchDropdowns() {
         state.activeBranchKey = setupSelect.value;
     }
 
-    sessionStorage.removeItem("selectedSubjectKey");
+    localStorage.removeItem("selectedSubjectKey");
 
     updateSliderLimits();
 }
@@ -138,7 +139,7 @@ export function renderModuleList() {
     const moduleKeys = Object.keys(state.QUESTION_REGISTRY || {});
 
     if (moduleKeys.length === 0) {
-        treeContainer.innerHTML = `<span style="color: var(--light-text-color);">No subjects registered in database yet.</span>`;
+        treeContainer.innerHTML = `<span class="text-dim">No subjects registered in database yet.</span>`;
         return;
     }
 
@@ -228,7 +229,7 @@ export function renderModuleCards() {
     const moduleKeys = Object.keys(state.QUESTION_REGISTRY || {});
 
     if (moduleKeys.length === 0) {
-        gridContainer.innerHTML = `<div class="text-center" style="color: var(--light-text-color); grid-column: 1/-1;">No active subjects available.</div>`;
+        gridContainer.innerHTML = `<div class="text-center text-dim grid-span-full">No active subjects available.</div>`;
         return;
     }
 
@@ -236,23 +237,22 @@ export function renderModuleCards() {
         const data = state.QUESTION_REGISTRY[key];
         const totalQs = getValidQuestionsCount(data.questions);
 
-        const bgStyle = data.imageUrl 
-            ? `background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url('${data.imageUrl}') center/cover no-repeat; color: #ffffff;`
-            : '';
+        const bgClass = data.imageUrl ? 'quiz-card-custom-bg' : '';
+        const bgStyleAttr = data.imageUrl ? `style="background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url('${data.imageUrl}');"` : '';
 
         return `
-            <div class="quiz-card" style="${bgStyle}">
+            <div class="quiz-card ${bgClass}" ${bgStyleAttr}>
                 <div>
-                    <div class="quiz-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="quiz-card-header flex-row-between">
                         <span class="quiz-card-badge">${data.category || 'General'}</span>
-                        <span style="font-size: 0.8rem; color: ${data.imageUrl ? '#ddd' : 'var(--light-text-color)'};">${totalQs} Questions</span>
+                        <span class="text-sm ${data.imageUrl ? 'text-overlay-light' : 'text-dim'}">${totalQs} Questions</span>
                     </div>
                     <div class="quiz-card-title">${data.branchName || key}</div>
-                    <div class="quiz-card-meta" style="color: ${data.imageUrl ? '#eee' : 'inherit'};">
+                    <div class="quiz-card-meta ${data.imageUrl ? 'text-overlay-bright' : ''}">
                         <strong>Publication:</strong> ${data.publication || 'Standard Regulation'}
                     </div>
                 </div>
-                <div class="quiz-card-footer" style="margin-top: 0.8em;">
+                <div class="quiz-card-footer">
                     <button class="btn-tactical btn-blue width-full btn-card-start" data-key="${key}" type="button">
                         Start
                     </button>
@@ -264,7 +264,8 @@ export function renderModuleCards() {
     gridContainer.querySelectorAll(".btn-card-start").forEach(btn => {
         btn.onclick = (e) => {
             const selectedKey = e.currentTarget.dataset.key;
-            sessionStorage.setItem("selectedSubjectKey", selectedKey);
+            // Standardized to localStorage
+            localStorage.setItem("selectedSubjectKey", selectedKey);
             window.location.href = "setup.html";
         };
     });

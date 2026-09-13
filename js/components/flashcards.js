@@ -33,12 +33,12 @@ export function initFlashcards() {
 
     function renderCard(index) {
         if (cardEl) {
-            cardEl.style.transition = "none";
+            cardEl.classList.add("no-transition");
             currentRotation = 0;
             cardEl.style.transform = "rotateY(0deg)";
             
             void cardEl.offsetHeight; // Force browser repaint
-            cardEl.style.transition = "";
+            cardEl.classList.remove("no-transition");
         }
 
         const q = questions[index];
@@ -55,15 +55,15 @@ export function initFlashcards() {
             if (!imgEl && frontContainer) {
                 imgEl = document.createElement("img");
                 imgEl.id = "flashcard-visual-cue";
-                imgEl.style.cssText = "max-width: 100%; max-height: 160px; border-radius: 6px; margin: 0.8em 0; object-fit: contain;";
+                imgEl.className = "flashcard-visual-cue";
                 frontContainer.insertBefore(imgEl, questionTextEl.nextSibling);
             }
             if (imgEl) {
                 imgEl.src = q.imageUrl;
-                imgEl.style.display = "block";
+                imgEl.classList.remove("hidden");
             }
         } else if (imgEl) {
-            imgEl.style.display = "none";
+            imgEl.classList.add("hidden");
         }
 
         let rawAnswer = (q.options && q.options[q.answer] !== undefined)

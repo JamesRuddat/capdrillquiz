@@ -16,7 +16,7 @@ export function initAdminPage() {
 
         if (!state.currentUser || (userRole !== "admin" && userRole !== "mod" && !isSuper)) {
             if (authGuard) {
-                authGuard.innerHTML = `<span style="color: #f85149;"><strong>ACCESS DENIED:</strong> You must be an Admin or Moderator to view this page.</span>`;
+                authGuard.innerHTML = `<span class="auth-denied"><strong>ACCESS DENIED:</strong> You must be an Admin or Moderator to view this page.</span>`;
             }
             return false;
         }
@@ -48,7 +48,7 @@ async function performUserSearch(query) {
 
     const cleanQuery = query.trim().toLowerCase();
     const container = document.getElementById("admin-user-profile-container");
-    if (container) container.innerHTML = `<div style="padding: 1em;">Searching database...</div>`;
+    if (container) container.innerHTML = `<div class="admin-search-loading">Searching database...</div>`;
 
     try {
         // 1. Fetch User Record
@@ -69,7 +69,7 @@ async function performUserSearch(query) {
         }
 
         if (!matchedUid) {
-            if (container) container.innerHTML = `<div class="quiz-card" style="padding: 1.5em; text-align: center;">No user found matching "<strong>${query}</strong>"</div>`;
+            if (container) container.innerHTML = `<div class="quiz-card admin-search-empty">No user found matching "<strong>${query}</strong>"</div>`;
             return;
         }
 
@@ -122,24 +122,24 @@ function renderUserProfile(uid, userData, scores, questions) {
 
     // Format Scores Table
     let scoresHTML = scores.length === 0 
-        ? `<p style="color: var(--light-text-color); font-size: 0.85rem;">No quiz activity recorded for this user.</p>`
+        ? `<p class="admin-empty-text">No quiz activity recorded for this user.</p>`
         : `
-            <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 0.5em;">
+            <table class="admin-table">
                 <thead>
-                    <tr style="border-bottom: 2px solid var(--border-color); text-align: left;">
-                        <th style="padding: 0.4em;">Subject</th>
-                        <th style="padding: 0.4em;">Score</th>
-                        <th style="padding: 0.4em;">Percentage</th>
-                        <th style="padding: 0.4em;">Date</th>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Score</th>
+                        <th>Percentage</th>
+                        <th>Date</th>
                     </tr>
                 </thead>
                 <tbody>
                     ${scores.map(s => `
-                        <tr style="border-bottom: 1px solid rgba(0,0,0,0.05);">
-                            <td style="padding: 0.4em;">${s.branch || 'General'}</td>
-                            <td style="padding: 0.4em;">${s.score}</td>
-                            <td style="padding: 0.4em;"><strong>${s.pct}%</strong></td>
-                            <td style="padding: 0.4em;">${s.date || (s.timestamp ? new Date(s.timestamp).toLocaleDateString() : 'N/A')}</td>
+                        <tr>
+                            <td>${s.branch || 'General'}</td>
+                            <td>${s.score}</td>
+                            <td><strong>${s.pct}%</strong></td>
+                            <td>${s.date || (s.timestamp ? new Date(s.timestamp).toLocaleDateString() : 'N/A')}</td>
                         </tr>
                     `).join('')}
                 </tbody>
@@ -148,23 +148,23 @@ function renderUserProfile(uid, userData, scores, questions) {
 
     // Format Created Questions List
     let questionsHTML = questions.length === 0
-        ? `<p style="color: var(--light-text-color); font-size: 0.85rem;">This user has not authored any questions.</p>`
+        ? `<p class="admin-empty-text">This user has not authored any questions.</p>`
         : questions.map(q => {
             const isVerified = q.verified === true;
             return `
-                <div style="padding: 0.8em; border-radius: 4px; margin-bottom: 0.5em; background: rgba(0,0,0,0.03); border: 1px solid var(--border-color);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.5em; margin-bottom: 0.3em;">
-                        <span style="font-size: 0.75rem; font-weight: bold; text-transform: uppercase; color: var(--primary-color);">${q.branchName}</span>
+                <div class="admin-q-card">
+                    <div class="admin-q-header">
+                        <span class="admin-q-branch">${q.branchName}</span>
                         <div>
                             ${isVerified 
-                                ? `<span style="color: #2ea043; font-size: 0.75rem; font-weight: bold;">✓ VERIFIED</span>` 
+                                ? `<span class="admin-badge-verified">✓ VERIFIED</span>` 
                                 : `<button data-admin-action="verify-q" data-branch="${q.branchKey}" data-qid="${q.qid}" class="btn-tactical btn-blue btn-sm">Verify</button>`
                             }
-                            <button data-admin-action="delete-q" data-branch="${q.branchKey}" data-qid="${q.qid}" class="btn-tactical btn-clear btn-sm" style="margin-left: 0.3em;">Delete</button>
+                            <button data-admin-action="delete-q" data-branch="${q.branchKey}" data-qid="${q.qid}" class="btn-tactical btn-clear btn-sm btn-margin-left">Delete</button>
                         </div>
                     </div>
-                    <div style="font-weight: 600; font-size: 0.9rem;">${q.q}</div>
-                    <div style="font-size: 0.8rem; color: var(--light-text-color); margin-top: 0.2em;">
+                    <div class="admin-q-text">${q.q}</div>
+                    <div class="admin-q-meta">
                         <strong>Ans:</strong> ${q.options ? q.options[q.answer] : 'N/A'} | <em>Citation:</em> ${q.explanation || 'None'}
                     </div>
                 </div>
@@ -172,35 +172,35 @@ function renderUserProfile(uid, userData, scores, questions) {
         }).join('');
 
     container.innerHTML = `
-        <div class="quiz-card" style="margin-bottom: 1.5em; padding: 1.2em;">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8em; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8em; margin-bottom: 1em;">
+        <div class="quiz-card admin-profile-card">
+            <div class="admin-profile-header">
                 <div>
-                    <h2 style="margin: 0;">${userData.callsign || 'Cadet'}</h2>
-                    <div style="font-size: 0.8rem; color: var(--light-text-color);">Email: ${userData.email || 'N/A'} | UID: ${uid}</div>
-                    <div style="font-size: 0.85rem; margin-top: 0.2em;">Total Points: <strong>${userData.points || 0} pts</strong></div>
+                    <h2 class="admin-user-title">${userData.callsign || 'Cadet'}</h2>
+                    <div class="admin-user-subtext">Email: ${userData.email || 'N/A'} | UID: ${uid}</div>
+                    <div class="admin-user-points">Total Points: <strong>${userData.points || 0} pts</strong></div>
                 </div>
 
                 ${isAdmin ? `
-                    <div style="display: flex; align-items: center; gap: 0.5em;">
-                        <label for="admin-role-select" style="font-size: 0.85rem; font-weight: bold;">Role:</label>
-                        <select id="admin-role-select" style="width: auto; padding: 0.3em;">
+                    <div class="admin-role-controls">
+                        <label for="admin-role-select" class="admin-role-label">Role:</label>
+                        <select id="admin-role-select" class="admin-role-select">
                             <option value="user" ${currentRole === 'user' ? 'selected' : ''}>USER</option>
                             <option value="mod" ${currentRole === 'mod' ? 'selected' : ''}>MODERATOR</option>
                             <option value="admin" ${currentRole === 'admin' ? 'selected' : ''}>ADMIN</option>
                         </select>
                         <button id="btn-save-role" class="btn-tactical btn-gold btn-sm">Update Role</button>
                     </div>
-                ` : `<span style="font-weight: bold; font-size: 0.85rem;">Role: ${currentRole.toUpperCase()}</span>`}
+                ` : `<span class="admin-role-badge">Role: ${currentRole.toUpperCase()}</span>`}
             </div>
 
             <!-- Tabs / Sections -->
-            <div style="margin-bottom: 1.5em;">
-                <h3 style="font-size: 1.1rem; margin-bottom: 0.4em;">📊 Quiz Performance History (${scores.length})</h3>
+            <div class="admin-section-spacing">
+                <h3 class="admin-section-heading">📊 Quiz Performance History (${scores.length})</h3>
                 ${scoresHTML}
             </div>
 
             <div>
-                <h3 style="font-size: 1.1rem; margin-bottom: 0.4em;">✏️ Created Questions (${questions.length})</h3>
+                <h3 class="admin-section-heading">✏️ Created Questions (${questions.length})</h3>
                 ${questionsHTML}
             </div>
         </div>

@@ -15,7 +15,7 @@ function formatTextWithLinks(text = "") {
     if (!text) return "";
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     return text.replace(urlRegex, (url) => {
-        return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: var(--primary-color, #4ea8de); text-decoration: underline;">${url}</a>`;
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-link">${url}</a>`;
     });
 }
 
@@ -128,10 +128,10 @@ export function updateBannerImage() {
     if (descEl) {
         if (rawDescription.trim() !== "") {
             descEl.innerHTML = formatTextWithLinks(rawDescription);
-            descEl.style.display = "block";
+            descEl.classList.remove("hidden");
         } else {
             descEl.innerHTML = "";
-            descEl.style.display = "none";
+            descEl.classList.add("hidden");
         }
     }
 }
@@ -220,27 +220,27 @@ export function loadQuestion() {
 
     // Ensure Exit Button listener is cleanly bound every time a question loads
     const exitBtn = document.getElementById("btn-quiz-exit");
-if (exitBtn) {
-    exitBtn.onclick = (e) => {
-        e.preventDefault();
-        exitQuizSession();
-    };
-}
+    if (exitBtn) {
+        exitBtn.onclick = (e) => {
+            e.preventDefault();
+            exitQuizSession();
+        };
+    }
 
-// Timer setup for evaluation mode (only start if interval is null)
-const evalBanner = document.getElementById("eval-timer-banner");
-if (session.mode === 'eval' && session.evalDurationMinutes) {
-    if (evalBanner) evalBanner.style.display = "flex";
-    if (!evalTimerInterval) {
-        startEvaluationTimer(session.evalDurationMinutes);
+    // Timer setup for evaluation mode (only start if interval is null)
+    const evalBanner = document.getElementById("eval-timer-banner");
+    if (session.mode === 'eval' && session.evalDurationMinutes) {
+        if (evalBanner) evalBanner.classList.remove("hidden");
+        if (!evalTimerInterval) {
+            startEvaluationTimer(session.evalDurationMinutes);
+        }
+    } else {
+        if (evalBanner) evalBanner.classList.add("hidden");
+        if (evalTimerInterval) {
+            clearInterval(evalTimerInterval);
+            evalTimerInterval = null;
+        }
     }
-} else {
-    if (evalBanner) evalBanner.style.display = "none";
-    if (evalTimerInterval) {
-        clearInterval(evalTimerInterval);
-        evalTimerInterval = null;
-    }
-}
 
     const badgeEl = document.getElementById("quiz-standard-badge");
     const trackerEl = document.getElementById("question-tracker");
@@ -250,7 +250,7 @@ if (session.mode === 'eval' && session.evalDurationMinutes) {
 
     if (!textEl || !container) return; 
 
-    if (badgeEl) badgeEl.innerText = `[MODULE: ${session.branchName}] (${session.mode.toUpperCase()} MODE)`;
+    if (badgeEl) badgeEl.innerText = `${session.branchName} (${session.mode.toUpperCase()} MODE)`;
     if (trackerEl) trackerEl.innerText = `Question ${currentIdx + 1} of ${session.activeQuestions.length}`;
     if (textEl) textEl.innerText = q.q;
 
@@ -260,13 +260,13 @@ if (session.mode === 'eval' && session.evalDurationMinutes) {
         if (!imgEl) {
             imgEl = document.createElement("img");
             imgEl.id = "question-visual-cue";
-            imgEl.style.cssText = "max-width: 100%; max-height: 250px; border-radius: 8px; margin: 1em auto; display: block; object-fit: contain;";
+            imgEl.className = "question-visual-cue";
             textEl.parentNode.insertBefore(imgEl, container);
         }
         imgEl.src = q.imageUrl;
-        imgEl.style.display = "block";
+        imgEl.classList.remove("hidden");
     } else if (imgEl) {
-        imgEl.style.display = "none";
+        imgEl.classList.add("hidden");
     }
 
     container.innerHTML = "";
@@ -296,9 +296,7 @@ if (session.mode === 'eval' && session.evalDurationMinutes) {
         } else {
             // In Test/Eval mode, KEEP buttons ENABLED so answers can be changed freely
             if (hasAnswered && idx === selectedIdx) {
-                btn.style.borderColor = "var(--alert-color)";
-                btn.style.backgroundColor = "rgba(255, 205, 0, 0.25)";
-                btn.style.fontWeight = "bold";
+                btn.classList.add("selected-option");
             }
             btn.onclick = () => selectOption(idx);
         }
@@ -411,13 +409,9 @@ export function selectOption(selectedIdx) {
         // Test / Eval Mode: Update active selection highlights without disabling buttons
         buttons.forEach((btn, idx) => {
             if (idx === selectedIdx) {
-                btn.style.borderColor = "var(--alert-color)";
-                btn.style.backgroundColor = "rgba(255, 205, 0, 0.25)";
-                btn.style.fontWeight = "bold";
+                btn.classList.add("selected-option");
             } else {
-                btn.style.borderColor = "";
-                btn.style.backgroundColor = "";
-                btn.style.fontWeight = "normal";
+                btn.classList.remove("selected-option");
             }
         });
     }
@@ -440,7 +434,11 @@ export function startEvaluationTimer(durationMinutes) {
 
         if (timerDisplay) {
             timerDisplay.innerText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-            if (totalSeconds <= 120) timerDisplay.style.color = "#f85149";
+            if (totalSeconds <= 120) {
+                timerDisplay.classList.add("timer-critical");
+            } else {
+                timerDisplay.classList.remove("timer-critical");
+            }
         }
 
         if (totalSeconds <= 0) {
@@ -578,54 +576,48 @@ export function renderResults() {
     }
 
     if (breakdownEl && res.questions && res.questions.length > 0) {
-        breakdownEl.innerHTML = `
-            <h2 style="font-size: 1.2rem; margin-bottom: 0.8em; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4em;">
-                Detailed Item Breakdown
-            </h2>
-        `;
+        breakdownEl.innerHTML = `<h2 class="breakdown-title">Detailed Breakdown</h2>`;
 
         res.questions.forEach((q, idx) => {
             const userChoiceIdx = res.userAnswers ? res.userAnswers[idx] : undefined;
             const isCorrect = (userChoiceIdx !== undefined && userChoiceIdx === q.answer);
 
             const card = document.createElement("div");
-            card.className = "col";
-            card.style.marginBottom = "1em";
-            card.style.borderLeft = isCorrect ? "4px solid #2ea043" : "4px solid #f85149";
+            card.className = `col result-card ${isCorrect ? 'result-correct' : 'result-incorrect'}`;
 
             let optionsHtml = "";
             q.options.forEach((opt, optIdx) => {
                 let badge = "";
-                let style = "padding: 0.5em; border-radius: 4px; margin: 0.2em 0; font-size: 0.85rem;";
+                let optionClass = "result-option";
 
                 if (optIdx === q.answer) {
-                    style += " background: rgba(46, 160, 67, 0.2); color: #2ea043; font-weight: bold;";
+                    optionClass += " result-option-correct";
                     badge = " ✓ [CORRECT ANSWER]";
                 } else if (optIdx === userChoiceIdx && !isCorrect) {
-                    style += " background: rgba(248, 81, 73, 0.2); color: #f85149; font-weight: bold;";
+                    optionClass += " result-option-incorrect";
                     badge = " ✗ [YOUR SELECTION]";
                 } else {
-                    style += " opacity: 0.7;";
+                    optionClass += " result-option-dim";
                 }
 
-                optionsHtml += `<div style="${style}">${optIdx + 1}. ${opt}${badge}</div>`;
+                optionsHtml += `<div class="${optionClass}">${optIdx + 1}. ${opt}${badge}</div>`;
             });
 
             const visualCueHtml = (q.imageUrl && q.imageUrl.trim() !== "")
-                ? `<div style="margin: 0.5em 0;"><img src="${q.imageUrl}" alt="Visual Cue" style="max-width: 100%; max-height: 200px; border-radius: 4px; border: 1px solid var(--border-color);"></div>`
+                ? `<div class="result-visual-cue-container"><img src="${q.imageUrl}" alt="Visual Cue" class="result-visual-cue"></div>`
                 : '';
 
             card.innerHTML = `
-                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 0.85rem; margin-bottom: 0.5em;">
-                    <span>Item ${idx + 1}</span>
-                    <span style="color: ${isCorrect ? '#2ea043' : '#f85149'};">
+                <div class="result-item-header">
+                    <span>${idx + 1}</span>
+                    <span class="${isCorrect ? 'text-correct' : 'text-incorrect'}">
                         ${isCorrect ? '[CORRECT]' : userChoiceIdx === undefined ? '[UNANSWERED]' : '[INCORRECT]'}
                     </span>
                 </div>
-                <p style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.6em;">${q.q}</p>
+                <p class="result-item-question">${q.q}</p>
                 ${visualCueHtml}
                 <div>${optionsHtml}</div>
-                ${q.explanation ? `<div style="font-size: 0.8rem; color: var(--light-text-color); margin-top: 0.6em; font-style: italic;">Note: ${q.explanation}</div>` : ''}
+                ${q.explanation ? `<div class="result-item-explanation">Note: ${q.explanation}</div>` : ''}
             `;
 
             breakdownEl.appendChild(card);

@@ -46,10 +46,10 @@ function formatCallsignDisplay(item, currentUid, currentUserCallsign) {
 
     if (isLegacy) {
         return `
-            <span style="color: var(--light-text-color); font-style: italic;" title="Recorded prior to callsign system update">
+            <span class="leaderboard-legacy-text" title="Recorded prior to callsign system update">
                 [Limited]
             </span>
-            <span class="quiz-card-badge" style="font-size: 0.7rem; opacity: 0.8; margin-left: 4px;">Legacy</span>
+            <span class="quiz-card-badge leaderboard-legacy-badge">Legacy</span>
         `;
     }
 
@@ -67,7 +67,11 @@ export function initLeaderboardPage() {
         modeSelect.addEventListener("change", (e) => {
             const subjectWrapper = document.getElementById("subject-filter-wrapper");
             if (subjectWrapper) {
-                subjectWrapper.style.display = e.target.value === 'user-points' ? 'none' : 'block';
+                if (e.target.value === 'user-points') {
+                    subjectWrapper.classList.add("hidden");
+                } else {
+                    subjectWrapper.classList.remove("hidden");
+                }
             }
             renderLeaderboard();
         });
@@ -105,7 +109,7 @@ export function updateDashboardMetrics() {
         }
 
         if (scoreList.length === 0) {
-            homeTopBody.innerHTML = `<tr><td colspan="4" class="text-center" style="color: var(--light-text-color);">No scores logged yet. Be the first!</td></tr>`;
+            homeTopBody.innerHTML = `<tr><td colspan="4" class="text-center text-dim">No scores logged yet. Be the first!</td></tr>`;
             return;
         }
 
@@ -125,25 +129,25 @@ export function updateDashboardMetrics() {
         const currentUserCallsign = state.userCallsign || null;
 
         homeTopBody.innerHTML = top3.map((item, idx) => {
-            let rankStyle = "";
-            if (idx === 0) rankStyle = 'style="background-color: rgba(255, 205, 0, 0.15);"';
-            else if (idx === 1) rankStyle = 'style="background-color: rgba(200, 200, 200, 0.15);"';
-            else if (idx === 2) rankStyle = 'style="background-color: rgba(205, 127, 50, 0.15);"';
+            let rankClass = "";
+            if (idx === 0) rankClass = "rank-gold";
+            else if (idx === 1) rankClass = "rank-silver";
+            else if (idx === 2) rankClass = "rank-bronze";
 
             const nameLabel = formatCallsignDisplay(item, currentUid, currentUserCallsign);
 
             return `
-                <tr ${rankStyle}>
+                <tr class="${rankClass}">
                     <td>${nameLabel}</td>
                     <td>${item.branch || 'General'}</td>
-                    <td style="font-weight: bold; color: var(--alert-color);">${item.score} (${item.pct}%)</td>
-                    <td style="color: var(--light-text-color); font-size: 0.85rem;">${item.date || 'N/A'}</td>
+                    <td class="font-bold text-alert">${item.score} (${item.pct}%)</td>
+                    <td class="text-dim text-sm">${item.date || 'N/A'}</td>
                 </tr>
             `;
         }).join('');
     }).catch(err => {
         console.error("Error loading top 3 preview scores:", err);
-        homeTopBody.innerHTML = `<tr><td colspan="4" class="text-center" style="color: var(--light-text-color);">Unable to load top scores preview.</td></tr>`;
+        homeTopBody.innerHTML = `<tr><td colspan="4" class="text-center text-dim">Unable to load top scores preview.</td></tr>`;
     });
 }
 
@@ -196,7 +200,7 @@ export async function renderLeaderboard() {
                 .sort((a, b) => b.points - a.points);
 
             if (userList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="2" class="text-center" style="color: var(--light-text-color);">No points recorded yet. Complete quizzes to earn stars!</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="2" class="text-center text-dim">No points recorded yet. Complete quizzes to earn stars!</td></tr>`;
                 initTableSorting("leaderboard-table");
                 return;
             }
@@ -204,20 +208,20 @@ export async function renderLeaderboard() {
             tbody.innerHTML = userList.slice(0, limitCount).map(user => {
                 const isMe = (currentUid && user.uid === currentUid) || 
                              (currentUserCallsign && user.callsign === currentUserCallsign);
-                const highlightStyle = isMe ? 'style="background-color: rgba(255, 205, 0, 0.12);"' : '';
+                const highlightClass = isMe ? 'rank-active-user' : '';
                 const callsignLabel = formatCallsignDisplay(user, currentUid, currentUserCallsign);
 
                 return `
-                    <tr ${highlightStyle}>
+                    <tr class="${highlightClass}">
                         <td>${callsignLabel}</td>
-                        <td class="text-center" style="font-weight: bold; color: var(--alert-color);">⭐ ${user.points} pts</td>
+                        <td class="text-center font-bold text-alert">⭐ ${user.points} pts</td>
                     </tr>
                 `;
             }).join('');
 
         } catch (err) {
             console.error("Error loading points leaderboard:", err);
-            tbody.innerHTML = `<tr><td colspan="2" class="text-center" style="color: var(--light-text-color);">Unable to load user points.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="2" class="text-center text-dim">Unable to load user points.</td></tr>`;
         }
 
     // 2. RENDER: Top Test Scores (Pulls from /scores)
@@ -252,7 +256,7 @@ export async function renderLeaderboard() {
             });
 
             if (scoreList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="text-center" style="color: var(--light-text-color);">No test scores logged yet. Be the first to complete a quiz!</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center text-dim">No test scores logged yet. Be the first to complete a quiz!</td></tr>`;
                 initTableSorting("leaderboard-table");
                 return;
             }
@@ -263,31 +267,31 @@ export async function renderLeaderboard() {
                              (currentUserCallsign && rawName === currentUserCallsign);
                 
                 // Gold / Silver / Bronze accent backgrounds for Home Preview top 3
-                let rankBg = "";
+                let rankClass = "";
                 if (isHomePage) {
-                    if (idx === 0) rankBg = 'background-color: rgba(255, 205, 0, 0.15);';
-                    else if (idx === 1) rankBg = 'background-color: rgba(200, 200, 200, 0.15);';
-                    else if (idx === 2) rankBg = 'background-color: rgba(205, 127, 50, 0.15);';
+                    if (idx === 0) rankClass = "rank-gold";
+                    else if (idx === 1) rankClass = "rank-silver";
+                    else if (idx === 2) rankClass = "rank-bronze";
                 } else if (isMe) {
-                    rankBg = 'background-color: rgba(255, 205, 0, 0.12);';
+                    rankClass = "rank-active-user";
                 }
 
                 const displayScore = `${item.score} (${item.pct}%)`;
                 const nameLabel = formatCallsignDisplay(item, currentUid, currentUserCallsign);
 
                 return `
-                    <tr style="${rankBg}">
+                    <tr class="${rankClass}">
                         <td>${nameLabel}</td>
                         <td>${item.branch || 'General'}</td>
-                        <td style="font-weight: bold; color: var(--alert-color);">${displayScore}</td>
-                        <td style="color: var(--light-text-color); font-size: 0.85rem;">${item.date || 'N/A'}</td>
+                        <td class="font-bold text-alert">${displayScore}</td>
+                        <td class="text-dim text-sm">${item.date || 'N/A'}</td>
                     </tr>
                 `;
             }).join('');
 
         } catch (err) {
             console.error("Error loading scores:", err);
-            tbody.innerHTML = `<tr><td colspan="4" class="text-center" style="color: var(--light-text-color);">Failed to load scores data.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center text-dim">Failed to load scores data.</td></tr>`;
         }
     }
 

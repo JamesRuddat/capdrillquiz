@@ -8,48 +8,60 @@ import { showConfirm } from '../pages/modal.js';
  * @param {Object} scoreData - Contains name, branch, score, pct, date
  * @returns {Promise<void>}
  */
-export function saveScoreToDB(scoreData) {
+export async function saveScoreToDB(scoreData) {
     const payload = {
         ...scoreData,
         callsign: state.userCallsign || scoreData.name || "Anonymous",
-        uid: state.currentUser ? state.currentUser.uid : null,
+        uid: state.userUid || (state.currentUser ? state.currentUser.uid : null),
         timestamp: Date.now()
     };
 
-    return database.ref("scores").push(payload);
+    try {
+        await database.ref("scores").push(payload);
+    } catch (err) {
+        console.error("Error saving score to database:", err);
+        showToast("Failed to record score online.", "error");
+    }
 }
 
 /**
  * Fetches all score records once
- * @param {Function} callback - Callback function receiving array of score logs
+ * @param {Function} [callback] - Optional callback function receiving array of score logs
+ * @returns {Promise<Array>}
  */
-export function fetchScoresOnce(callback) {
-    database.ref("scores").once("value", snapshot => {
+export async function fetchScoresOnce(callback) {
+    try {
+        const snapshot = await database.ref("scores").once("value");
         if (!snapshot.exists()) {
-            callback([]);
-            return;
+            if (callback) callback([]);
+            return [];
         }
 
         let logs = [];
         snapshot.forEach(child => {
             logs.push({ key: child.key, ...child.val() });
         });
-        callback(logs);
-    }, error => {
+
+        if (callback) callback(logs);
+        return logs;
+    } catch (error) {
         console.error("Error fetching scores once:", error);
-        callback([]);
-    });
+        if (callback) callback([]);
+        return [];
+    }
 }
 
 /**
  * Fetches scores sorted by percentage descending
- * @param {Function} callback - Callback function receiving array of score logs
+ * @param {Function} [callback] - Optional callback function receiving array of score logs
+ * @returns {Promise<Array>}
  */
-export function fetchScoresOrderedByPct(callback) {
-    database.ref("scores").orderByChild("pct").once("value", snapshot => {
+export async function fetchScoresOrderedByPct(callback) {
+    try {
+        const snapshot = await database.ref("scores").orderByChild("pct").once("value");
         if (!snapshot.exists()) {
-            callback([]);
-            return;
+            if (callback) callback([]);
+            return [];
         }
 
         let logs = [];
@@ -59,11 +71,13 @@ export function fetchScoresOrderedByPct(callback) {
 
         // Firebase orders ascending, so reverse to display top scores first
         logs.reverse();
-        callback(logs);
-    }, error => {
+        if (callback) callback(logs);
+        return logs;
+    } catch (error) {
         console.error("Error fetching ordered scores:", error);
-        callback([]);
-    });
+        if (callback) callback([]);
+        return [];
+    }
 }
 
 /**
@@ -73,12 +87,12 @@ export function fetchScoresOrderedByPct(callback) {
  * @param {string} voteType - 'up' or 'down'
  */
 export async function voteQuestion(branchKey, questionId, voteType) {
-    if (!state.currentUser) {
+    const uid = state.userUid;
+    if (!uid) {
         showToast("You must be logged in to vote on questions!", "error");
         return;
     }
 
-    const uid = state.currentUser.uid;
     const voteRef = database.ref(`subjects/${branchKey}/questions/${questionId}/votes/${uid}`);
     const snapshot = await voteRef.once("value");
 
@@ -97,12 +111,12 @@ export async function voteQuestion(branchKey, questionId, voteType) {
  * @param {string} questionId 
  */
 export async function toggleQuestionFlag(branchKey, questionId) {
-    if (!state.currentUser) {
+    const uid = state.userUid;
+    if (!uid) {
         showToast("You must be logged in to flag questions!", "error");
         return;
     }
 
-    const uid = state.currentUser.uid;
     const flagRef = database.ref(`subjects/${branchKey}/questions/${questionId}/flags/${uid}`);
     const snapshot = await flagRef.once("value");
 
@@ -121,7 +135,9 @@ export async function toggleQuestionFlag(branchKey, questionId) {
  * @param {string} questionId 
  */
 export async function verifyQuestion(branchKey, questionId) {
-    const userRole = state.userRole || (state.currentUser?.uid === SUPER_UID ? "admin" : "user");
+    const uid = state.userUid;
+    const userRole = state.userRole || (uid === SUPER_UID ? "admin" : "user");
+    
     if (userRole !== "admin" && userRole !== "mod") {
         showToast("Only moderators can verify questions!", "error");
         return;
@@ -130,7 +146,7 @@ export async function verifyQuestion(branchKey, questionId) {
     try {
         await database.ref(`subjects/${branchKey}/questions/${questionId}`).update({
             verified: true,
-            verifiedBy: state.currentUser.uid,
+            verifiedBy: uid,
             verifiedAt: new Date().toISOString()
         });
         showToast("Question verified successfully!", "success");

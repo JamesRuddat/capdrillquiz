@@ -5,7 +5,6 @@ import { showToast } from './user-service.js';
 
 /**
  * Evaluates and grants missing badges based on full user stats snapshot.
- * Safe to call anywhere (e.g. Profile Page load or Quiz Submission).
  */
 export async function evaluateUserBadges(userData = {}) {
     const user = state.currentUser;
@@ -14,7 +13,6 @@ export async function evaluateUserBadges(userData = {}) {
     const userRef = database.ref(`users/${user.uid}`);
     const currentBadges = userData.badges || {};
 
-    // Coerce values to numbers so numeric comparisons (>= 50) work properly
     const rawPoints = Number(userData.points || userData.lifetimePoints || state.userPoints || 0);
     const evals = Number(userData.totalEvaluations || 0);
     const correct = Number(userData.totalCorrect || 0);
@@ -57,6 +55,7 @@ export async function evaluateUserBadges(userData = {}) {
 
     return currentBadges;
 }
+
 /**
  * Evaluates and grants new badges specifically after completing an evaluation
  */
@@ -84,14 +83,12 @@ export async function checkAndAwardBadges(evalResults) {
             branch: activeBranch
         };
 
-        // Track subject specific correct counters
         if (activeBranch === 'AE') {
             updatedStats.aeCorrect = (userData.aeCorrect || 0) + (evalResults.correctCount || 0);
         } else if (activeBranch === 'ES') {
             updatedStats.esCorrect = (userData.esCorrect || 0) + (evalResults.correctCount || 0);
         }
 
-        // 1. Update aggregate metrics in Firebase
         const metricsUpdate = {
             totalCorrect: updatedStats.totalCorrect,
             totalEvaluations: updatedStats.totalEvaluations,
@@ -101,8 +98,6 @@ export async function checkAndAwardBadges(evalResults) {
         if (updatedStats.esCorrect !== undefined) metricsUpdate.esCorrect = updatedStats.esCorrect;
 
         await userRef.update(metricsUpdate);
-
-        // 2. Run badge checks against updated stats
         await evaluateUserBadges(updatedStats);
 
     } catch (err) {
@@ -119,27 +114,23 @@ export function renderUserBadges(containerId, userBadges = {}) {
 
     const html = Object.values(BADGE_REGISTRY).map(badge => {
         const isUnlocked = !!userBadges[badge.id];
-
-        // Distinct styling: Unlocked badges get vibrant gold borders; locked badges are dimmed and greyscale
-        const cardStyle = isUnlocked
-            ? 'background: rgba(255, 204, 0, 0.1); border: 3px solid var(--primary-color); box-shadow: 0 2px 8px rgba(255, 205, 0, 0.15);'
-            : 'background: var(--card-background); border: 1px solid var(--border-color); opacity: 0.45; filter: grayscale(100%);';
+        const statusClass = isUnlocked ? 'badge-unlocked' : 'badge-locked';
 
         const statusLabel = isUnlocked
-            ? '<span style="color: #2ea043; font-weight: bold;">Unlocked ✓</span>'
-            : '<span style="color: var(--light-text-color);">Locked 🔒</span>';
+            ? '<span class="badge-status-unlocked">Unlocked ✓</span>'
+            : '<span class="badge-status-locked">Locked 🔒</span>';
 
         return `
-            <div class="badge-card" style="${cardStyle} padding: 0.8em; border-radius: 8px; text-align: center; transition: transform 0.15s ease;">
-                <div style="font-size: 2.2rem; line-height: 1.2;">${badge.icon}</div>
-                <div style="font-weight: bold; margin-top: 0.4em; font-size: 0.9rem;">${badge.title}</div>
-                <div style="font-size: 0.75rem; color: var(--light-text-color); margin: 0.3em 0 0.5em 0; line-height: 1.3;">${badge.desc}</div>
-                <div style="font-size: 0.7rem;">
+            <div class="badge-card ${statusClass}">
+                <div class="badge-icon">${badge.icon}</div>
+                <div class="badge-title">${badge.title}</div>
+                <div class="badge-desc">${badge.desc}</div>
+                <div class="badge-status-container">
                     ${statusLabel}
                 </div>
             </div>
         `;
     }).join('');
 
-    container.innerHTML = `<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1em;">${html}</div>`;
+    container.innerHTML = `<div class="badge-grid">${html}</div>`;
 }

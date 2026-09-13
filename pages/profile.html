@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
-    <html lang="en" data-theme="light">
+<html lang="en" data-theme="light">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,6 +16,7 @@
     <script type="module" src="/js/components/footer.js"></script>
     <script type="module" src="/js/pages/modal-element.js"></script>
 </head>
+
 <body>
     <site-header></site-header>
 
@@ -23,8 +24,8 @@
         <!-- Guest Fallback -->
         <div id="profile-guest-notice" class="card text-center hidden">
             <h2>Authentication Required</h2>
-            <p style="color: var(--light-text-color);">Please sign in with Google to view your profile, stats, and badges.</p>
-            <button id="profile-signin-btn" class="btn-tactical btn-gold" type="button" style="margin-top: 1em;">
+            <p class="profile-subtext">Please sign in with Google to view your profile, stats, and badges.</p>
+            <button id="profile-signin-btn" class="btn-tactical btn-gold profile-signin-btn" type="button">
                 Sign In with Google
             </button>
         </div>
@@ -32,17 +33,18 @@
         <!-- Authenticated Profile View -->
         <div id="profile-content" class="hidden">
             <!-- Header Card -->
-            <div class="card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1em;">
+            <div class="card profile-header-card">
                 <div>
                     <span class="quiz-card-badge">RECORD</span>
-                    <h1 id="profile-callsign-display" style="margin: 0.2em 0 0 0;">---</h1>
-                    <p id="profile-uid-display" style="margin: 0.2em 0 0 0; font-size: 0.75rem; color: var(--light-text-color); font-family: monospace;"></p>
+                    <h1 id="profile-callsign-display" class="profile-callsign">---</h1>
+                    <p id="profile-uid-display" class="profile-uid"></p>
                 </div>
-                <div style="display: flex; gap: 1em; align-items: center;">
-                    <div class="text-center" style="border: 1px solid var(--border-color); padding: 0.6em 1.2em; border-radius: 6px;">
-                        <div style="font-size: 0.75rem; color: var(--light-text-color);">LIFETIME STARS</div>
-                        <div id="profile-points-display" style="font-size: 1.5rem; font-weight: bold; color: var(--alert-color);">⭐ 0</div>
+                <div class="profile-header-actions">
+                    <div class="text-center profile-stars-box">
+                        <div class="profile-stat-label">LIFETIME STARS</div>
+                        <div id="profile-points-display" class="profile-stars-value">⭐ 0</div>
                     </div>
+                    <br>
                     <button id="btn-change-callsign" class="btn-tactical btn-sm" type="button">
                         Edit Callsign
                     </button>
@@ -50,22 +52,22 @@
             </div>
 
             <!-- Stats Overview -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1em; margin: 1.5em 0;">
+            <div class="profile-stats-grid">
                 <div class="card text-center">
-                    <div style="font-size: 0.8rem; color: var(--light-text-color);">EVALUATIONS COMPLETED</div>
-                    <div id="stat-evals-count" style="font-size: 1.8rem; font-weight: bold; margin-top: 0.2em;">0</div>
+                    <div class="profile-stat-label">EVALUATIONS COMPLETED</div>
+                    <div id="stat-evals-count" class="profile-stat-value">0</div>
                 </div>
                 <div class="card text-center">
-                    <div style="font-size: 0.8rem; color: var(--light-text-color);">TOTAL CORRECT ANSWERS</div>
-                    <div id="stat-correct-count" style="font-size: 1.8rem; font-weight: bold; margin-top: 0.2em;">0</div>
+                    <div class="profile-stat-label">TOTAL CORRECT ANSWERS</div>
+                    <div id="stat-correct-count" class="profile-stat-value">0</div>
                 </div>
             </div>
 
             <!-- Badges & Achievements Showcase -->
-            <section class="card" style="margin-top: 1.5em;">
-                <h2 style="margin-bottom: 0.8em;">ACHIEVEMENTS & MILESTONES</h2>
+            <section class="card profile-section-margin">
+                <h2 class="profile-section-title">ACHIEVEMENTS & MILESTONES</h2>
                 <div id="user-badges-grid">
-                    <p style="color: var(--light-text-color);">Loading achievements...</p>
+                    <p class="profile-subtext">Loading achievements...</p>
                 </div>
             </section>
         </div>

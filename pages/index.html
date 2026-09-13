@@ -22,65 +22,107 @@
     <site-header></site-header>
 
     <main>
+        <!-- 1. OPERATIONAL COMMAND DASHBOARD -->
         <section id="home-view" class="col">
-            <h1>Overview</h1>
-            <p>
-                Whether you are preparing for tests, studying publications &amp; regulations, or brushing up on
-                leadership concepts, test your knowledge here with interactive quizzes built by the community.
-            </p>
-
-            <h3>100% Free Access</h3>
-            <p>
-                No paywalls, ad revenue, or premium tiers — ever. PROP is committed to remaining 100% free for all
-                nationwide to practice study subjects and test recall as often as needed.
-            </p>
-
-            <h3>Community &amp; Partner-Powered</h3>
-            <p>
-                In collaboration with resources like <a href="https://captestprep.org" target="_blank"
-                    rel="noopener noreferrer"
-                    style="color: var(--alert-color); font-weight: bold; text-decoration: underline;">captestprep.org</a>,
-                we integrate verified study material, let you add practice questions, rate community items, and earn
-                author reputation stars.
-            </p>
-
-            <div class="stats-grid" id="home-stats-grid">
-                <div class="stat-card">
-                    <span class="stat-number" id="stat-total-evals">0</span>
-                    <span class="stat-label">Total Tests Taken</span>
+            
+            <!-- Universal Briefing Banner -->
+            <div class="briefing-card">
+                <div class="briefing-header">
+                    <span class="briefing-title">Operational Briefing</span>
+                    <span class="briefing-status">Status: Active</span>
                 </div>
-                <div class="stat-card">
-                    <span class="stat-number" id="stat-modules-count">0</span>
-                    <span class="stat-label">Active Subjects &amp; Quizzes</span>
+                <p class="briefing-text">
+                    Welcome to <strong>PROP</strong>. Master aerospace, leadership, emergency services, and STEM concepts with community-built evaluations. Open 100% free for all students, cadets, and self-directed learners nationwide.
+                </p>
+            </div>
+
+            <!-- Two-Column Grid: Daily Challenge + Quick Dispatch -->
+            <div class="dashboard-grid">
+                
+                <!-- Daily Readiness Question Widget -->
+                <div class="quiz-card daily-challenge-card">
+                    <div>
+                        <div class="daily-challenge-header">
+                            <span class="daily-challenge-badge">🎯 Daily Knowledge Challenge</span>
+                            <span class="daily-pts-badge">+25 PTS</span>
+                        </div>
+                        <h4 id="daily-question-text" class="daily-question-title">Loading daily challenge... FIX ME</h4>
+                        <div id="daily-options-container" class="daily-options-stack">
+                            <!-- Dynamically loaded via app.js -->
+                        </div>
+                    </div>
+                    <div id="daily-feedback" class="daily-feedback-panel hidden"></div>
                 </div>
+
+                <!-- Stats & Direct Action Buttons -->
+                <div class="flex-col gap-md">
+                    <div id="home-stats-grid" class="stats-grid grid-two-col">
+                        <div class="stat-card">
+                            <span id="stat-total-evals" class="stat-number">0</span>
+                            <span class="stat-label">Tests Completed</span>
+                            <div class="stat-action-wrapper">
+                                <a href="setup.html" class="btn-tactical btn-blue width-full">
+    🎯 Take a Test
+</a>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <span id="stat-modules-count" class="stat-number">0</span>
+                            <span class="stat-label">Active Subjects</span>
+                            <div class="stat-action-wrapper">
+                                <a href="hub.html" class="btn-tactical btn-gold width-full">
+    ➕ Create Subject
+</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Universal Operator Level Status Card -->
+                    <div class="rank-card">
+                        <div class="rank-icon">🏅</div>
+                        <div class="rank-info flex-1">
+                            <div class="rank-header-row">
+                                <span id="home-user-rank">Trainee I</span>
+                                <span id="home-user-pts">0 PTS</span>
+                            </div>
+                            <div class="rank-progress-track">
+                                <div id="home-rank-progress" class="rank-progress-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </section>
 
-<section id="leaderboard-view" class="col">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8em;">
-        <h1 style="margin: 0;">TOP HONOR ROLL</h1>
-        <a href="leaderboard.html" class="btn-tactical btn-sm">Full Leaderboard ➔</a>
-    </div>
+        <!-- 2. HONOR ROLL / LEADERBOARD SECTION -->
+        <section id="leaderboard-view" class="col">
+            <div class="section-header-row">
+                <h1 class="margin-none">TOP HONOR ROLL</h1>
+                <a href="leaderboard.html" class="btn-tactical btn-sm">Full Leaderboard ➔</a>
+            </div>
 
-    <table id="leaderboard-table">
-        <thead id="leaderboard-thead">
-            <tr>
-                <th class="sortable" data-sort="name">Callsign <span class="sort-icon">↕</span></th>
-                <th class="sortable" data-sort="module">Subject <span class="sort-icon">↕</span></th>
-                <th class="sortable" data-sort="score">Score <span class="sort-icon">↕</span></th>
-                <th class="sortable" data-sort="date">Date <span class="sort-icon">↕</span></th>
-            </tr>
-        </thead>
-        <tbody id="home-top-scores-body">
-            <tr>
-                <td colspan="4" class="text-center" style="color: var(--light-text-color);">
-                    Connecting to cloud database...
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</section>
+            <table id="leaderboard-table">
+                <thead id="leaderboard-thead">
+                    <tr>
+                        <th class="sortable" data-sort="name">Callsign <span class="sort-icon">↕</span></th>
+                        <th class="sortable" data-sort="module">Subject <span class="sort-icon">↕</span></th>
+                        <th class="sortable" data-sort="score">Score <span class="sort-icon">↕</span></th>
+                        <th class="sortable" data-sort="date">Date <span class="sort-icon">↕</span></th>
+                    </tr>
+                </thead>
+                <tbody id="home-top-scores-body">
+                    <tr>
+                        <td colspan="4" class="text-center text-dim">
+                            Connecting to cloud database...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
 
+        <!-- 3. SUBJECTS & QUIZZES GRID -->
         <section id="select-view" class="col">
             <h1>Subjects &amp; Quizzes</h1>
             <div id="quiz-cards-grid" class="cards-grid">

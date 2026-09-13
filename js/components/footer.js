@@ -1,32 +1,59 @@
 export class SiteFooter extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
-            <footer>
-                <p>
-                    Made by Mr. Ruddat - v4.0.1 (Shadowfox) | 
-                    <a href="https://github.com/JamesRuddat/capdrillquiz/commits/main/" 
-                       target="_blank" 
-                       rel="noopener noreferrer" 
-                       style="color: var(--primary-color, #4ea8de); text-decoration: underline;">
-                        View Commit History
-                    </a>
-                </p>
+            <footer class="site-footer">
+                <div class="footer-content">
+                    
+                    <!-- Left: Version & Repository Status -->
+                    <div class="text-left">
+                        <p class="margin-none">
+                            <strong>Build:</strong> <code>v4.0.1 (Shadowfox)</code>
+                        </p>
+                        <p class="footer-subtext">
+                            <a href="https://github.com/JamesRuddat/capdrillquiz/commits/main/" 
+                               target="_blank" 
+                               rel="noopener noreferrer" 
+                               class="text-link font-bold">
+                            GitHub
+                            </a>
+                        </p>
+                    </div>
+
+                    <!-- Middle: Reference Disclaimer Text -->
+                    <div class="footer-center-ref">
+                        Reference for educational purposes only. Always consult official guidance.
+                    </div>
+
+                    <!-- Right: Developer Credit & Expertise -->
+                    <div class="text-right">
+                        <p class="footer-dev-title">
+                            Architected &amp; Developed by <span class="footer-accent-text">Mr. Ruddat</span>
+                        </p>
+                        <p class="footer-subtext">
+                            Full-Stack Developer &amp; Domain SME
+                        </p>
+                    </div>
+
+                </div>
             </footer>
         `;
     }
 }
-customElements.define('site-footer', SiteFooter);
+
+if (!customElements.get('site-footer')) {
+    customElements.define('site-footer', SiteFooter);
+}
 
 /*
-<div class="ad-container" style="margin: 1.5em 0; text-align: center; min-height: 90px; background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color);">
+<!-- Clean AdSense Container (Optional Placeholder) -->
+<div class="ad-container">
     <ins class="adsbygoogle"
-            style="display:block"
-            data-ad-client="ca-pub-1864969470317711"
-            data-ad-slot="1234567890"
-            data-ad-format="auto"
-            data-full-width-responsive="true"></ins>
+         data-ad-client="ca-pub-1864969470317711"
+         data-ad-slot="1234567890"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
     <script>
         (adsbygoogle = window.adsbygoogle || []).push({});
     </script>
-</div> 
+</div>
 */
