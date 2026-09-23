@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-adsense-account" content="ca-pub-1864969470317711">
+    <link rel="icon" type="image/x-icon" href="/assets/images/emblems/icon.svg">
+    <title>Drill & Ceremonies | AFMAN 36-2203</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1864969470317711"
+        crossorigin="anonymous"></script>
+
+    <!-- Load Component Partials -->
+    <script type="module" src="/js/components/header.js"></script>
+    <script type="module" src="/js/components/footer.js"></script>
+    <script type="module" src="/js/pages/modal-element.js"></script>
+</head>
+
+<body>
+
+    <site-header></site-header>
+
+    <main>
+        <!-- 2. OPERATIONAL CONTROL CARD -->
+        <section class="col">
+            <div class="briefing-card margin-none" style="margin-bottom: 1em;">
+                <div class="briefing-header">
+                    <span class="briefing-title">Tactical Practice Control</span>
+                    <span class="briefing-status">AFMAN 36-2203 / CAP PAMPHLET 60-33</span>
+                </div>
+                <p class="briefing-text">
+                    Practice Air Force / Civil Air Patrol drill position symbols and master flight assembly maneuvers
+                    including
+                    <strong>Fall In</strong>, <strong>Open Ranks</strong>, and <strong>Close Ranks</strong>.
+                </p>
+            </div>
+
+            <div class="flex-row-between gap-md" style="align-items: center;">
+                <div>
+                    <label for="drill-mode-select" class="subtext font-bold">Select Drill Evaluation Mode:</label>
+                </div>
+                <div style="min-width: 240px;">
+                    <select id="drill-mode-select" class="form-select-inline width-full">
+                        <option value="symbol" selected>Symbol Identification</option>
+                        <option value="formation">Formation Builder Grid</option>
+                        <option value="custom">Custom Sandbox Builder</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. DYNAMIC DRILL WORKSPACE CONTAINER -->
+        <section class="col">
+            <div id="drill-view-container">
+                <div class="text-center text-dim" style="padding: 2em 0;">
+                    Initializing drill tactical engine...
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <custom-modal></custom-modal>
+    <site-footer></site-footer>
+
+    <!-- Firebase Compat SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <!-- Drill Module ES Engine Initialization -->
+    <script type="module">
+        import { initDrillPage } from '/js/pages/drill-page.js';
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initDrillPage();
+        });
+    </script>
+</body>
+
+</html>

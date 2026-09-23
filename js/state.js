@@ -13,6 +13,12 @@ export const state = {
     // Subject Registry & Navigation
     QUESTION_REGISTRY: {},
     activeBranchKey: "",
+    selectedCategory: "ALL", // Category filter for cards grid
+
+    // Subject Hub UI State
+    isCreatingNewSubject: false,
+    editingSubjectKey: null,
+    activeSubjectListenerRef: null,
 
     // Active Quiz Session State
     activeQuestions: [],
@@ -65,6 +71,48 @@ export const state = {
         }));
 
         this.broadcastStateChange();
+    },
+
+    /**
+     * Helper: Returns a subject object safely from registry by key
+     */
+    getSubject(branchKey) {
+        return this.QUESTION_REGISTRY ? this.QUESTION_REGISTRY[branchKey] : null;
+    },
+
+    /**
+     * Helper: Returns all dynamic practice links for a subject
+     */
+    getSubjectLinks(branchKey) {
+        const subject = this.getSubject(branchKey);
+        if (subject && Array.isArray(subject.links) && subject.links.length > 0) {
+            return subject.links;
+        }
+        return [];
+    },
+
+    /**
+     * Helper: Checks if a subject is a standalone simulator or custom tool
+     */
+    isSimulatorSubject(branchKey) {
+        const subject = this.getSubject(branchKey);
+        if (!subject) {
+            return branchKey === "DRILL_36_2203" || branchKey === "ELT_DF_SIM";
+        }
+        return subject.type === "interactive" || subject.type === "simulator" || Boolean(subject.url);
+    },
+
+    /**
+     * Helper: Gets the target launcher URL or defaults to setup.html
+     */
+    getSubjectLaunchHref(branchKey) {
+        const subject = this.getSubject(branchKey);
+        if (subject && subject.url) return subject.url;
+
+        if (branchKey === "DRILL_36_2203") return "/pages/drill.html";
+        if (branchKey === "ELT_DF_SIM" || branchKey === "DF_SEARCH_SIM") return "/pages/df-search.html";
+
+        return `setup.html?subject=${branchKey}`;
     },
 
     /**

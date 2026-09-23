@@ -27,15 +27,17 @@
                 <span class="arrow-icon arrow-right"></span>
             </div>
             <h2>Authentication Required</h2>
-            <p class="profile-subtext">Please sign in to view your operational record, drill rank history, and achievement badges.</p>
-            <button id="profile-signin-btn" class="btn-tactical btn-gold profile-signin-btn margin-top-md" type="button">
+            <p class="profile-subtext">Please sign in to view your operational record, drill rank history, and
+                achievement badges.</p>
+            <button id="profile-signin-btn" class="btn-tactical btn-gold profile-signin-btn margin-top-md"
+                type="button">
                 Sign In / Register
             </button>
         </div>
 
         <!-- Authenticated Profile View -->
         <div id="profile-content" class="hidden flex-col gap-lg">
-            
+
             <!-- Main Record Header Card -->
             <div class="card profile-header-card">
                 <div>
@@ -46,7 +48,8 @@
                 <div class="profile-header-actions flex-col align-end gap-sm">
                     <div class="text-center profile-stars-box">
                         <div class="profile-stat-label text-xs font-bold text-dim">LIFETIME POINTS</div>
-                        <div id="profile-points-display" class="profile-stars-value font-bold text-alert text-xl">0 PTS</div>
+                        <div id="profile-points-display" class="profile-stars-value font-bold text-alert text-xl">0 PTS
+                        </div>
                     </div>
                     <button id="btn-change-callsign" class="btn-tactical btn-outline btn-sm" type="button">
                         Edit Callsign
@@ -74,11 +77,13 @@
             <div class="profile-stats-grid">
                 <div class="card text-center">
                     <div class="profile-stat-label text-xs font-bold text-dim">EVALUATIONS COMPLETED</div>
-                    <div id="stat-evals-count" class="profile-stat-value font-bold text-2xl text-alert margin-top-xs">0</div>
+                    <div id="stat-evals-count" class="profile-stat-value font-bold text-2xl text-alert margin-top-xs">0
+                    </div>
                 </div>
                 <div class="card text-center">
                     <div class="profile-stat-label text-xs font-bold text-dim">TOTAL CORRECT ANSWERS</div>
-                    <div id="stat-correct-count" class="profile-stat-value font-bold text-2xl text-alert margin-top-xs">0</div>
+                    <div id="stat-correct-count" class="profile-stat-value font-bold text-2xl text-alert margin-top-xs">
+                        0</div>
                 </div>
             </div>
 
@@ -108,7 +113,7 @@
     <site-footer></site-footer>
 
     <script type="module" src="/js/pages/profile-page.js"></script>
-    <script src="/js/profanity-filter.js"></script>
+
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>

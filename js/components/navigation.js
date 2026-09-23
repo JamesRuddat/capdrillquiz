@@ -1,272 +1,236 @@
 import { state } from '../state.js';
-import { updateDashboardMetrics, renderLeaderboard } from './leaderboard.js';
-import { renderUnifiedHub } from '../pages/hub-page.js';
 
-// Helper function to extract valid, non-null questions from arrays or sparse Firebase objects
-function getValidQuestionsCount(questionsPayload) {
-    if (!questionsPayload) return 0;
+// Static Interactive Tools / Simulators with direct publication links
+const STATIC_INTERACTIVE_TOOLS = [
+    {
+        id: "DRILL_36_2203",
+        branchName: "Drill & Ceremonies Simulator",
+        category: "Simulator",
+        publication: "Simulator",
+        pdfUrl: "",
+        description: "Master flight formations, Open Ranks staggers, position symbol identification, and dynamic grid building.",
+        type: "simulator",
+        url: "/pages/drill.html",
+        badge: "Simulator",
+        imageUrl: "/assets/images/banners/drill-banner.jpg"
+    },
+    {
+        id: "ELT_DF_SIM",
+        branchName: "ELT Direction Finding Simulator",
+        category: "Simulator",
+        publication: "Simulator",
+        pdfUrl: "",
+        description: "Practice emergency locator transmitter (ELT) search missions with DF-88 needle tracking, audio signal strength, and VOR/DME navigation.",
+        type: "simulator",
+        url: "/pages/df-search.html",
+        badge: "Simulator",
+        imageUrl: "/assets/images/banners/elt-banner.jpg"
+    }
+];
 
-    const items = Array.isArray(questionsPayload)
-        ? questionsPayload
-        : Object.values(questionsPayload);
-
-    return items.filter(q => q && typeof q === 'object' && typeof q.q === 'string' && q.q.trim() !== '').length;
+/**
+ * Utility: Sanitizes input string against XSS
+ */
+export function sanitizeInput(str = "") {
+    if (typeof str !== "string") return "";
+    return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
-export function showView(viewId) {
-    const views = ['home-view', 'setup-view', 'quiz-view', 'results-view', 'leaderboard-view', 'hub-view'];
-
-    views.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.toggle('hidden', id !== viewId);
-    });
-
-    const selectView = document.getElementById('select-view');
-    if (selectView) {
-        const isAllowedView = (viewId === 'home-view' || viewId === 'setup-view');
-        selectView.classList.toggle('hidden', !isAllowedView);
-    }
-
-    const navMap = {
-        'home-view': 'nav-home',
-        'setup-view': 'nav-setup',
-        'leaderboard-view': 'nav-leaderboard',
-        'hub-view': 'nav-hub'
-    };
-
-    document.querySelectorAll('#navbar a').forEach(a => a.classList.remove('active-nav'));
-    if (navMap[viewId] && document.getElementById(navMap[viewId])) {
-        document.getElementById(navMap[viewId]).classList.add('active-nav');
-    }
-
-    if (viewId === 'home-view') {
-        updateDashboardMetrics();
-        renderLeaderboard();
-        renderSubjectCards();
-    }
-    if (viewId === 'setup-view') {
-        populateBranchDropdowns();
-    }
-    if (viewId === 'leaderboard-view') renderLeaderboard();
-    if (viewId === 'hub-view') renderUnifiedHub();
-}
-
+/**
+ * Populates subject dropdown selects on setup and quiz views
+ */
 export function populateBranchDropdowns() {
-    const setupSelect = document.getElementById("quiz-select");
-    const builderTargetSelect = document.getElementById("builder-target-quiz");
-    const inspectSelect = document.getElementById("bank-inspect-select");
-    const leaderboardSelect = document.getElementById("filter-leaderboard");
+    const selects = [
+        document.getElementById("quiz-select"),
+        document.getElementById("bank-inspect-select")
+    ].filter(Boolean);
 
-    // Standardized to localStorage
-    const savedCardSubject = localStorage.getItem("selectedSubjectKey");
+    if (selects.length === 0) return;
 
-    const savedSetup = setupSelect ? (savedCardSubject || setupSelect.value) : savedCardSubject;
-    const savedBuilder = builderTargetSelect ? builderTargetSelect.value : "";
-    const savedInspect = inspectSelect ? inspectSelect.value : "";
-    const currentFilter = leaderboardSelect ? leaderboardSelect.value : "ALL";
+    const registry = state.QUESTION_REGISTRY || {};
+    const keys = Object.keys(registry);
 
-    const subjectKeys = Object.keys(state.QUESTION_REGISTRY || {});
+    let optionsHTML = `<option value="">-- Select a Subject --</option>`;
 
-    if (setupSelect) setupSelect.innerHTML = "";
-    if (builderTargetSelect) builderTargetSelect.innerHTML = "";
-    if (inspectSelect) inspectSelect.innerHTML = "";
-    if (leaderboardSelect) leaderboardSelect.innerHTML = `<option value="ALL">All Subjects</option>`;
+    // Add Firebase subjects
+    keys.forEach(key => {
+        const item = registry[key];
+        const label = item?.branchName || key;
+        optionsHTML += `<option value="${key}">${label}</option>`;
+    });
 
-    if (subjectKeys.length === 0) {
-        if (setupSelect) setupSelect.innerHTML = `<option value="">No Subjects Available</option>`;
-        if (builderTargetSelect) builderTargetSelect.innerHTML = `<option value="">No Subjects Available</option>`;
-        if (inspectSelect) inspectSelect.innerHTML = `<option value="">No Subjects Available</option>`;
-        return;
-    }
-
-    subjectKeys.forEach((key) => {
-        const item = state.QUESTION_REGISTRY[key];
-        const label = `${item.branchName || key} (${item.publication || 'Standard'})`;
-
-        const opt1 = document.createElement("option");
-        opt1.value = key;
-        opt1.textContent = label;
-
-        const opt2 = document.createElement("option");
-        opt2.value = key;
-        opt2.textContent = label;
-
-        const opt3 = document.createElement("option");
-        opt3.value = key;
-        opt3.textContent = label;
-
-        if (setupSelect) setupSelect.appendChild(opt1);
-        if (builderTargetSelect) builderTargetSelect.appendChild(opt2);
-        if (inspectSelect) inspectSelect.appendChild(opt3);
-
-        if (leaderboardSelect) {
-            const optLb = document.createElement("option");
-            optLb.value = key;
-            optLb.textContent = item.branchName || key;
-            leaderboardSelect.appendChild(optLb);
+    // Add static interactive tools to dropdown if not present
+    STATIC_INTERACTIVE_TOOLS.forEach(tool => {
+        if (!registry[tool.id]) {
+            optionsHTML += `<option value="${tool.id}">${tool.branchName}</option>`;
         }
     });
 
-    if (inspectSelect && savedInspect && state.QUESTION_REGISTRY[savedInspect]) {
-        inspectSelect.value = savedInspect;
-    }
-
-    if (setupSelect && savedSetup && state.QUESTION_REGISTRY[savedSetup]) {
-        setupSelect.value = savedSetup;
-    }
-
-    if (builderTargetSelect && savedBuilder && state.QUESTION_REGISTRY[savedBuilder]) {
-        builderTargetSelect.value = savedBuilder;
-    }
-
-    if (leaderboardSelect) {
-        leaderboardSelect.value = currentFilter;
-    }
-
-    if (setupSelect && setupSelect.value) {
-        state.activeBranchKey = setupSelect.value;
-    }
-
-    localStorage.removeItem("selectedSubjectKey");
-
-    updateSliderLimits();
+    selects.forEach(select => {
+        const currentVal = select.value;
+        select.innerHTML = optionsHTML;
+        if (currentVal && select.querySelector(`option[value="${currentVal}"]`)) {
+            select.value = currentVal;
+        }
+    });
 }
 
+/**
+ * Renders subject list for hub/inspector views
+ */
 export function renderSubjectList() {
-    const treeContainer = document.getElementById("dynamic-publications-tree");
-    if (!treeContainer) return;
+    const container = document.getElementById("subject-list-container");
+    if (!container) return;
 
-    const subjectKeys = Object.keys(state.QUESTION_REGISTRY || {});
+    const registry = state.QUESTION_REGISTRY || {};
+    const keys = Object.keys(registry);
 
-    if (subjectKeys.length === 0) {
-        treeContainer.innerHTML = `<span class="text-dim">No subjects registered in database yet.</span>`;
+    if (keys.length === 0) {
+        container.innerHTML = `<p class="subtext">No database subjects found.</p>`;
         return;
     }
 
-    let html = `<ul class="tree">`;
-    subjectKeys.forEach((key) => {
-        const item = state.QUESTION_REGISTRY[key];
-        const count = getValidQuestionsCount(item.questions);
-
-        html += `
-            <li><strong>${item.branchName || key} — ${item.publication || 'N/A'}</strong>
-                <ul>
-                    <li>Category: ${item.category || 'General'}</li>
-                    <li>Registered Questions: ${count}</li>
-                </ul>
-            </li>
+    container.innerHTML = keys.map(key => {
+        const item = registry[key];
+        return `
+            <div class="subject-item-row flex-row-between" data-key="${key}">
+                <span><strong>${item.branchName || key}</strong> (${item.category || 'General'})</span>
+                <span class="subtext">${item.publication || ''}</span>
+            </div>
         `;
-    });
-    html += `</ul>`;
-
-    treeContainer.innerHTML = html;
+    }).join('');
 }
 
-export function updateSliderLimits() {
-    const selectEl = document.getElementById("quiz-select");
-    const slider = document.getElementById("quiz-question-count-slider");
-    const label = document.getElementById("quiz-question-count-label");
-
-    if (!selectEl || !slider || !label) return;
-
-    const selectedKey = selectEl.value;
-    const subject = state.QUESTION_REGISTRY ? state.QUESTION_REGISTRY[selectedKey] : null;
-
-    if (!subject || !subject.questions) {
-        slider.min = 1;
-        slider.max = 1;
-        slider.value = 1;
-        label.innerText = "0 Questions";
-        return;
-    }
-
-    const totalAvailable = getValidQuestionsCount(subject.questions);
-
-    if (totalAvailable === 0) {
-        slider.min = 1;
-        slider.max = 1;
-        slider.value = 1;
-        label.innerText = "0 Questions";
-        return;
-    }
-
-    slider.min = 1;
-    slider.max = totalAvailable;
-    slider.value = totalAvailable;
-
-    label.innerText = `${totalAvailable} ${totalAvailable === 1 ? 'Question' : 'Questions'} (Max: ${totalAvailable})`;
-}
-
-export function toggleTheme() {
-    const root = document.documentElement;
-    const current = root.getAttribute("data-theme");
-    root.setAttribute("data-theme", current === "dark" ? "light" : "dark");
-}
-
-export function toggleAccordion(id) {
-    const content = document.getElementById(id);
-    const icon = document.getElementById(id + "-icon");
-    if (content) {
-        const isExpanded = content.classList.toggle("expanded");
-        const trigger = content.previousElementSibling;
-        if (trigger && trigger.classList.contains("accordion-trigger")) {
-            trigger.classList.toggle("active-trigger", isExpanded);
-        }
-        if (icon) icon.innerText = isExpanded ? "▲" : "▼";
-    }
-}
-
-export function sanitizeInput(str) {
-    return String(str).replace(/[&<>"']/g, (m) => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
-    })[m]);
-}
-
+/**
+ * Renders practice subject cards on home dashboard grid with dynamic link support
+ */
 export function renderSubjectCards() {
-    const gridContainer = document.getElementById("quiz-cards-grid");
-    if (!gridContainer) return;
+    const container = document.getElementById("quiz-cards-grid");
+    if (!container) return;
 
-    const subjectKeys = Object.keys(state.QUESTION_REGISTRY || {});
+    const registry = state.QUESTION_REGISTRY || {};
 
-    if (subjectKeys.length === 0) {
-        gridContainer.innerHTML = `<div class="text-center text-dim grid-span-full">No active subjects available.</div>`;
+    const dbSubjects = Object.keys(registry).map(key => ({
+        id: key,
+        ...registry[key]
+    }));
+
+    const combinedSubjects = [...STATIC_INTERACTIVE_TOOLS];
+    dbSubjects.forEach(dbSub => {
+        if (!combinedSubjects.some(item => item.id === dbSub.id)) {
+            combinedSubjects.push(dbSub);
+        }
+    });
+
+    if (combinedSubjects.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state-card text-center">
+                <div class="empty-state-icon">🛰️</div>
+                <h3 class="empty-state-title">No Practice Subjects Found</h3>
+            </div>`;
         return;
     }
 
-    gridContainer.innerHTML = subjectKeys.map(key => {
-        const data = state.QUESTION_REGISTRY[key];
-        const totalQs = getValidQuestionsCount(data.questions);
+    container.innerHTML = combinedSubjects.map(subject => {
+        const pubLabel = subject.publication || subject.badge || "CAP Regulation";
+        const bgImage = subject.imageUrl || subject.bgImage;
+        const bgClass = bgImage ? 'quiz-card-custom-bg' : '';
+        const bgStyleAttr = bgImage
+            ? `style="background-image: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.85) 100%), url('${bgImage}');"`
+            : '';
 
-        const bgClass = data.imageUrl ? 'quiz-card-custom-bg' : '';
-        const bgStyleAttr = data.imageUrl ? `style="background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url('${data.imageUrl}');"` : '';
+        // Safely count questions
+        const rawQs = subject.questions || {};
+        const totalQs = Array.isArray(rawQs) ? rawQs.length : Object.keys(rawQs).length;
+
+        // Render Dynamic Publication Link Badge
+        const mainPdfUrl = subject.pdfUrl || (subject.links && subject.links.find(l => l.type === 'pdf')?.url);
+        const badgeHTML = mainPdfUrl
+            ? `<a href="${mainPdfUrl}" target="_blank" rel="noopener noreferrer" class="quiz-card-badge badge-status badge-verified" title="Open Handbook">${pubLabel}</a>`
+            : `<span class="quiz-card-badge badge-status badge-verified">${pubLabel}</span>`;
+
+        // Render Dynamic Multi-Button Footer
+        let buttonsHTML = '';
+        const linkList = subject.links || [];
+
+        if (linkList.length > 0) {
+            // Render a button for each custom link added by user/admin
+            buttonsHTML = linkList.map(link => {
+                const isPrimary = link.type === 'simulator' || link.primary;
+                const btnClass = isPrimary ? 'btn-gold' : 'btn-blue';
+                return `
+                    <a href="${link.url}" ${link.url.startsWith('http') ? 'target="_blank" rel="noopener"' : ''} class="btn-tactical ${btnClass} flex-1">
+                        ${link.label || 'Launch'}
+                    </a>
+                `;
+            }).join('');
+        } else {
+            // Default Fallback: Only render button IF questions exist OR if it is an interactive simulator
+            const customUrl = subject.url || (subject.id === "DRILL_36_2203" ? "/pages/drill.html" : subject.id === "ELT_DF_SIM" ? "/pages/df-search.html" : null);
+            const isSimulator = subject.type === "interactive" || subject.type === "simulator" || Boolean(customUrl);
+            
+            if (isSimulator || totalQs > 0) {
+                const btnClass = isSimulator ? "btn-gold" : "btn-blue";
+                const btnText = isSimulator ? "Launch Simulator ➔" : "Start Evaluation ➔";
+                const btnHref = isSimulator && customUrl ? customUrl : `setup.html?subject=${subject.id}`;
+
+                buttonsHTML = `<a href="${btnHref}" class="btn-tactical ${btnClass} width-full">${btnText}</a>`;
+            }
+        }
 
         return `
             <div class="quiz-card ${bgClass}" ${bgStyleAttr}>
-                <div>
-                    <div class="quiz-card-header flex-row-between">
-                        <span class="quiz-card-badge">${data.category || 'General'}</span>
-                        <span class="text-sm ${data.imageUrl ? 'text-overlay-light' : 'text-dim'}">${totalQs} Questions</span>
-                    </div>
-                    <div class="quiz-card-title">${data.branchName || key}</div>
-                    <div class="quiz-card-meta ${data.imageUrl ? 'text-overlay-bright' : ''}">
-                        <strong>Publication:</strong> ${data.publication || 'Standard Regulation'}
-                    </div>
+                <div class="quiz-card-header">
+                    ${badgeHTML}
+                    <h3 class="quiz-card-title">${subject.branchName || subject.title || subject.id}</h3>
                 </div>
-                <div class="quiz-card-footer">
-                    <button class="btn-tactical btn-blue width-full btn-card-start" data-key="${key}" type="button">
-                        Start
-                    </button>
+                <p class="quiz-card-meta">
+                    ${subject.description || 'No description provided.'}
+                </p>
+                <div class="quiz-card-footer flex-wrap gap-sm">
+                    ${buttonsHTML}
                 </div>
             </div>
         `;
     }).join('');
+}
 
-    gridContainer.querySelectorAll(".btn-card-start").forEach(btn => {
-        btn.onclick = (e) => {
-            const selectedKey = e.currentTarget.dataset.key;
-            // Standardized to localStorage
-            localStorage.setItem("selectedSubjectKey", selectedKey);
-            window.location.href = "setup.html";
-        };
-    });
+/**
+ * Updates question count slider limits on setup page based on selected subject.
+ * Automatically maxes out the slider value to match total available questions.
+ */
+export function updateSliderLimits() {
+    const quizSelect = document.getElementById("quiz-select");
+    const slider = document.getElementById("quiz-question-count-slider");
+    const sliderLabel = document.getElementById("quiz-question-count-label");
+
+    if (!quizSelect || !slider) return;
+
+    const selectedKey = quizSelect.value;
+    const subjectData = state.QUESTION_REGISTRY ? state.QUESTION_REGISTRY[selectedKey] : null;
+
+    if (!subjectData || !subjectData.questions) {
+        slider.min = "1";
+        slider.max = "10";
+        slider.value = "10";
+        if (sliderLabel) sliderLabel.innerText = "10 Questions (Max: 10)";
+        return;
+    }
+
+    const rawQs = subjectData.questions;
+    const totalQs = Array.isArray(rawQs) ? rawQs.length : Object.keys(rawQs).length;
+    const maxVal = Math.max(1, totalQs);
+
+    slider.min = "1";
+    slider.max = String(maxVal);
+    slider.value = String(maxVal); // Automatically set slider to maximum available questions
+
+    if (sliderLabel) {
+        sliderLabel.innerText = `${maxVal} ${maxVal === 1 ? 'Question' : 'Questions'} (Max: ${maxVal})`;
+    }
 }

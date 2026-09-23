@@ -39,7 +39,7 @@
                 <h2>Subject</h2>
 
                 <div class="flex-center gap-sm flex-wrap">
-                    <button id="btn-create-module-card" class="btn-tactical btn-gold btn-padding-compact">
+                    <button id="btn-create-subject-card" class="btn-tactical btn-gold btn-padding-compact">
                         Create New Subject
                     </button>
                 </div>
@@ -47,7 +47,16 @@
                 <div class="flex-center gap-sm flex-wrap">
                     <label for="bank-inspect-select" class="hub-select-label">View Subject:</label>
                     <select id="bank-inspect-select" class=""></select>
-                    <button id="btn-delete-module" class="btn-tactical btn-clear hidden">
+                    <div class="flex-row gap-sm align-center margin-bottom-sm">
+    <label for="hub-sort-select" class="font-bold text-sm">Sort By:</label>
+    <select id="hub-sort-select" class="form-select-inline">
+        <option value="newest" selected>Newest First (Date Created)</option>
+        <option value="oldest">Oldest First (Date Created)</option>
+        <option value="title">Alphabetical (A-Z)</option>
+        <option value="questions">Question Count</option>
+    </select>
+</div>
+                    <button id="btn-delete-subject" class="btn-tactical btn-clear hidden">
                         Delete Subject
                     </button>
                 </div>
@@ -74,7 +83,6 @@
     <custom-modal></custom-modal>
     <site-footer></site-footer>
 
-    <script src="/js/profanity-filter.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
