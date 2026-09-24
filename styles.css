@@ -187,22 +187,24 @@ hr {
     transform: scale(1.05);
 }
 
-.user-dropdown {
+.user-dropdown,
+.card-menu-dropdown {
     position: absolute;
-    top: calc(100% + 10px);
+    top: calc(100% + 6px);
     right: 0;
-    width: 210px;
     background-color: var(--card-background);
     border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 8px 24px var(--card-shadow);
     display: none;
     flex-direction: column;
-    padding: 0.5em 0;
+    padding: 0.4em 0;
     z-index: 1003;
     border: 1px solid var(--border-color);
+    min-width: 160px;
 }
 
-.user-dropdown.is-open {
+.user-dropdown.is-open,
+.card-menu-dropdown:not(.hidden) {
     display: flex !important;
 }
 
@@ -215,20 +217,24 @@ hr {
 }
 
 #navbar .user-dropdown a.user-dropdown-item,
-.user-dropdown-item {
-    padding: 0.7em 1em;
+.user-dropdown-item,
+.card-menu-item {
+    padding: 0.6em 1em;
     color: var(--text-color);
     background: transparent;
     border: none;
     text-align: left;
     font-size: 0.88rem;
+    text-decoration: none;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
-    transition: background 0.15s ease;
+    align-items: center;
+    transition: background 0.15s ease, color 0.15s ease;
 }
 
-.user-dropdown-item:hover {
+.user-dropdown-item:hover,
+.card-menu-item:hover {
     background-color: rgba(255, 205, 0, 0.12);
     color: var(--alert-color);
 }
@@ -236,7 +242,7 @@ hr {
 .user-dropdown-divider {
     height: 1px;
     background-color: var(--border-color);
-    margin: 0.1em 0;
+    margin: 0.2em 0;
 }
 
 /* HAMBURGER DRAWER */
@@ -497,11 +503,9 @@ hr {
     display: flex;
     flex-direction: column;
     gap: 0.5em;
-    margin-top: 1em;
 }
 
 .daily-feedback-panel {
-    margin-top: 1em;
     padding: 0.8em;
     border-radius: 6px;
     font-size: 0.85rem;
@@ -588,7 +592,7 @@ hr {
 }
 
 /* ==========================================================================
-   6. SUBJECT CARDS & GRID (FULL-WIDTH MULTI-BUTTON STACK)
+   6. SUBJECT CARDS & GRID
    ========================================================================== */
 .cards-grid {
     display: grid;
@@ -606,6 +610,7 @@ hr {
     justify-content: space-between;
     min-height: 240px;
     line-height: 1.5;
+    position: relative;
 }
 
 .quiz-card:hover {
@@ -625,14 +630,21 @@ hr {
     line-height: 1.3;
 }
 
-.quiz-card-meta {
+.quiz-card-meta,
+.quiz-card p {
     font-size: 0.85rem;
     color: var(--light-text-color);
     margin-bottom: 1.2em;
     line-height: 1.4;
+
+    /* Clamp text to a maximum of 3 lines */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* Force Multi-Button Dynamic Actions to Expand Full Card Width */
 .quiz-card-footer {
     display: flex;
     flex-direction: column;
@@ -681,16 +693,22 @@ hr {
 .empty-state-desc { margin-bottom: 1.2em; }
 .empty-state-btn { display: inline-block; padding: 0.6em 1.2em; font-size: 0.9rem; }
 
+/* Consolidated Zero-Content / Disabled Card State */
+.quiz-card-disabled,
 .quiz-card.card-disabled,
 .quiz-card.card-inactive {
     opacity: 0.55;
-    filter: grayscale(85%);
-    border: 1px dashed var(--border-color);
-    pointer-events: none;
-    position: relative;
+    filter: grayscale(60%);
+    border: 1px dashed var(--border-color) !important;
+    transition: opacity 0.2s ease, filter 0.2s ease;
 }
 
-.quiz-card.card-disabled .btn-tactical {
+.quiz-card-disabled:hover {
+    opacity: 0.85;
+    filter: grayscale(0%);
+}
+
+.quiz-card-disabled .btn-tactical {
     background-color: var(--input-bg) !important;
     color: var(--light-text-color) !important;
     border-color: var(--border-color) !important;
@@ -768,7 +786,7 @@ hr {
 }
 
 /* ==========================================================================
-   8. FORMS, INPUTS & BUTTON SYSTEM
+   8. FORMS, INPUTS & UNIFIED BUTTON SYSTEM
    ========================================================================== */
 input[type="text"],
 input[type="url"],
@@ -832,6 +850,25 @@ select:focus {
 .btn-gold { background-color: var(--alert-color); color: #000; }
 .btn-blue { background-color: var(--primary-color); color: #fff; border-color: var(--border-color); }
 .btn-red, .btn-clear { background-color: var(--alt-color); color: #fff; }
+
+.card-menu-trigger {
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    line-height: 1;
+    opacity: 0.75;
+    transition: opacity 0.2s, background-color 0.2s;
+}
+
+.card-menu-trigger:hover {
+    opacity: 1;
+    background-color: rgba(255, 205, 0, 0.15);
+}
 
 .badge-status,
 .quiz-card-badge {

@@ -1,7 +1,7 @@
 import { database, SUPER_UID } from '../config.js';
 import { state } from '../state.js';
 import { validateInputsClean } from '../profanity-filter.js';
-import { awardPoints, showToast, updateUserRole } from '../services/user-service.js';
+import { awardPoints, showToast } from '../services/user-service.js';
 import { voteQuestion, toggleQuestionFlag, verifyQuestion, deleteQuestion } from '../services/db-service.js';
 import { showConfirm } from './modal.js';
 
@@ -112,7 +112,6 @@ function formatTextWithLinks(text = "") {
 function getSubjectLaunchUrl(data, branchKey) {
     if (data && data.url) return data.url;
 
-    // Direct mappings for standalone simulators
     if (branchKey === "DRILL_36_2203") return "/pages/drill.html";
     if (branchKey === "ELT_DF_SIM" || branchKey === "DF_SEARCH_SIM") return "/pages/df-search.html";
 
@@ -120,10 +119,7 @@ function getSubjectLaunchUrl(data, branchKey) {
 }
 
 /**
- * Utility: Sorts subject keys based on chosen sort criteria (including millisecond timestamp precision)
- * @param {Object} registry - state.QUESTION_REGISTRY object
- * @param {string} sortBy - 'newest', 'oldest', 'title', or 'questions'
- * @returns {Array<string>} Array of sorted subject keys
+ * Utility: Sorts subject keys based on chosen sort criteria
  */
 export function getSortedSubjectKeys(registry = {}, sortBy = "newest") {
     const keys = Object.keys(registry || {});
@@ -132,31 +128,30 @@ export function getSortedSubjectKeys(registry = {}, sortBy = "newest") {
         const itemA = registry[a] || {};
         const itemB = registry[b] || {};
 
-        // Parse full millisecond timestamps
         const timeA = itemA.createdAt ? new Date(itemA.createdAt).getTime() : 0;
         const timeB = itemB.createdAt ? new Date(itemB.createdAt).getTime() : 0;
 
         if (sortBy === "newest") {
-            if (timeB !== timeA) return timeB - timeA; // Exact time comparison (newest first)
-            return (itemA.branchName || a).localeCompare(itemB.branchName || b); // Fallback: A-Z
+            if (timeB !== timeA) return timeB - timeA;
+            return (itemA.branchName || a).localeCompare(itemB.branchName || b);
         }
 
         if (sortBy === "oldest") {
-            if (timeA !== timeB) return timeA - timeB; // Exact time comparison (oldest first)
-            return (itemA.branchName || a).localeCompare(itemB.branchName || b); // Fallback: A-Z
+            if (timeA !== timeB) return timeA - timeB;
+            return (itemA.branchName || a).localeCompare(itemB.branchName || b);
         }
 
         if (sortBy === "title") {
             const nameA = (itemA.branchName || a).toLowerCase();
             const nameB = (itemB.branchName || b).toLowerCase();
-            return nameA.localeCompare(nameB); // Alphabetical A-Z
+            return nameA.localeCompare(nameB);
         }
 
         if (sortBy === "questions") {
             const countA = Array.isArray(itemA.questions) ? itemA.questions.length : Object.keys(itemA.questions || {}).length;
             const countB = Array.isArray(itemB.questions) ? itemB.questions.length : Object.keys(itemB.questions || {}).length;
-            if (countB !== countA) return countB - countA; // Most questions first
-            return timeB - timeA; // Secondary fallback: newest first
+            if (countB !== countA) return countB - countA;
+            return timeB - timeA;
         }
 
         return 0;
@@ -164,7 +159,7 @@ export function getSortedSubjectKeys(registry = {}, sortBy = "newest") {
 }
 
 /**
- * Populates dropdown inspector options sorted by selected order with time badge
+ * Populates dropdown inspector options sorted by selected order
  */
 export function populateInspectSelectOptions(sortBy = "newest") {
     const inspectSelect = document.getElementById("bank-inspect-select");
@@ -177,8 +172,6 @@ export function populateInspectSelectOptions(sortBy = "newest") {
 
     sortedKeys.forEach(key => {
         const mod = registry[key];
-        
-        // Display date and local time if timestamp exists
         let timeLabel = "";
         if (mod.createdAt) {
             const d = new Date(mod.createdAt);
@@ -304,11 +297,19 @@ function processUrlRouteParameters() {
     const urlParams = new URLSearchParams(window.location.search);
     const searchQuery = urlParams.get("search")?.trim();
     const editSubjectKey = urlParams.get("subject")?.trim();
+    const autoEditMode = urlParams.get("edit") === "true";
     const inspectSelect = document.getElementById("bank-inspect-select");
 
     if (editSubjectKey && state.QUESTION_REGISTRY[editSubjectKey]) {
         if (inspectSelect) inspectSelect.value = editSubjectKey;
         state.isCreatingNewSubject = false;
+
+        if (autoEditMode) {
+            state.editingSubjectKey = editSubjectKey;
+        } else {
+            state.editingSubjectKey = null;
+        }
+
         renderUnifiedHub();
         return;
     }
@@ -364,7 +365,6 @@ export function saveSubjectEdit(key) {
     const descVal = document.getElementById("edit-mod-description")?.value.trim() || "";
     const bgVal = document.getElementById("edit-mod-bg")?.value.trim() || "";
 
-    // Collect dynamic multi-link entries
     const dynamicLinks = collectDynamicLinksFromDOM("edit-dynamic-links-container");
 
     if (!catVal || !titleVal || !publicationVal) return;
@@ -408,9 +408,7 @@ export function submitNewSubjectCard() {
     const descVal = document.getElementById("create-mod-description")?.value.trim() || "";
     const bgVal = document.getElementById("create-mod-bg")?.value.trim() || "";
 
-    // Collect dynamic multi-link entries
     const dynamicLinks = collectDynamicLinksFromDOM("create-dynamic-links-container");
-
     const cleanKey = keyVal.toUpperCase().replace(/[^A-Z0-9_]/g, '');
 
     if (!cleanKey || !titleVal) {
@@ -510,25 +508,11 @@ export function renderUnifiedHub() {
         else if (userRole === "mod") roleBadge = "MODERATOR";
         else if (state.currentUser) roleBadge = "CADET";
 
-        const isModOrAdmin = isSuper || userRole === "admin" || userRole === "mod";
-
         authStatus.innerHTML = `
             <div class="hub-auth-banner">
                 <span>Status: <strong>${roleBadge}</strong> (${state.userCallsign || state.currentUser?.email || 'Read-Only'})</span>
-                ${isModOrAdmin ? `
-                    <button id="btn-manage-roles" class="btn-tactical btn-gold btn-sm btn-padding-compact">
-                        Open Personnel Panel
-                    </button>
-                ` : ''}
             </div>
         `;
-
-        const manageBtn = document.getElementById("btn-manage-roles");
-        if (manageBtn) {
-            manageBtn.onclick = () => {
-                window.location.href = "admin.html";
-            };
-        }
     }
 
     // 1. Create New Subject Form
@@ -542,7 +526,6 @@ export function renderUnifiedHub() {
                     <input type="text" id="create-mod-category" placeholder="Category (e.g., Drill, Leadership, ES)">
                     <input type="text" id="create-mod-publication" placeholder="Publication Citation (e.g., CAPP 60-33)">
                     
-                    <!-- Dynamic Dynamic Links Container -->
                     <div id="create-dynamic-links-container" class="hub-form-stack-xs margin-top-xs">
                         <label class="font-bold text-sm">Action Buttons / Practice Sets:</label>
                     </div>
@@ -616,7 +599,6 @@ export function renderUnifiedHub() {
                         <input type="text" id="edit-mod-publication" value="${(data.publication || 'Standard Regulation').replace(/"/g, '&quot;')}" placeholder="Publication Citation" class="hub-publication-input">
                     </div>
 
-                    <!-- Dynamic Multi-Link Editor -->
                     <div id="edit-dynamic-links-container" class="hub-form-stack-xs hub-field-margin-sm">
                         <label class="font-bold text-sm">Action Buttons / Practice Links:</label>
                         ${existingLinks.map(link => `
@@ -653,15 +635,13 @@ export function renderUnifiedHub() {
                 </div>
             </div>
         `;
-} else {
+    } else {
         const canEditSubject = isSuper || isSubjectOwner;
         const formattedDescription = formatTextWithLinks(data.description || '');
 
         const customLaunchUrl = getSubjectLaunchUrl(data, branch);
         const isSimulator = Boolean(customLaunchUrl);
         const hasQuestions = totalQs > 0;
-        
-        // Show launch button ONLY if it is a simulator/custom URL OR has at least 1 question
         const showLaunchButton = isSimulator || hasQuestions;
 
         const launchButtonText = isSimulator ? "Launch Simulator ➔" : "Take Quiz ➔";

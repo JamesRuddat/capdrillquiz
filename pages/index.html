@@ -19,7 +19,22 @@
 
 <body>
 
-    <site-header></site-header>
+    <site-header>
+        <!-- Static Skeleton Shell (Prevents Header Glitch) -->
+        <nav id="navbar">
+            <div class="nav-links">
+                <a href="index.html" class="active-nav">Home</a>
+                <a href="setup.html">Practice</a>
+                <a href="leaderboard.html">Leaderboard</a>
+            </div>
+            <div class="nav-search-wrapper">
+                <input type="text" class="nav-search-input" placeholder="Search Subjects..." disabled />
+            </div>
+            <div class="nav-controls">
+                <div class="badge-status badge-verified nav-pts-badge">⭐ ...</div>
+            </div>
+        </nav>
+    </site-header>
 
     <main>
         <!-- 1. OPERATIONAL COMMAND DASHBOARD -->
@@ -45,8 +60,8 @@
                 <div id="daily-challenge-card" class="quiz-card daily-challenge-card">
                     <div>
                         <div class="daily-challenge-header flex-row-between">
-                            <span class="daily-challenge-badge">Daily Knowledge Challenge</span>
-                            <span class="daily-pts-badge badge-status badge-verified">+25 PTS</span>
+                            <span class="daily-challenge-badge">Question Review</span>
+                            <span class="daily-pts-badge badge-status badge-verified"></span>
                         </div>
                         <h4 id="daily-question-text" class="daily-question-title">Loading daily challenge...</h4>
                         <div id="daily-options-container" class="daily-options-stack">
@@ -60,7 +75,7 @@
                 <div class="flex-col gap-md">
                     <div id="home-stats-grid" class="stats-grid grid-two-col">
                         <div class="stat-card">
-                            <span id="stat-total-evals" class="stat-number">0</span>
+                            <span id="stat-total-evals" class="stat-number">--</span>
                             <span class="stat-label">Tests Completed</span>
                             <div class="stat-action-wrapper">
                                 <a href="setup.html" class="btn-tactical btn-blue width-full">
@@ -70,7 +85,7 @@
                         </div>
 
                         <div class="stat-card">
-                            <span id="stat-modules-count" class="stat-number">0</span>
+                            <span id="stat-subjects-count" class="stat-number">--</span>
                             <span class="stat-label">Active Subjects</span>
                             <div class="stat-action-wrapper">
                                 <a href="hub.html" class="btn-tactical btn-gold width-full">
@@ -105,20 +120,34 @@
                 <a href="leaderboard.html" class="btn-tactical btn-sm">Full Leaderboard ➔</a>
             </div>
 
-            <table id="leaderboard-table">
-                <thead id="leaderboard-thead">
+            <table class="leaderboard-table" id="leaderboard-table">
+                <thead>
                     <tr>
-                        <th class="sortable" data-sort="name">Callsign</span></th>
-                        <th class="sortable" data-sort="module">Subject</span></th>
-                        <th class="sortable" data-sort="score">Score</span></th>
-                        <th class="sortable" data-sort="date">Date</span></th>
+                        <th>Callsign</th>
+                        <th>Subject</th>
+                        <th>Score</th>
+                        <th>Date</th>
                     </tr>
                 </thead>
                 <tbody id="home-top-scores-body">
-                    <tr>
-                        <td colspan="4" class="text-center text-dim">
-                            Connecting to cloud database...
-                        </td>
+                    <!-- Static Placeholders (Replaced automatically when Firebase returns) -->
+                    <tr class="skeleton-row">
+                        <td class="text-dim">Loading...</td>
+                        <td class="text-dim">--</td>
+                        <td class="text-dim">--</td>
+                        <td class="text-dim">--</td>
+                    </tr>
+                    <tr class="skeleton-row">
+                        <td class="text-dim">Loading...</td>
+                        <td class="text-dim">--</td>
+                        <td class="text-dim">--</td>
+                        <td class="text-dim">--</td>
+                    </tr>
+                    <tr class="skeleton-row">
+                        <td class="text-dim">Loading...</td>
+                        <td class="text-dim">--</td>
+                        <td class="text-dim">--</td>
+                        <td class="text-dim">--</td>
                     </tr>
                 </tbody>
             </table>
@@ -127,7 +156,28 @@
         <!-- 3. SUBJECTS & QUIZZES GRID -->
         <section id="select-view" class="col">
             <div id="quiz-cards-grid" class="cards-grid">
-                <div class="text-center">Loading available subjects...</div>
+                <!-- Static Skeleton Placeholder Cards -->
+                <div class="quiz-card quiz-card-skeleton">
+                    <div class="quiz-card-header">
+                        <div class="skeleton-text skeleton-title"></div>
+                        <div class="skeleton-text skeleton-badge"></div>
+                    </div>
+                    <div class="skeleton-text skeleton-body"></div>
+                </div>
+                <div class="quiz-card quiz-card-skeleton">
+                    <div class="quiz-card-header">
+                        <div class="skeleton-text skeleton-title"></div>
+                        <div class="skeleton-text skeleton-badge"></div>
+                    </div>
+                    <div class="skeleton-text skeleton-body"></div>
+                </div>
+                <div class="quiz-card quiz-card-skeleton">
+                    <div class="quiz-card-header">
+                        <div class="skeleton-text skeleton-title"></div>
+                        <div class="skeleton-text skeleton-badge"></div>
+                    </div>
+                    <div class="skeleton-text skeleton-body"></div>
+                </div>
             </div>
         </section>
     </main>

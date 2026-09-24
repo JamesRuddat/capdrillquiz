@@ -18,7 +18,22 @@
 </head>
 
 <body>
-    <site-header></site-header>
+    <site-header>
+        <!-- Static Skeleton Shell (Prevents Header Glitch) -->
+        <nav id="navbar">
+            <div class="nav-links">
+                <a href="index.html" class="active-nav">Home</a>
+                <a href="setup.html">Practice</a>
+                <a href="leaderboard.html">Leaderboard</a>
+            </div>
+            <div class="nav-search-wrapper">
+                <input type="text" class="nav-search-input" placeholder="Search Subjects..." disabled />
+            </div>
+            <div class="nav-controls">
+                <div class="badge-status badge-verified nav-pts-badge">⭐ ...</div>
+            </div>
+        </nav>
+    </site-header>
 
     <main class="container">
         <!-- Guest Fallback Notice -->
@@ -48,7 +63,7 @@
                 <div class="profile-header-actions flex-col align-end gap-sm">
                     <div class="text-center profile-stars-box">
                         <div class="profile-stat-label text-xs font-bold text-dim">LIFETIME POINTS</div>
-                        <div id="profile-points-display" class="profile-stars-value font-bold text-alert text-xl">0 PTS
+                        <div id="profile-points-display" class="profile-stars-value font-bold text-alert text-xl">-- PTS
                         </div>
                     </div>
                     <button id="btn-change-callsign" class="btn-tactical btn-outline btn-sm" type="button">
@@ -65,7 +80,7 @@
                 <div class="rank-info flex-1">
                     <div class="rank-header-row flex-row-between">
                         <span id="home-user-rank" class="font-bold text-lg">Airman</span>
-                        <span id="home-user-pts" class="text-sm text-dim">0 / 1 Badges</span>
+                        <span id="home-user-pts" class="text-sm text-dim">-- / -- Badges</span>
                     </div>
                     <div class="rank-progress-track margin-top-xs">
                         <div id="home-rank-progress" class="rank-progress-fill" style="width: 0%;"></div>
@@ -77,13 +92,13 @@
             <div class="profile-stats-grid">
                 <div class="card text-center">
                     <div class="profile-stat-label text-xs font-bold text-dim">EVALUATIONS COMPLETED</div>
-                    <div id="stat-evals-count" class="profile-stat-value font-bold text-2xl text-alert margin-top-xs">0
+                    <div id="stat-evals-count" class="profile-stat-value font-bold text-2xl text-alert margin-top-xs">--
                     </div>
                 </div>
                 <div class="card text-center">
                     <div class="profile-stat-label text-xs font-bold text-dim">TOTAL CORRECT ANSWERS</div>
                     <div id="stat-correct-count" class="profile-stat-value font-bold text-2xl text-alert margin-top-xs">
-                        0</div>
+                        --</div>
                 </div>
             </div>
 

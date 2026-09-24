@@ -1,9 +1,9 @@
 import { state } from '../state.js';
-import { sanitizeInput } from './navigation.js';
+import { sanitizeInput } from '../components/navigation.js';
 import { saveScoreToDB } from '../services/db-service.js';
-import { updateDashboardMetrics } from './leaderboard.js';
+import { updateDashboardMetrics } from '../components/leaderboard.js';
 import { awardPoints, showToast } from '../services/user-service.js';
-import { showConfirm } from '../pages/modal.js';
+import { showConfirm } from './modal.js';
 import { checkAndAwardBadges } from '../services/badge-service.js';
 
 let evalTimerInterval = null;
@@ -35,6 +35,149 @@ function extractValidQuestions(rawQuestions) {
         : Object.values(rawQuestions);
 
     return rawItems.filter(q => q && typeof q === 'object' && typeof q.q === 'string' && q.q.trim() !== '');
+}
+
+/**
+ * Updates Question Count Slider AND Disables/Enables Mode Buttons when 0 questions exist
+ */
+export function updateSliderLimits() {
+    const quizSelect = document.getElementById("quiz-select");
+    const slider = document.getElementById("quiz-question-count-slider");
+    const sliderLabel = document.getElementById("quiz-question-count-label");
+
+    // Mode Buttons
+    const btnTest = document.getElementById("btn-mode-test");
+    const btnStudy = document.getElementById("btn-mode-study");
+    const btnFlashcards = document.getElementById("btn-mode-flashcards");
+    const modeButtons = [btnTest, btnStudy, btnFlashcards].filter(Boolean);
+
+    if (!quizSelect || !slider) return;
+
+    const selectedKey = quizSelect.value;
+    const subjectData = state.QUESTION_REGISTRY ? state.QUESTION_REGISTRY[selectedKey] : null;
+
+    const rawQs = subjectData ? subjectData.questions : null;
+    const validQuestions = extractValidQuestions(rawQs);
+    const totalQs = validQuestions.length;
+
+    if (totalQs === 0) {
+        // Zero Question State: Zero out slider & disable mode buttons
+        slider.min = "0";
+        slider.max = "0";
+        slider.value = "0";
+        slider.disabled = true;
+
+        if (sliderLabel) {
+            sliderLabel.innerText = "0 Questions Available (Max: 0)";
+        }
+
+        modeButtons.forEach(btn => {
+            btn.disabled = true;
+            btn.title = "No questions available for this subject.";
+            btn.style.opacity = "0.45";
+            btn.style.cursor = "not-allowed";
+        });
+        return;
+    }
+
+    // Normal Active Question State
+    slider.disabled = false;
+    slider.min = "1";
+    slider.max = String(totalQs);
+    slider.value = String(totalQs); // Max out slider by default
+
+    if (sliderLabel) {
+        sliderLabel.innerText = `${totalQs} ${totalQs === 1 ? 'Question' : 'Questions'} (Max: ${totalQs})`;
+    }
+
+    modeButtons.forEach(btn => {
+        btn.disabled = false;
+        btn.title = "";
+        btn.style.opacity = "1";
+        btn.style.cursor = "pointer";
+    });
+}
+
+/**
+ * Sync Subject Banner, Render Dynamic Action Buttons, & Wire Edit Subject Button
+ */
+export function updateBannerImage() {
+    const selectEl = document.getElementById("quiz-select");
+    const bannerEl = document.getElementById("subject-banner");
+    const bannerTitleEl = document.querySelector("#subject-banner .banner-title");
+    const descEl = document.getElementById("subject-desc") || document.getElementById("subject-banner-desc");
+    const editBtn = document.getElementById("btn-edit-subject");
+
+    if (!selectEl || !bannerEl) return;
+
+    const activeBranchKey = selectEl.value;
+    const registryEntry = state.QUESTION_REGISTRY ? state.QUESTION_REGISTRY[activeBranchKey] : null;
+
+    // --- Wire Edit Subject Button ---
+    if (editBtn) {
+        if (activeBranchKey) {
+            editBtn.classList.remove("hidden");
+            editBtn.onclick = () => {
+                window.location.href = `hub.html?subject=${activeBranchKey}&edit=true`;
+            };
+        } else {
+            editBtn.classList.add("hidden");
+        }
+    }
+
+    const defaultImage = "https://www.gocivilairpatrol.com/media/photoalbums/67190384_2450135768383102_536700487_A2E9342E843CE.jpg?dimensions=950x633";
+
+    const imageUrl = (registryEntry && registryEntry.imageUrl && registryEntry.imageUrl.trim() !== "")
+        ? registryEntry.imageUrl
+        : defaultImage;
+
+    const subjectTitle = (registryEntry && registryEntry.branchName) ? registryEntry.branchName : "Subject Configuration";
+    const rawDescription = (registryEntry && registryEntry.description) ? registryEntry.description : "";
+
+    bannerEl.style.backgroundImage = `url('${imageUrl}')`;
+
+    if (bannerTitleEl) {
+        bannerTitleEl.innerText = subjectTitle;
+    }
+
+    // --- Render Description & Dynamic Resource Buttons ---
+    if (descEl) {
+        const dynamicLinks = (registryEntry && Array.isArray(registryEntry.links)) ? registryEntry.links : [];
+
+        let descriptionHTML = rawDescription.trim() !== "" 
+            ? `<div class="margin-bottom-sm">${formatTextWithLinks(rawDescription)}</div>`
+            : "";
+
+        let buttonsHTML = "";
+        if (dynamicLinks.length > 0) {
+            buttonsHTML = `
+                <div class="setup-resource-links flex-col gap-xs margin-top-sm">
+                    <strong class="text-sm font-bold">Study Resources & Practice Tools:</strong>
+                    <div class="flex-row gap-sm flex-wrap">
+                        ${dynamicLinks.map(link => {
+                            const btnClass = link.type === 'quiz' ? 'btn-gold' : 'btn-blue';
+                            return `
+                                <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="btn-tactical ${btnClass} flex-1">
+                                    ${link.label || 'Open Resource'} ➔
+                                </a>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        if (descriptionHTML || buttonsHTML) {
+            descEl.innerHTML = descriptionHTML + buttonsHTML;
+            descEl.classList.remove("hidden");
+        } else {
+            descEl.innerHTML = "";
+            descEl.classList.add("hidden");
+        }
+    }
+
+    // Always re-evaluate slider and button states on selection change
+    updateSliderLimits();
 }
 
 /**
@@ -94,46 +237,6 @@ export function initResultsPage() {
 
     const homeBtn = document.getElementById("btn-res-home");
     if (homeBtn) homeBtn.onclick = () => window.location.href = "index.html";
-}
-
-/**
- * Sync Subject Banner on Setup Page
- */
-export function updateBannerImage() {
-    const selectEl = document.getElementById("quiz-select");
-    const bannerEl = document.getElementById("subject-banner");
-    const bannerTitleEl = document.querySelector("#subject-banner .banner-title");
-    const descEl = document.getElementById("subject-desc") || document.getElementById("subject-banner-desc");
-
-    if (!selectEl || !bannerEl) return;
-
-    const activeBranchKey = selectEl.value;
-    const registryEntry = state.QUESTION_REGISTRY ? state.QUESTION_REGISTRY[activeBranchKey] : null;
-
-    const defaultImage = "https://www.gocivilairpatrol.com/media/photoalbums/67190384_2450135768383102_536700487_A2E9342E843CE.jpg?dimensions=950x633";
-
-    const imageUrl = (registryEntry && registryEntry.imageUrl && registryEntry.imageUrl.trim() !== "")
-        ? registryEntry.imageUrl
-        : defaultImage;
-
-    const subjectTitle = (registryEntry && registryEntry.branchName) ? registryEntry.branchName : "Subject Configuration";
-    const rawDescription = (registryEntry && registryEntry.description) ? registryEntry.description : "";
-
-    bannerEl.style.backgroundImage = `url('${imageUrl}')`;
-
-    if (bannerTitleEl) {
-        bannerTitleEl.innerText = subjectTitle;
-    }
-
-    if (descEl) {
-        if (rawDescription.trim() !== "") {
-            descEl.innerHTML = formatTextWithLinks(rawDescription);
-            descEl.classList.remove("hidden");
-        } else {
-            descEl.innerHTML = "";
-            descEl.classList.add("hidden");
-        }
-    }
 }
 
 /**
@@ -227,7 +330,7 @@ export function loadQuestion() {
         };
     }
 
-    // Timer setup for evaluation mode (only start if interval is null)
+    // Timer setup for evaluation mode
     const evalBanner = document.getElementById("eval-timer-banner");
     if (session.mode === 'eval' && session.evalDurationMinutes) {
         if (evalBanner) evalBanner.classList.remove("hidden");
@@ -285,7 +388,6 @@ export function loadQuestion() {
         btn.innerText = `${idx + 1}. ${opt}`;
 
         if (session.mode === 'study') {
-            // In Study mode, freeze buttons and show instant feedback
             if (hasAnswered) {
                 btn.disabled = true;
                 if (idx === q.answer) btn.classList.add("correct");
@@ -294,7 +396,6 @@ export function loadQuestion() {
                 btn.onclick = () => selectOption(idx);
             }
         } else {
-            // In Test/Eval mode, KEEP buttons ENABLED so answers can be changed freely
             if (hasAnswered && idx === selectedIdx) {
                 btn.classList.add("selected-option");
             }
@@ -332,7 +433,6 @@ export function updateNavigationControls(session) {
     const total = session.activeQuestions.length;
     const currentIdx = session.currentIdx;
 
-    // Populate Jump Select with Color Status Indicators
     if (jumpSelect) {
         let optionsHTML = "";
         session.activeQuestions.forEach((_, idx) => {
@@ -351,12 +451,10 @@ export function updateNavigationControls(session) {
         };
     }
 
-    // Previous Button Disabled State
     if (prevBtn) {
         prevBtn.disabled = currentIdx === 0;
     }
 
-    // Next / Submit Button Text & Style
     if (nextBtn) {
         if (currentIdx === total - 1) {
             nextBtn.innerText = "Submit Exam";
@@ -387,7 +485,6 @@ export function selectOption(selectedIdx) {
     const feedbackPanel = document.getElementById("feedback-panel");
 
     if (session.mode === 'study') {
-        // Freeze options for Study mode once selected
         buttons.forEach(btn => btn.disabled = true);
         if (feedbackPanel) feedbackPanel.classList.remove("hidden");
 
@@ -406,7 +503,6 @@ export function selectOption(selectedIdx) {
             }
         }
     } else {
-        // Test / Eval Mode: Update active selection highlights without disabling buttons
         buttons.forEach((btn, idx) => {
             if (idx === selectedIdx) {
                 btn.classList.add("selected-option");
@@ -470,7 +566,6 @@ export async function finishQuiz() {
     const questions = session.activeQuestions || [];
     let correctCount = 0;
 
-    // Calculate Score (Unanswered items remain undefined and count as 0)
     questions.forEach((q, idx) => {
         const userChoice = session.userAnswers ? session.userAnswers[idx] : undefined;
         if (userChoice !== undefined && userChoice === q.answer) {
@@ -629,7 +724,6 @@ export function renderResults() {
  * Quits Quiz Session Safely
  */
 export async function exitQuizSession() {
-    // 1. Pause active timer
     if (evalTimerInterval) {
         clearInterval(evalTimerInterval);
         evalTimerInterval = null;
@@ -643,7 +737,6 @@ export async function exitQuizSession() {
 
     const session = JSON.parse(sessionRaw);
 
-    // 2. Perform confirmation with native fallback if overlay element is missing
     let confirmed = true;
     if (session.mode === 'test' || session.mode === 'eval') {
         const modalOverlay = document.getElementById("custom-modal-overlay");
@@ -657,12 +750,10 @@ export async function exitQuizSession() {
         }
     }
 
-    // 3. Complete Exit Action
     if (confirmed) {
         localStorage.removeItem("activeQuizSession");
         window.location.href = "setup.html";
     } else {
-        // Resume timer if user decided to stay
         if (session.mode === 'eval' && session.evalDurationMinutes) {
             startEvaluationTimer(session.evalDurationMinutes);
         }

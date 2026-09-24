@@ -19,7 +19,22 @@
 
 <body>
 
-    <site-header></site-header>
+    <site-header>
+        <!-- Static Skeleton Shell (Prevents Header Glitch) -->
+        <nav id="navbar">
+            <div class="nav-links">
+                <a href="index.html" class="active-nav">Home</a>
+                <a href="setup.html">Practice</a>
+                <a href="leaderboard.html">Leaderboard</a>
+            </div>
+            <div class="nav-search-wrapper">
+                <input type="text" class="nav-search-input" placeholder="Search Subjects..." disabled />
+            </div>
+            <div class="nav-controls">
+                <div class="badge-status badge-verified nav-pts-badge">⭐ ...</div>
+            </div>
+        </nav>
+    </site-header>
 
     <main>
         <section id="hub-view" class="col">
@@ -48,14 +63,14 @@
                     <label for="bank-inspect-select" class="hub-select-label">View Subject:</label>
                     <select id="bank-inspect-select" class=""></select>
                     <div class="flex-row gap-sm align-center margin-bottom-sm">
-    <label for="hub-sort-select" class="font-bold text-sm">Sort By:</label>
-    <select id="hub-sort-select" class="form-select-inline">
-        <option value="newest" selected>Newest First (Date Created)</option>
-        <option value="oldest">Oldest First (Date Created)</option>
-        <option value="title">Alphabetical (A-Z)</option>
-        <option value="questions">Question Count</option>
-    </select>
-</div>
+                        <label for="hub-sort-select" class="font-bold text-sm">Sort By:</label>
+                        <select id="hub-sort-select" class="form-select-inline">
+                            <option value="newest" selected>Newest First (Date Created)</option>
+                            <option value="oldest">Oldest First (Date Created)</option>
+                            <option value="title">Alphabetical (A-Z)</option>
+                            <option value="questions">Question Count</option>
+                        </select>
+                    </div>
                     <button id="btn-delete-subject" class="btn-tactical btn-clear hidden">
                         Delete Subject
                     </button>

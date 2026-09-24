@@ -19,7 +19,22 @@
 
 <body>
 
-    <site-header></site-header>
+    <site-header>
+        <!-- Static Skeleton Shell (Prevents Header Glitch) -->
+        <nav id="navbar">
+            <div class="nav-links">
+                <a href="index.html" class="active-nav">Home</a>
+                <a href="setup.html">Practice</a>
+                <a href="leaderboard.html">Leaderboard</a>
+            </div>
+            <div class="nav-search-wrapper">
+                <input type="text" class="nav-search-input" placeholder="Search Subjects..." disabled />
+            </div>
+            <div class="nav-controls">
+                <div class="badge-status badge-verified nav-pts-badge">⭐ ...</div>
+            </div>
+        </nav>
+    </site-header>
 
     <main>
         <section id="setup-view" class="col">
@@ -55,6 +70,10 @@
                         </div>
                         <input type="range" id="quiz-question-count-slider" min="1" max="1" value="1">
                     </div>
+
+                    <button id="btn-edit-subject" type="button" class="btn-tactical btn-clear btn-sm width-full">
+                        Edit
+                    </button>
                 </div>
 
                 <!-- Right Column: Mode Action Buttons -->
@@ -79,7 +98,28 @@
 
         <section id="select-view" class="col">
             <div id="quiz-cards-grid" class="cards-grid">
-                <div class="text-center">Loading available subjects...</div>
+                <!-- Static Skeleton Placeholder Cards -->
+                <div class="quiz-card quiz-card-skeleton">
+                    <div class="quiz-card-header">
+                        <div class="skeleton-text skeleton-title"></div>
+                        <div class="skeleton-text skeleton-badge"></div>
+                    </div>
+                    <div class="skeleton-text skeleton-body"></div>
+                </div>
+                <div class="quiz-card quiz-card-skeleton">
+                    <div class="quiz-card-header">
+                        <div class="skeleton-text skeleton-title"></div>
+                        <div class="skeleton-text skeleton-badge"></div>
+                    </div>
+                    <div class="skeleton-text skeleton-body"></div>
+                </div>
+                <div class="quiz-card quiz-card-skeleton">
+                    <div class="quiz-card-header">
+                        <div class="skeleton-text skeleton-title"></div>
+                        <div class="skeleton-text skeleton-badge"></div>
+                    </div>
+                    <div class="skeleton-text skeleton-body"></div>
+                </div>
             </div>
         </section>
     </main>

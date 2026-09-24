@@ -16,7 +16,22 @@
 
 <body>
 
-    <site-header></site-header>
+    <site-header>
+        <!-- Static Skeleton Shell (Prevents Header Glitch) -->
+        <nav id="navbar">
+            <div class="nav-links">
+                <a href="index.html" class="active-nav">Home</a>
+                <a href="setup.html">Practice</a>
+                <a href="leaderboard.html">Leaderboard</a>
+            </div>
+            <div class="nav-search-wrapper">
+                <input type="text" class="nav-search-input" placeholder="Search Subjects..." disabled />
+            </div>
+            <div class="nav-controls">
+                <div class="badge-status badge-verified nav-pts-badge">⭐ ...</div>
+            </div>
+        </nav>
+    </site-header>
 
     <main>
         <section id="ingest-view" class="col">
@@ -43,7 +58,8 @@
                         <span class="daily-challenge-badge">1. AI Prompt Template</span>
                         <button id="btn-copy-prompt" class="btn-tactical btn-sm">Copy Prompt</button>
                     </div>
-                    <p class="text-dim margin-none">Paste this prompt template into an AI model along with your source material:</p>
+                    <p class="text-dim margin-none">Paste this prompt template into an AI model along with your source
+                        material:</p>
 
                     <pre id="promptTemplate" class="code-block-display">You are a database JSON formatting assistant. Convert the provided source text or study material into a valid JSON object matching the exact database schema below.
 

@@ -4,6 +4,32 @@ import { showToast } from './user-service.js';
 import { showConfirm } from '../pages/modal.js';
 
 /**
+ * Subscribes to Realtime Firebase Subject Registry changes
+ * and updates state with event broadcasting.
+ */
+export function subscribeToSubjects(callback) {
+    return database.ref("subjects").on("value", (snapshot) => {
+        const registry = snapshot.val() || {};
+        state.setQuestionRegistry(registry);
+        if (typeof callback === "function") {
+            callback(registry);
+        }
+    });
+}
+
+/**
+ * Subscribes to Realtime Firebase Scores
+ */
+export function subscribeToScores(callback) {
+    return database.ref("scores").on("value", (snapshot) => {
+        const scores = snapshot.val() || {};
+        if (typeof callback === "function") {
+            callback(scores);
+        }
+    });
+}
+
+/**
  * Validates and inserts a single subject or mass JSON object containing multiple subjects into Firebase.
  * Supports zero-question datasets (e.g., study guides, tools, and overview nodes).
  * 

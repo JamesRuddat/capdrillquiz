@@ -1,6 +1,7 @@
 import { state } from '../state.js';
-import { database } from '../config.js';
+import { database } from '/js/config.js';
 import { updateRankCardUI } from '../services/badge-service.js';
+import { Cache } from '../services/storage-service.js';
 
 let currentSortCol = null;
 let currentSortAsc = true;
@@ -32,17 +33,14 @@ function parseCorrectCount(item) {
 function formatCallsignDisplay(item, currentUid, currentUserCallsign) {
     const rawName = item.callsign || item.name || '';
 
-    // Check if entry belongs to the logged-in user via UID or callsign fallback
     const isMe = (currentUid && item.uid && item.uid === currentUid) ||
         (currentUserCallsign && rawName === currentUserCallsign);
 
-    // If it's the current user, always display their active callsign + YOU badge
     if (isMe) {
         const activeName = currentUserCallsign || rawName || 'Active User';
         return `<strong>${activeName}</strong> <span class="quiz-card-badge">YOU</span>`;
     }
 
-    // For other users: redact if entry lacks callsign/UID or is flagged legacy
     const isLegacy = (!item.callsign && !item.uid) || item.isLegacyName === true;
 
     if (isLegacy) {
@@ -91,13 +89,48 @@ export function initLeaderboardPage() {
 export function updateDashboardMetrics() {
     updateRankCardUI();
 
-    // 1. Update active subjects counter
-    const subjectsCountEl = document.getElementById("stat-subjects-count");
-    if (subjectsCountEl) {
-        subjectsCountEl.innerText = Object.keys(state.QUESTION_REGISTRY || {}).length;
+    const subjectsCountEl = document.getElementById("stat-subjects-count") || document.getElementById("stat-modules-count");
+
+    const renderCount = (count) => {
+        if (subjectsCountEl) {
+            subjectsCountEl.innerText = count;
+        }
+    };
+
+    // 1. Check in-memory state store
+    let registry = state.QUESTION_REGISTRY || {};
+    let count = Object.keys(registry).length;
+
+    // 2. Fallback to Cache service if state is empty at DOM load
+    if (count === 0) {
+        const cachedSubjects = Cache.getSubjects();
+        const cachedCount = Object.keys(cachedSubjects).length;
+        if (cachedCount > 0) {
+            registry = cachedSubjects;
+            state.QUESTION_REGISTRY = cachedSubjects; // Hydrate state
+            count = cachedCount;
+        }
     }
 
-    // 2. Fetch and render top 3 high scores for index page
+    if (count > 0) {
+        renderCount(count);
+    } else {
+        // 3. Fallback to Firebase query
+        database.ref("subjects").once("value").then(snapshot => {
+            const freshRegistry = snapshot.val() || {};
+            state.QUESTION_REGISTRY = freshRegistry;
+            
+            // Sync to local Storage Service Cache
+            Cache.setSubjects(freshRegistry);
+            
+            const freshCount = Object.keys(freshRegistry).length;
+            renderCount(freshCount);
+        }).catch(err => {
+            console.error("Error fetching subject registry from Firebase:", err);
+        });
+    }
+
+    // 4. Fetch and render top 3 high scores for index page
     const homeTopBody = document.getElementById("home-top-scores-body");
     if (!homeTopBody) return;
 
@@ -105,7 +138,6 @@ export function updateDashboardMetrics() {
         const scores = snapshot.val() || {};
         const scoreList = Object.values(scores);
 
-        // Update total test evaluations counter on home page
         const totalEvalsEl = document.getElementById("stat-total-evals");
         if (totalEvalsEl) {
             totalEvalsEl.innerText = scoreList.length;
@@ -116,17 +148,13 @@ export function updateDashboardMetrics() {
             return;
         }
 
-        // SORT BY TOTAL CORRECT ANSWERS DESCENDING (90/100 beats 9/10)
         scoreList.sort((a, b) => {
             const correctA = parseCorrectCount(a);
             const correctB = parseCorrectCount(b);
-            if (correctB !== correctA) {
-                return correctB - correctA;
-            }
-            return (b.pct || 0) - (a.pct || 0); // Tie-breaker: higher %
+            if (correctB !== correctA) return correctB - correctA;
+            return (b.pct || 0) - (a.pct || 0);
         });
 
-        // Take top 3 scores for index page
         const top3 = scoreList.slice(0, 3);
         const currentUid = state.userUid || (state.currentUser && state.currentUser.uid) || null;
         const currentUserCallsign = state.userCallsign || null;
@@ -155,7 +183,7 @@ export function updateDashboardMetrics() {
 }
 
 /**
- * Renders Full Leaderboard Table (Supports both 'scores' and 'user-points' modes)
+ * Renders Full Leaderboard Table
  */
 export async function renderLeaderboard() {
     const mainBody = document.getElementById("leaderboard-body");
@@ -165,7 +193,6 @@ export async function renderLeaderboard() {
 
     if (!tbody || !thead) return;
 
-    // Is this the home page preview card?
     const isHomePage = !mainBody && !!homeBody;
     const limitCount = isHomePage ? 3 : 50;
 
@@ -178,7 +205,6 @@ export async function renderLeaderboard() {
     const currentUid = state.userUid || (state.currentUser && state.currentUser.uid) || null;
     const currentUserCallsign = state.userCallsign || null;
 
-    // 1. RENDER: Lifetime Points Leaderboard (Pulls from /users)
     if (mode === 'user-points' && !isHomePage) {
         thead.innerHTML = `
             <tr>
@@ -230,8 +256,6 @@ export async function renderLeaderboard() {
             console.error("Error loading points leaderboard:", err);
             tbody.innerHTML = `<tr><td colspan="2" class="text-center text-dim">Unable to load user points.</td></tr>`;
         }
-
-        // 2. RENDER: Top Test Scores (Pulls from /scores)
     } else {
         thead.innerHTML = `
             <tr>
@@ -260,14 +284,11 @@ export async function renderLeaderboard() {
                 scoreList = scoreList.filter(item => item.branch === selectedSubject || item.activeBranchKey === selectedSubject);
             }
 
-            // SORT BY TOTAL CORRECT ANSWERS DESCENDING
             scoreList.sort((a, b) => {
                 const correctA = parseCorrectCount(a);
                 const correctB = parseCorrectCount(b);
-                if (correctB !== correctA) {
-                    return correctB - correctA;
-                }
-                return (b.pct || 0) - (a.pct || 0); // Tie-breaker: higher %
+                if (correctB !== correctA) return correctB - correctA;
+                return (b.pct || 0) - (a.pct || 0);
             });
 
             if (scoreList.length === 0) {
@@ -281,7 +302,6 @@ export async function renderLeaderboard() {
                 const isMe = (currentUid && item.uid && item.uid === currentUid) ||
                     (currentUserCallsign && rawName === currentUserCallsign);
 
-                // Gold / Silver / Bronze accent backgrounds for Home Preview top 3
                 let rankClass = "";
                 if (isHomePage) {
                     if (idx === 0) rankClass = "rank-gold";
@@ -310,7 +330,6 @@ export async function renderLeaderboard() {
         }
     }
 
-    // Re-bind sort listeners to newly rendered DOM headers
     initTableSorting("leaderboard-table");
 }
 

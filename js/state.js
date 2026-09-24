@@ -58,6 +58,30 @@ export const state = {
     },
 
     /**
+     * Updates the global question registry and broadcasts an event to subscribers
+     */
+    setQuestionRegistry(newRegistry) {
+        this.QUESTION_REGISTRY = newRegistry || {};
+        window.dispatchEvent(new CustomEvent("app:registry-updated", {
+            detail: { registry: this.QUESTION_REGISTRY, count: this.getSubjectCount() }
+        }));
+    },
+
+    /**
+     * Helper: Returns total count of dynamic subjects in registry
+     */
+    getSubjectCount() {
+        return Object.keys(this.QUESTION_REGISTRY || {}).length;
+    },
+
+    /**
+     * Helper: Returns array of all subject objects
+     */
+    getAllSubjects() {
+        return Object.values(this.QUESTION_REGISTRY || {});
+    },
+
+    /**
      * Updates user points in real-time and broadcasts to site-header and profile
      */
     updatePoints(newPoints) {

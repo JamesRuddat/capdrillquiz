@@ -1,3 +1,6 @@
+import { state } from '../state.js';
+import { SUPER_UID } from '../config.js';
+
 export class SiteHeader extends HTMLElement {
     connectedCallback() {
         this.renderShell();
@@ -48,7 +51,6 @@ export class SiteHeader extends HTMLElement {
                 <div id="nav-drawer" class="nav-links">
                     <a href="index.html" class="${currentPath.endsWith("index.html") || currentPath === "/" ? "active-nav" : ""}">Home</a>
                     <a href="setup.html" class="${currentPath.endsWith("setup.html") ? "active-nav" : ""}">Practice</a>
-                    <a href="hub.html" class="${currentPath.endsWith("hub.html") ? "active-nav" : ""}">Subject Hub</a>
                     <a href="leaderboard.html" class="${currentPath.endsWith("leaderboard.html") ? "active-nav" : ""}">Leaderboard</a>
                 </div>
 
@@ -141,11 +143,8 @@ export class SiteHeader extends HTMLElement {
                     <div class="empty-state-icon">🛸</div>
                     <h3 class="empty-state-title">No Subjects or Quizzes Found</h3>
                     <p class="subtext empty-state-desc">
-                        No evaluations match "<strong>${searchTerm}</strong>". Want to generate a custom practice session instead?
+                        No evaluations match "<strong>${searchTerm}</strong>".
                     </p>
-                    <a href="hub.html" class="btn-tactical btn-gold empty-state-btn">
-                        Configure Custom Subject
-                    </a>
                 `;
 
                 gridContainer.appendChild(emptyStateCard);
@@ -185,6 +184,12 @@ export class SiteHeader extends HTMLElement {
 
         const initial = callsign ? callsign.charAt(0).toUpperCase() : "C";
 
+        // Determine if user has Admin/Moderator privilege
+        const userUid = state.currentUser ? state.currentUser.uid : localStorage.getItem("active_uid");
+        const isSuper = userUid === SUPER_UID;
+        const userRole = state.userRole || (isSuper ? "admin" : "user");
+        const isModOrAdmin = isSuper || userRole === "admin" || userRole === "mod";
+
         controls.innerHTML = `
             <span id="nav-user-points" class="badge-status badge-verified nav-pts-badge">
                 ⭐ ${points} pts
@@ -196,11 +201,13 @@ export class SiteHeader extends HTMLElement {
                 <div id="user-dropdown" class="user-dropdown">
                     <div class="user-dropdown-header">${callsign}</div>
                     <a href="profile.html" class="user-dropdown-item">
-                        View Profile &amp; Badges
+                        Profile &amp; Badges
                     </a>
-                    <button id="btn-edit-callsign" class="user-dropdown-item" type="button">
-                        Edit Callsign
-                    </button>
+                    ${isModOrAdmin ? `
+                        <a href="admin.html" class="user-dropdown-item text-gold font-bold">
+                            Personnel Panel
+                        </a>
+                    ` : ''}
                     <div class="user-dropdown-divider"></div>
                     <button id="btn-signout" class="user-dropdown-item" type="button">
                         Sign Out

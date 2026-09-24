@@ -19,7 +19,22 @@
 
 <body>
 
-    <site-header></site-header>
+    <site-header>
+        <!-- Static Skeleton Shell (Prevents Header Glitch) -->
+        <nav id="navbar">
+            <div class="nav-links">
+                <a href="index.html" class="active-nav">Home</a>
+                <a href="setup.html">Practice</a>
+                <a href="leaderboard.html">Leaderboard</a>
+            </div>
+            <div class="nav-search-wrapper">
+                <input type="text" class="nav-search-input" placeholder="Search Subjects..." disabled />
+            </div>
+            <div class="nav-controls">
+                <div class="badge-status badge-verified nav-pts-badge">⭐ ...</div>
+            </div>
+        </nav>
+    </site-header>
 
     <main>
         <section id="leaderboard-view" class="col">
@@ -55,20 +70,35 @@
                 </p>
             </div>
 
-            <table id="leaderboard-table">
+            <table id="leaderboard-table" class="leaderboard-table">
                 <thead id="leaderboard-thead">
                     <tr>
-                        <th class="sortable" data-sort="name">Callsign </span></th>
-                        <th class="sortable" data-sort="module">Subject </span></th>
-                        <th class="sortable" data-sort="score">Score </span></th>
-                        <th class="sortable" data-sort="date">Date </span></th>
+                        <th class="sortable" data-sort="name">Callsign <span class="arrow-icon arrow-sort"></span></th>
+                        <th class="sortable" data-sort="subject">Subject <span class="arrow-icon arrow-sort"></span>
+                        </th>
+                        <th class="sortable" data-sort="score">Score <span class="arrow-icon arrow-sort"></span></th>
+                        <th class="sortable" data-sort="date">Date <span class="arrow-icon arrow-sort"></span></th>
                     </tr>
                 </thead>
                 <tbody id="leaderboard-body">
-                    <tr>
-                        <td colspan="4" class="text-center text-dim">
-                            Connecting to cloud database...
-                        </td>
+                    <!-- Static Skeleton Rows (prevents layout shifts while Firebase syncs) -->
+                    <tr class="skeleton-row">
+                        <td class="text-dim">Loading evaluation data...</td>
+                        <td class="text-dim">--</td>
+                        <td class="text-dim">--</td>
+                        <td class="text-dim">--</td>
+                    </tr>
+                    <tr class="skeleton-row">
+                        <td class="text-dim">Loading evaluation data...</td>
+                        <td class="text-dim">--</td>
+                        <td class="text-dim">--</td>
+                        <td class="text-dim">--</td>
+                    </tr>
+                    <tr class="skeleton-row">
+                        <td class="text-dim">Loading evaluation data...</td>
+                        <td class="text-dim">--</td>
+                        <td class="text-dim">--</td>
+                        <td class="text-dim">--</td>
                     </tr>
                 </tbody>
             </table>

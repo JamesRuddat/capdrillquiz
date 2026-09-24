@@ -1,13 +1,16 @@
 import { auth, database } from './config.js';
 import { state } from './state.js';
 import { initializeUserCallsign } from './services/auth-service.js';
-import { initQuizPage, initResultsPage, updateBannerImage, startQuiz } from './components/quiz-engine.js';
+import { subscribeToSubjects } from './services/db-service.js';
+import { initQuizPage, initResultsPage } from './pages/quiz-page.js';
 import { initFlashcards } from './components/flashcards.js';
 import { initLeaderboardPage, updateDashboardMetrics, initTableSorting } from './components/leaderboard.js';
 import { initHubPage, renderUnifiedHub } from './pages/hub-page.js';
-import { populateBranchDropdowns, renderSubjectList, renderSubjectCards, updateSliderLimits } from './components/navigation.js';
+import { populateBranchDropdowns, renderSubjectList, renderSubjectCards } from './components/navigation.js';
 import { initAdminPage } from './pages/admin-page.js';
 import { initDailyChallenge } from './components/daily-challenge.js';
+import { updateBannerImage, updateSliderLimits, startQuiz } from './pages/quiz-page.js';
+import { showConfirm } from './pages/modal.js';
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -27,13 +30,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById("bank-inspector-list")) initHubPage();
     if (document.getElementById("admin-view")) initAdminPage();
 
-    // Home Page Stats
+    // Home Page Stats & Metrics
     if (document.getElementById("home-view") || document.getElementById("home-top-scores-body")) {
         updateDashboardMetrics();
         initTableSorting("leaderboard-table");
     }
 
-    // 3. SETUP VIEW BINDINGS
+    // 3. SETUP VIEW BINDINGS & CONTROLS
     if (document.getElementById("setup-view")) {
         const quizSelect = document.getElementById("quiz-select");
         const slider = document.getElementById("quiz-question-count-slider");
@@ -54,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
-        // Mode Action Buttons (Attached via Event Listeners for ES Subject Scope)
+        // Mode Action Buttons
         const btnTest = document.getElementById("btn-mode-test");
         const btnStudy = document.getElementById("btn-mode-study");
         const btnFlashcards = document.getElementById("btn-mode-flashcards");
@@ -63,6 +66,44 @@ document.addEventListener("DOMContentLoaded", () => {
         if (btnStudy) btnStudy.addEventListener("click", () => startQuiz("study"));
         if (btnFlashcards) btnFlashcards.addEventListener("click", () => startQuiz("flashcard"));
     }
+
+    // Global Interceptor for External Links
+    document.body.addEventListener("click", async (e) => {
+        const link = e.target.closest("a[href]");
+        if (!link) return;
+
+        const href = link.getAttribute("href");
+        if (!href) return;
+
+        // Skip internal/anchor links or javascript triggers
+        if (href.startsWith("#") || href.startsWith("javascript:") || href.startsWith("mailto:") || href.startsWith("tel:")) {
+            return;
+        }
+
+        try {
+            const linkUrl = new URL(href, window.location.href);
+            const currentHost = window.location.hostname;
+
+            // Check if link goes outside current domain
+            const isExternal = linkUrl.hostname !== currentHost && linkUrl.hostname !== "";
+
+            if (isExternal) {
+                e.preventDefault(); // Pause navigation
+
+                const confirmed = await showConfirm(
+                    `You are about to leave and navigate to an external website:\n\n${linkUrl.href}\n\nDo you wish to proceed?`,
+                    "External Link Warning"
+                );
+
+                if (confirmed) {
+                    // Open in a new tab safely if user confirms
+                    window.open(linkUrl.href, "_blank", "noopener,noreferrer");
+                }
+            }
+        } catch (err) {
+            // Ignore invalid/relative URL parsing errors and allow normal navigation
+        }
+    });
 
     // 4. AUTH OBSERVER: Centralized state sync
     auth.onAuthStateChanged(async (user) => {
@@ -92,16 +133,14 @@ document.addEventListener("DOMContentLoaded", () => {
         if (document.getElementById("bank-inspector-list")) renderUnifiedHub();
     });
 
-    // 5. DATABASE SYNC: Real-time subject registry updates
-    database.ref("subjects").on("value", (snapshot) => {
-        state.QUESTION_REGISTRY = snapshot.val() || {};
-
+    // 5. DATABASE SYNC: Real-time subject registry updates via db-service.js
+    subscribeToSubjects(() => {
         requestAnimationFrame(() => {
             populateBranchDropdowns();
             renderSubjectList();
             renderSubjectCards();
 
-            if (document.getElementById("home-view") || document.getElementById("home-top-scores-body")) {
+            if (document.getElementById("home-view") || document.getElementById("stat-modules-count") || document.getElementById("stat-subjects-count") || document.getElementById("home-top-scores-body")) {
                 updateDashboardMetrics();
             }
 
