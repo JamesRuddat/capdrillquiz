@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-adsense-account" content="ca-pub-1864969470317711">
     <link rel="icon" type="image/x-icon" href="/assets/images/emblems/icon.svg">
-    <title>PROP - Quiz Hub</title>
+    <title>Subject Hub</title>
     <link rel="stylesheet" href="../styles.css">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1864969470317711"
         crossorigin="anonymous"></script>
@@ -14,65 +14,90 @@
     <!-- Load Component Partials -->
     <script type="module" src="/js/components/header.js"></script>
     <script type="module" src="/js/components/footer.js"></script>
-    <script type="module" src="/js/pages/modal-element.js"></script>
+    <script type="module" src="/js/components/modal-element.js"></script>
 </head>
 
 <body>
 
-    <site-header></site-header>
+    <site-header>
+        <!-- Static Skeleton Shell (Prevents Header Glitch) -->
+        <nav id="navbar">
+            <div class="nav-links">
+                <a href="index.html" class="active-nav">Dashboard</a>
+                <a href="setup.html">Practice</a>
+                <a href="leaderboard.html">Leaderboard</a>
+            </div>
+            <div class="nav-search-wrapper">
+                <input type="text" class="nav-search-input" placeholder="Search Subjects..." disabled />
+            </div>
+            <div class="nav-controls">
+                <div class="badge-status badge-verified nav-pts-badge">⭐ ...</div>
+            </div>
+        </nav>
+    </site-header>
 
     <main>
         <section id="hub-view" class="col">
-            <h1>Subject HUB</h1>
-            <p style="font-size: 0.8rem; color: var(--light-text-color);">
+            <h1 class="margin-none">Subject HUB</h1>
+            <p class="subtext">
                 Create subjects, append questions, inspect community items, or manage database records.
             </p>
 
-            <div id="hub-auth-status" class="advisory" style="margin-bottom: 1em;">
+            <div id="hub-auth-status" class="advisory">
                 Status: Guest
             </div>
 
             <hr>
 
-            <div
-                style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 0.8em; gap: 0.5em;">
-                <h1 style="margin: 0;">Subject &amp; Questions</h1>
-                <hr>
-                <div style="display: flex; align-items: center; gap: 0.5em; flex-wrap: wrap;">
-                    <button id="btn-create-module-card" class="btn-tactical btn-gold" style="padding: 0.4em 0.8em;">
-                        ➕ Create New Subject
+            <!-- Subject Management Controls Row -->
+            <div class="hub-control-row">
+                <h2>Subject</h2>
+
+                <div class="flex-center gap-sm flex-wrap">
+                    <button id="btn-create-subject-card" class="btn-tactical btn-gold btn-padding-compact">
+                        Create New Subject
                     </button>
                 </div>
 
-                <div style="display: flex; align-items: center; gap: 0.5em; flex-wrap: wrap;">
-                    <label for="bank-inspect-select" style="font-size: 0.8rem; margin: 0;">View Subject:</label>
-                    <select id="bank-inspect-select" style="width: auto; padding: 0.3em; margin: 0;"></select>
-                    <button id="btn-delete-module" class="btn-tactical btn-clear hidden">
+                <div class="flex-center gap-sm flex-wrap">
+                    <label for="bank-inspect-select" class="subtext">View Subject:</label>
+                    <select id="bank-inspect-select" class=""></select>
+                    <div class="flex-row gap-sm align-center margin-bottom-sm">
+                        <label for="hub-sort-select" class="font-bold text-sm">Sort By:</label>
+                        <select id="hub-sort-select" class="form-select-inline">
+                            <option value="newest" selected>Newest First (Date Created)</option>
+                            <option value="oldest">Oldest First (Date Created)</option>
+                            <option value="title">Alphabetical (A-Z)</option>
+                            <option value="questions">Question Count</option>
+                        </select>
+                    </div>
+                    <button id="btn-delete-subject" class="btn-tactical btn-red hidden">
                         Delete Subject
                     </button>
                 </div>
             </div>
-
-            <div
-                style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin: 1em 0 0.8em 0; gap: 0.5em; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 1em;">
-                <h2 style="margin: 0; font-size: 1.2rem;">Subject Questions</h2>
-                <div style="display: flex; align-items: center; gap: 0.5em; flex-wrap: wrap;">
-                    <button id="btn-add-question-card" class="btn-tactical btn-gold" style="padding: 0.4em 0.8em;">
-                        ➕ Add Question Card
+            <hr>
+            <!-- Questions Header Row -->
+            <div class="hub-questions-header-row">
+                <h2>Questions</h2>
+                <div class="flex-center gap-sm flex-wrap">
+                    <button id="btn-add-question-card" class="btn-tactical btn-gold btn-padding-compact">
+                        Add Question Card
                     </button>
                 </div>
             </div>
-
+            <br>
             <div id="bank-inspector-list">
-                <div style="color: var(--light-text-color); font-size: 0.8rem;">Select a subject above to manage or
-                    inspect questions...</div>
+                <div class="hub-inspector-placeholder">
+                    Select a subject above to manage or inspect questions...
+                </div>
             </div>
         </section>
     </main>
-<custom-modal></custom-modal>
+
+    <custom-modal></custom-modal>
     <site-footer></site-footer>
 
-    <script src="/js/profanity-filter.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>

@@ -1,280 +1,314 @@
 import { state } from '../state.js';
-import { updateDashboardMetrics, renderLeaderboard } from './leaderboard.js';
-import { renderUnifiedHub } from '../pages/hub-page.js';
 
-// Helper function to extract valid, non-null questions from arrays or sparse Firebase objects
-function getValidQuestionsCount(questionsPayload) {
-    if (!questionsPayload) return 0;
+// Static Interactive Tools / Simulators with direct publication links
+const STATIC_INTERACTIVE_TOOLS = [
+    {
+        id: "DRILL_SIM",
+        branchName: "Drill & Ceremonies Simulator",
+        category: "Simulator",
+        publication: "Simulator",
+        pdfUrl: "",
+        description: "Master flight formations, Open Ranks staggers, position symbol identification, and dynamic grid building.",
+        type: "simulator",
+        url: "/pages/drill.html",
+        badge: "Simulator",
+        imageUrl: "/assets/images/CAP/Drill.PNG"
+    },
+    {
+        id: "ELT_DF_SIM",
+        branchName: "ELT Direction Finding Simulator",
+        category: "Simulator",
+        publication: "Simulator",
+        pdfUrl: "",
+        description: "Practice emergency locator transmitter (ELT) search missions with DF-88 needle tracking, audio signal strength, and VOR/DME navigation.",
+        type: "simulator",
+        url: "/pages/df-search.html",
+        badge: "Simulator",
+        imageUrl: "/assets/images/CAP/Airplane.jpg"
+    }
+];
 
-    const items = Array.isArray(questionsPayload) 
-        ? questionsPayload 
-        : Object.values(questionsPayload);
-
-    return items.filter(q => q && typeof q === 'object' && typeof q.q === 'string' && q.q.trim() !== '').length;
+/**
+ * Utility: Sanitizes input string against XSS
+ */
+export function sanitizeInput(str = "") {
+    if (typeof str !== "string") return "";
+    return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
-export function showView(viewId) {
-    // Top-level views (Multi-page DOM fallback)
-    const views = ['home-view', 'setup-view', 'quiz-view', 'results-view', 'leaderboard-view', 'hub-view'];
-    
-    views.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.toggle('hidden', id !== viewId);
-    });
-
-    // Control 'select-view' visibility explicitly
-    const selectView = document.getElementById('select-view');
-    if (selectView) {
-        const isAllowedView = (viewId === 'home-view' || viewId === 'setup-view');
-        selectView.classList.toggle('hidden', !isAllowedView);
-    }
-
-    const navMap = {
-        'home-view': 'nav-home',
-        'setup-view': 'nav-setup',
-        'leaderboard-view': 'nav-leaderboard',
-        'hub-view': 'nav-hub'
-    };
-
-    // Update active navbar tab
-    document.querySelectorAll('#navbar a').forEach(a => a.classList.remove('active-nav'));
-    if (navMap[viewId] && document.getElementById(navMap[viewId])) {
-        document.getElementById(navMap[viewId]).classList.add('active-nav');
-    }
-
-    // View-specific initializations
-    if (viewId === 'home-view') {
-        updateDashboardMetrics();
-        renderLeaderboard();
-        renderModuleCards();
-    }
-    if (viewId === 'setup-view') {
-        populateBranchDropdowns();
-    }
-    if (viewId === 'leaderboard-view') renderLeaderboard();
-    if (viewId === 'hub-view') renderUnifiedHub();
-}
-
+/**
+ * Populates subject dropdown selects on setup and quiz views
+ */
 export function populateBranchDropdowns() {
-    const setupSelect = document.getElementById("quiz-select");
-    const builderTargetSelect = document.getElementById("builder-target-quiz");
-    const inspectSelect = document.getElementById("bank-inspect-select");
-    const leaderboardSelect = document.getElementById("filter-leaderboard");
+    const selects = [
+        document.getElementById("quiz-select"),
+        document.getElementById("bank-inspect-select")
+    ].filter(Boolean);
 
-    // 1. Retrieve pre-selected subject passed from multi-page card redirect
-    const savedCardSubject = sessionStorage.getItem("selectedSubjectKey");
+    if (selects.length === 0) return;
 
-    // 2. Save active choices
-    const savedSetup = setupSelect ? (savedCardSubject || setupSelect.value) : savedCardSubject;
-    const savedBuilder = builderTargetSelect ? builderTargetSelect.value : "";
-    const savedInspect = inspectSelect ? inspectSelect.value : "";
-    const currentFilter = leaderboardSelect ? leaderboardSelect.value : "ALL";
+    const registry = state.QUESTION_REGISTRY || {};
+    const keys = Object.keys(registry);
 
-    const moduleKeys = Object.keys(state.QUESTION_REGISTRY || {});
+    let optionsHTML = `<option value="">-- Select a Subject --</option>`;
 
-    if (setupSelect) setupSelect.innerHTML = "";
-    if (builderTargetSelect) builderTargetSelect.innerHTML = "";
-    if (inspectSelect) inspectSelect.innerHTML = "";
-    if (leaderboardSelect) leaderboardSelect.innerHTML = `<option value="ALL">All Subjects</option>`;
+    // Add Firebase subjects
+    keys.forEach(key => {
+        const item = registry[key];
+        const label = item?.branchName || key;
+        optionsHTML += `<option value="${key}">${label}</option>`;
+    });
 
-    if (moduleKeys.length === 0) {
-        if (setupSelect) setupSelect.innerHTML = `<option value="">No Subjects Available</option>`;
-        if (builderTargetSelect) builderTargetSelect.innerHTML = `<option value="">No Subjects Available</option>`;
-        if (inspectSelect) inspectSelect.innerHTML = `<option value="">No Subjects Available</option>`;
-        return;
-    }
-
-    moduleKeys.forEach((key) => {
-        const item = state.QUESTION_REGISTRY[key];
-        const label = `${item.branchName || key} (${item.publication || 'Standard'})`;
-
-        const opt1 = document.createElement("option");
-        opt1.value = key;
-        opt1.textContent = label;
-
-        const opt2 = document.createElement("option");
-        opt2.value = key;
-        opt2.textContent = label;
-
-        const opt3 = document.createElement("option");
-        opt3.value = key;
-        opt3.textContent = label;
-
-        if (setupSelect) setupSelect.appendChild(opt1);
-        if (builderTargetSelect) builderTargetSelect.appendChild(opt2);
-        if (inspectSelect) inspectSelect.appendChild(opt3);
-
-        if (leaderboardSelect) {
-            const optLb = document.createElement("option");
-            optLb.value = key;
-            optLb.textContent = item.branchName || key;
-            leaderboardSelect.appendChild(optLb);
+    // Add static interactive tools to dropdown if not present
+    STATIC_INTERACTIVE_TOOLS.forEach(tool => {
+        if (!registry[tool.id]) {
+            optionsHTML += `<option value="${tool.id}">${tool.branchName}</option>`;
         }
     });
 
-    // 3. Apply active selection
-    if (inspectSelect && savedInspect && state.QUESTION_REGISTRY[savedInspect]) {
-        inspectSelect.value = savedInspect;
-    }
-
-    if (setupSelect && savedSetup && state.QUESTION_REGISTRY[savedSetup]) {
-        setupSelect.value = savedSetup;
-    }
-
-    if (builderTargetSelect && savedBuilder && state.QUESTION_REGISTRY[savedBuilder]) {
-        builderTargetSelect.value = savedBuilder;
-    }
-
-    if (leaderboardSelect) {
-        leaderboardSelect.value = currentFilter;
-    }
-
-    if (setupSelect && setupSelect.value) {
-        state.activeBranchKey = setupSelect.value;
-    }
-
-    // Clean consumed session selection key
-    sessionStorage.removeItem("selectedSubjectKey");
-
-    updateSliderLimits();
+    selects.forEach(select => {
+        const currentVal = select.value;
+        select.innerHTML = optionsHTML;
+        if (currentVal && select.querySelector(`option[value="${currentVal}"]`)) {
+            select.value = currentVal;
+        }
+    });
 }
 
-export function renderModuleList() {
-    const treeContainer = document.getElementById("dynamic-publications-tree");
-    if (!treeContainer) return;
+/**
+ * Renders subject list for hub/inspector views
+ */
+export function renderSubjectList() {
+    const container = document.getElementById("subject-list-container");
+    if (!container) return;
 
-    const moduleKeys = Object.keys(state.QUESTION_REGISTRY || {});
+    const registry = state.QUESTION_REGISTRY || {};
+    const keys = Object.keys(registry);
 
-    if (moduleKeys.length === 0) {
-        treeContainer.innerHTML = `<span style="color: var(--light-text-color);">No subjects registered in database yet.</span>`;
+    if (keys.length === 0) {
+        container.innerHTML = `<p class="subtext">No database subjects found.</p>`;
         return;
     }
 
-    let html = `<ul class="tree">`;
-    moduleKeys.forEach((key) => {
-        const item = state.QUESTION_REGISTRY[key];
-        const count = getValidQuestionsCount(item.questions);
-
-        html += `
-            <li><strong>${item.branchName || key} — ${item.publication || 'N/A'}</strong>
-                <ul>
-                    <li>Category: ${item.category || 'General'}</li>
-                    <li>Registered Questions: ${count}</li>
-                </ul>
-            </li>
+    container.innerHTML = keys.map(key => {
+        const item = registry[key];
+        return `
+            <div class="subject-item-row flex-row-between" data-key="${key}">
+                <span><strong>${item.branchName || key}</strong> (${item.category || 'General'})</span>
+                <span class="subtext">${item.publication || ''}</span>
+            </div>
         `;
-    });
-    html += `</ul>`;
-
-    treeContainer.innerHTML = html;
+    }).join('');
 }
 
-export function updateSliderLimits() {
-    const selectEl = document.getElementById("quiz-select");
-    const slider = document.getElementById("quiz-question-count-slider");
-    const label = document.getElementById("quiz-question-count-label");
+/**
+ * Renders practice subject cards on dashboard dashboard grid.
+ * Features a top-right 3-dots menu (⋮) for editing actions.
+ * Zero-question & zero-link subjects are automatically pushed to the bottom and grayed out.
+ */
+export function renderSubjectCards() {
+    const container = document.getElementById("quiz-cards-grid");
+    if (!container) return;
 
-    if (!selectEl || !slider || !label) return;
+    const registry = state.QUESTION_REGISTRY || {};
 
-    const selectedKey = selectEl.value;
-    const module = state.QUESTION_REGISTRY ? state.QUESTION_REGISTRY[selectedKey] : null;
+    const dbSubjects = Object.keys(registry).map(key => ({
+        id: key,
+        ...registry[key]
+    }));
 
-    if (!module || !module.questions) {
-        slider.min = 1;
-        slider.max = 1;
-        slider.value = 1;
-        label.innerText = "0 Questions";
-        return;
-    }
-
-    const totalAvailable = getValidQuestionsCount(module.questions);
-
-    if (totalAvailable === 0) {
-        slider.min = 1;
-        slider.max = 1;
-        slider.value = 1;
-        label.innerText = "0 Questions";
-        return;
-    }
-
-    slider.min = 1;
-    slider.max = totalAvailable;
-    slider.value = totalAvailable;
-
-    label.innerText = `${totalAvailable} ${totalAvailable === 1 ? 'Question' : 'Questions'} (Max: ${totalAvailable})`;
-}
-
-export function toggleTheme() {
-    const root = document.documentElement;
-    const current = root.getAttribute("data-theme");
-    root.setAttribute("data-theme", current === "dark" ? "light" : "dark");
-}
-
-export function toggleAccordion(id) {
-    const content = document.getElementById(id);
-    const icon = document.getElementById(id + "-icon");
-    if (content) {
-        const isExpanded = content.classList.toggle("expanded");
-        const trigger = content.previousElementSibling;
-        if (trigger && trigger.classList.contains("accordion-trigger")) {
-            trigger.classList.toggle("active-trigger", isExpanded);
+    const combinedSubjects = [...STATIC_INTERACTIVE_TOOLS];
+    dbSubjects.forEach(dbSub => {
+        if (!combinedSubjects.some(item => item.id === dbSub.id)) {
+            combinedSubjects.push(dbSub);
         }
-        if (icon) icon.innerText = isExpanded ? "▲" : "▼";
-    }
-}
+    });
 
-export function sanitizeInput(str) {
-    return String(str).replace(/[&<>"']/g, (m) => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
-    })[m]);
-}
-
-export function renderModuleCards() {
-    const gridContainer = document.getElementById("quiz-cards-grid");
-    if (!gridContainer) return;
-
-    const moduleKeys = Object.keys(state.QUESTION_REGISTRY || {});
-
-    if (moduleKeys.length === 0) {
-        gridContainer.innerHTML = `<div class="text-center" style="color: var(--light-text-color); grid-column: 1/-1;">No active subjects available.</div>`;
+    if (combinedSubjects.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state-card text-center">
+                <div class="empty-state-icon">🛰️</div>
+                <h3 class="empty-state-title">No Practice Subjects Found</h3>
+            </div>`;
         return;
     }
 
-    gridContainer.innerHTML = moduleKeys.map(key => {
-        const data = state.QUESTION_REGISTRY[key];
-        const totalQs = getValidQuestionsCount(data.questions);
+    // Sort: Active cards first; Zero-question & zero-link cards pushed to bottom
+    combinedSubjects.sort((a, b) => {
+        const rawQsA = a.questions || {};
+        const countA = Array.isArray(rawQsA) ? rawQsA.length : Object.keys(rawQsA).length;
+        const linksA = (a.links || []).length;
+        const customUrlA = a.url || (a.id === "DRILL_SIM" ? "/pages/drill.html" : a.id === "ELT_DF_SIM" ? "/pages/df-search.html" : null);
+        const hasContentA = countA > 0 || linksA > 0 || Boolean(customUrlA);
 
-        const bgStyle = data.imageUrl 
-            ? `background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url('${data.imageUrl}') center/cover no-repeat; color: #ffffff;`
+        const rawQsB = b.questions || {};
+        const countB = Array.isArray(rawQsB) ? rawQsB.length : Object.keys(rawQsB).length;
+        const linksB = (b.links || []).length;
+        const customUrlB = b.url || (b.id === "DRILL_SIM" ? "/pages/drill.html" : b.id === "ELT_DF_SIM" ? "/pages/df-search.html" : null);
+        const hasContentB = countB > 0 || linksB > 0 || Boolean(customUrlB);
+
+        if (hasContentA && !hasContentB) return -1;
+        if (!hasContentA && hasContentB) return 1;
+        return 0;
+    });
+
+    container.innerHTML = combinedSubjects.map(subject => {
+        const pubLabel = subject.publication || subject.badge || "CAP Regulation";
+        const bgImage = subject.imageUrl || subject.bgImage;
+
+        // Safely count questions
+        const rawQs = subject.questions || {};
+        const totalQs = Array.isArray(rawQs) ? rawQs.length : Object.keys(rawQs).length;
+        const linkList = subject.links || [];
+
+        const customUrl = subject.url || (subject.id === "DRILL_SIM" ? "/pages/drill.html" : subject.id === "ELT_DF_SIM" ? "/pages/df-search.html" : null);
+        const isSimulator = subject.type === "interactive" || subject.type === "simulator" || Boolean(customUrl);
+
+        const hasPlayableContent = totalQs > 0 || linkList.length > 0 || isSimulator;
+
+        // Visual Dimming for 0-Question & 0-Link Subjects
+        const cardDisabledClass = hasPlayableContent ? '' : 'quiz-card-disabled';
+        const bgClass = bgImage ? 'quiz-card-custom-bg' : '';
+        const bgStyleAttr = bgImage
+            ? `style="background-image: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.85) 100%), url('${bgImage}');"`
             : '';
 
-        return `
-            <div class="quiz-card" style="${bgStyle}">
-                <div>
-                    <div class="quiz-card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span class="quiz-card-badge">${data.category || 'General'}</span>
-                        <span style="font-size: 0.8rem; color: ${data.imageUrl ? '#ddd' : 'var(--light-text-color)'};">${totalQs} Questions</span>
-                    </div>
-                    <div class="quiz-card-title">${data.branchName || key}</div>
-                    <div class="quiz-card-meta" style="color: ${data.imageUrl ? '#eee' : 'inherit'};">
-                        <strong>Publication:</strong> ${data.publication || 'Standard Regulation'}
-                    </div>
+        // Render Dynamic Publication Link Badge
+        const mainPdfUrl = subject.pdfUrl || (linkList.find(l => l.type === 'pdf')?.url);
+        const badgeHTML = mainPdfUrl
+            ? `<a href="${mainPdfUrl}" target="_blank" rel="noopener noreferrer" class="quiz-card-badge badge-status badge-verified" title="Open Handbook">${pubLabel}</a>`
+            : `<span class="quiz-card-badge badge-status badge-verified">${pubLabel}</span>`;
+
+        // Render Dynamic Multi-Button Footer
+        let buttonsHTML = '';
+
+        if (linkList.length > 0) {
+            buttonsHTML = linkList.map(link => {
+                const isPrimary = link.type === 'simulator' || link.primary;
+                const btnClass = isPrimary ? 'btn-gold' : 'btn-blue';
+                return `
+                    <a href="${link.url}" ${link.url.startsWith('http') ? 'target="_blank" rel="noopener"' : ''} class="btn-tactical ${btnClass} flex-1">
+                        ${link.label || 'Launch'}
+                    </a>
+                `;
+            }).join('');
+        } else if (isSimulator || totalQs > 0) {
+            const btnClass = isSimulator ? "btn-gold" : "btn-blue";
+            const btnText = isSimulator ? "Launch Simulator ➔" : "Start Evaluation ➔";
+            const btnHref = isSimulator && customUrl ? customUrl : `setup.html?subject=${subject.id}`;
+
+            buttonsHTML = `<a href="${btnHref}" class="btn-tactical ${btnClass} width-full">${btnText}</a>`;
+        } else {
+            // Disabled State Indicator for Zero-Content Cards
+            buttonsHTML = `<span class="badge-status subtext width-full text-center" style="opacity: 0.7;">Overview / Reference Only</span>`;
+        }
+
+        // Top-right 3-dots menu button & dropdown
+        const menuHTML = `
+            <div class="card-menu-wrapper" style="position: relative;">
+                <button type="button" class="card-menu-trigger" aria-label="Card Options" onclick="window.toggleCardMenu(event, '${subject.id}')">
+                    &#8285;
+                </button>
+                <div id="card-menu-${subject.id}" class="card-menu-dropdown hidden">
+                    <a href="hub.html?subject=${subject.id}&edit=true" class="card-menu-item">
+                        Edit Subject
+                    </a>
                 </div>
-                <div class="quiz-card-footer" style="margin-top: 0.8em;">
-                    <button class="btn-tactical btn-blue width-full btn-card-start" data-key="${key}" type="button">
-                        Start
-                    </button>
+            </div>
+        `;
+
+        return `
+            <div class="quiz-card ${bgClass} ${cardDisabledClass}" ${bgStyleAttr}>
+                <div class="quiz-card-header flex-row-between align-center">
+                    ${badgeHTML}
+                    ${menuHTML}
+                </div>
+                <h3 class="quiz-card-title margin-top-xs">${subject.branchName || subject.title || subject.id}</h3>
+                <p class="quiz-card-meta">
+                    ${subject.description || 'No description provided.'}
+                </p>
+                <div class="quiz-card-footer flex-wrap gap-sm">
+                    ${buttonsHTML}
                 </div>
             </div>
         `;
     }).join('');
 
-    // Multi-page navigation redirect handler
-    gridContainer.querySelectorAll(".btn-card-start").forEach(btn => {
-        btn.onclick = (e) => {
-            const selectedKey = e.currentTarget.dataset.key;
-            sessionStorage.setItem("selectedSubjectKey", selectedKey);
-            window.location.href = "setup.html";
-        };
-    });
+    // Global listener to close dropdowns when clicking outside
+    if (!window.cardMenuListenerAttached) {
+        document.addEventListener("click", () => {
+            document.querySelectorAll(".card-menu-dropdown").forEach(el => el.classList.add("hidden"));
+        });
+        window.cardMenuListenerAttached = true;
+    }
+}
+
+/**
+ * Toggles the 3-dots dropdown menu for a specific card
+ */
+window.toggleCardMenu = function (e, id) {
+    e.stopPropagation();
+    const targetMenu = document.getElementById(`card-menu-${id}`);
+    const isClosed = targetMenu ? targetMenu.classList.contains("hidden") : false;
+
+    // Close all open card menus first
+    document.querySelectorAll(".card-menu-dropdown").forEach(el => el.classList.add("hidden"));
+
+    if (targetMenu && isClosed) {
+        targetMenu.classList.remove("hidden");
+    }
+};
+
+/**
+ * Updates question count slider limits on setup page based on selected subject.
+ */
+export function updateSliderLimits() {
+    const quizSelect = document.getElementById("quiz-select");
+    const slider = document.getElementById("quiz-question-count-slider");
+    const sliderLabel = document.getElementById("quiz-question-count-label");
+    const startBtn = document.getElementById("btn-start-evaluation");
+
+    if (!quizSelect || !slider) return;
+
+    const selectedKey = quizSelect.value;
+    const subjectData = state.QUESTION_REGISTRY ? state.QUESTION_REGISTRY[selectedKey] : null;
+
+    if (!subjectData || !subjectData.questions) {
+        slider.min = "0";
+        slider.max = "0";
+        slider.value = "0";
+        slider.disabled = true;
+        if (sliderLabel) sliderLabel.innerText = "0 Questions Available (Max: 0)";
+        if (startBtn) startBtn.disabled = true;
+        return;
+    }
+
+    const rawQs = subjectData.questions;
+    const totalQs = Array.isArray(rawQs) ? rawQs.length : Object.keys(rawQs).length;
+
+    if (totalQs === 0) {
+        slider.min = "0";
+        slider.max = "0";
+        slider.value = "0";
+        slider.disabled = true;
+        if (sliderLabel) sliderLabel.innerText = "0 Questions Available (Max: 0)";
+        if (startBtn) startBtn.disabled = true;
+        return;
+    }
+
+    slider.disabled = false;
+    if (startBtn) startBtn.disabled = false;
+
+    slider.min = "1";
+    slider.max = String(totalQs);
+    slider.value = String(totalQs);
+
+    if (sliderLabel) {
+        sliderLabel.innerText = `${totalQs} ${totalQs === 1 ? 'Question' : 'Questions'} (Max: ${totalQs})`;
+    }
 }

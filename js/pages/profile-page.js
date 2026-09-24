@@ -12,33 +12,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if (signinBtn) signinBtn.onclick = () => handleGoogleAuth();
     if (editBtn) editBtn.onclick = () => editUserCallsign().then(() => loadUserProfile());
 
-    // Helper to toggle visibility cleanly
     function showProfile() {
-        if (guestNotice) {
-            guestNotice.classList.add("hidden");
-            guestNotice.style.display = "none";
-        }
-        if (profileContent) {
-            profileContent.classList.remove("hidden");
-            profileContent.style.display = "block";
-        }
+        if (guestNotice) guestNotice.classList.add("hidden");
+        if (profileContent) profileContent.classList.remove("hidden");
     }
 
     function showGuest() {
-        if (guestNotice) {
-            guestNotice.classList.remove("hidden");
-            guestNotice.style.display = "block";
-        }
-        if (profileContent) {
-            profileContent.classList.add("hidden");
-            profileContent.style.display = "none";
-        }
+        if (guestNotice) guestNotice.classList.remove("hidden");
+        if (profileContent) profileContent.classList.add("hidden");
     }
 
-    // 1. Check local session storage instantly
-    const cachedUid = Object.keys(sessionStorage)
-        .find(k => k.startsWith("callsign_"))
-        ?.replace("callsign_", "");
+    // 1. Check persistent local storage instantly (0ms delay)
+    const cachedUid = localStorage.getItem("active_uid");
 
     if (cachedUid) {
         showProfile();
@@ -69,20 +54,17 @@ async function loadUserProfile() {
         const evals = userData.totalEvaluations || 0;
         const correct = userData.totalCorrect || 0;
 
-        // Compile comprehensive user metrics to evaluate badge qualifications
         const userStats = {
             ...userData,
             points: points,
             totalEvaluations: evals,
             totalCorrect: correct,
-            averagePct: evals > 0 ? (correct / (evals * 10)) * 100 : 0 // Fallback estimate
+            averagePct: evals > 0 ? (correct / (evals * 10)) * 100 : 0
         };
 
-        // 1. Check & persist earned badges based on current user statistics
         const updatedBadges = await evaluateUserBadges(userStats);
         const finalBadges = updatedBadges || userData.badges || {};
 
-        // 2. DOM Binding
         const nameEl = document.getElementById("profile-callsign-display");
         const uidEl = document.getElementById("profile-uid-display");
         const ptsEl = document.getElementById("profile-points-display");
@@ -95,7 +77,6 @@ async function loadUserProfile() {
         if (evalsEl) evalsEl.innerText = evals;
         if (correctEl) correctEl.innerText = correct;
 
-        // 3. Render Badges Showcase (Displays Earned vs Locked Badges)
         renderUserBadges("user-badges-grid", finalBadges);
 
     } catch (err) {

@@ -1,73 +1,126 @@
 <!DOCTYPE html>
-<html lang="en">
-    <html lang="en" data-theme="light">
+<html lang="en" data-theme="light">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-adsense-account" content="ca-pub-1864969470317711">
     <link rel="icon" type="image/x-icon" href="/assets/images/emblems/icon.svg">
-    <title>PROP - Profile</title>
+    <title>Profile | Operational Record</title>
     <link rel="stylesheet" href="/styles.css">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1864969470317711"
         crossorigin="anonymous"></script>
 
-    <!-- Load Component Partials -->
+    <!-- Component Partials -->
     <script type="module" src="/js/components/header.js"></script>
     <script type="module" src="/js/components/footer.js"></script>
-    <script type="module" src="/js/pages/modal-element.js"></script>
+    <script type="module" src="/js/components/modal-element.js"></script>
 </head>
-<body>
-    <site-header></site-header>
 
-    <main>
-        <!-- Guest Fallback -->
-        <div id="profile-guest-notice" class="card text-center hidden">
+<body>
+    <site-header>
+        <!-- Static Skeleton Shell (Prevents Header Glitch) -->
+        <nav id="navbar">
+            <div class="nav-links">
+                <a href="index.html" class="active-nav">Dashboard</a>
+                <a href="setup.html">Practice</a>
+                <a href="leaderboard.html">Leaderboard</a>
+            </div>
+            <div class="nav-search-wrapper">
+                <input type="text" class="nav-search-input" placeholder="Search Subjects..." disabled />
+            </div>
+            <div class="nav-controls">
+                <div class="badge-status badge-verified nav-pts-badge">⭐ ...</div>
+            </div>
+        </nav>
+    </site-header>
+
+    <main class="container">
+        <!-- Guest Fallback Notice -->
+        <div id="profile-guest-notice" class="card text-center hidden margin-y-lg">
+            <div class="empty-state-icon">
+                <span class="arrow-icon arrow-right"></span>
+            </div>
             <h2>Authentication Required</h2>
-            <p style="color: var(--light-text-color);">Please sign in with Google to view your profile, stats, and badges.</p>
-            <button id="profile-signin-btn" class="btn-tactical btn-gold" type="button" style="margin-top: 1em;">
-                Sign In with Google
+            <p class="subtext">Please sign in to view your operational record, drill rank history, and
+                achievement badges.</p>
+            <button id="profile-signin-btn" class="btn-tactical btn-gold profile-signin-btn margin-top-md"
+                type="button">
+                Sign In / Register
             </button>
         </div>
 
         <!-- Authenticated Profile View -->
-        <div id="profile-content" class="hidden">
-            <!-- Header Card -->
-            <div class="card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1em;">
+        <div id="profile-content" class="hidden flex-col gap-lg">
+
+            <!-- Main Record Header Card -->
+            <div class="card profile-header-card">
                 <div>
-                    <span class="quiz-card-badge">RECORD</span>
-                    <h1 id="profile-callsign-display" style="margin: 0.2em 0 0 0;">---</h1>
-                    <p id="profile-uid-display" style="margin: 0.2em 0 0 0; font-size: 0.75rem; color: var(--light-text-color); font-family: monospace;"></p>
+                    <span class="quiz-card-badge">ACTIVE RECORD</span>
+                    <h1 id="profile-callsign-display" class="profile-callsign">---</h1>
+                    <p id="profile-uid-display" class="profile-uid subtext text-sm"></p>
                 </div>
-                <div style="display: flex; gap: 1em; align-items: center;">
-                    <div class="text-center" style="border: 1px solid var(--border-color); padding: 0.6em 1.2em; border-radius: 6px;">
-                        <div style="font-size: 0.75rem; color: var(--light-text-color);">LIFETIME STARS</div>
-                        <div id="profile-points-display" style="font-size: 1.5rem; font-weight: bold; color: var(--alert-color);">⭐ 0</div>
+                <div class="profile-header-actions flex-col align-end gap-sm">
+                    <div class="text-center profile-stars-box">
+                        <div class="profile-stat-label text-xs font-bold subtext">LIFETIME POINTS</div>
+                        <div id="profile-points-display" class="profile-stars-value font-bold text-alert text-xl">-- PTS
+                        </div>
                     </div>
-                    <button id="btn-change-callsign" class="btn-tactical btn-sm" type="button">
+                    <button id="btn-change-callsign" class="btn-tactical btn-outline btn-sm" type="button">
                         Edit Callsign
                     </button>
                 </div>
             </div>
 
-            <!-- Stats Overview -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1em; margin: 1.5em 0;">
+            <!-- Operational Rank Tracker Widget -->
+            <section class="card rank-card">
+                <div class="rank-icon">
+                    <!-- Dynamic SVG Drill Emblem renders here -->
+                </div>
+                <div class="rank-info flex-1">
+                    <div class="rank-header-row flex-row-between">
+                        <span id="dashboard-user-rank" class="font-bold text-lg">Airman</span>
+                        <span id="dashboard-user-pts" class="text-sm subtext">-- / -- Badges</span>
+                    </div>
+                    <div class="rank-progress-track margin-top-xs">
+                        <div id="dashboard-rank-progress" class="rank-progress-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Metrics Overview Grid -->
+            <div class="profile-grid-auto">
                 <div class="card text-center">
-                    <div style="font-size: 0.8rem; color: var(--light-text-color);">EVALUATIONS COMPLETED</div>
-                    <div id="stat-evals-count" style="font-size: 1.8rem; font-weight: bold; margin-top: 0.2em;">0</div>
+                    <div class="profile-stat-label text-xs font-bold subtext">EVALUATIONS COMPLETED</div>
+                    <div id="stat-evals-count" class="profile-stat-value font-bold text-2xl text-alert margin-top-xs">--
+                    </div>
                 </div>
                 <div class="card text-center">
-                    <div style="font-size: 0.8rem; color: var(--light-text-color);">TOTAL CORRECT ANSWERS</div>
-                    <div id="stat-correct-count" style="font-size: 1.8rem; font-weight: bold; margin-top: 0.2em;">0</div>
+                    <div class="profile-stat-label text-xs font-bold subtext">TOTAL CORRECT ANSWERS</div>
+                    <div id="stat-correct-count" class="profile-stat-value font-bold text-2xl text-alert margin-top-xs">
+                        --</div>
                 </div>
             </div>
 
-            <!-- Badges & Achievements Showcase -->
-            <section class="card" style="margin-top: 1.5em;">
-                <h2 style="margin-bottom: 0.8em;">ACHIEVEMENTS & MILESTONES</h2>
-                <div id="user-badges-grid">
-                    <p style="color: var(--light-text-color);">Loading achievements...</p>
+            <!-- Career Rank Progression Record -->
+            <section class="card profile-section-margin">
+                <div class="flex-row-between margin-bottom-md">
+                    <h2>DRILL RANK PATHWAY</h2>
+                    <span class="text-xs subtext">Unlocked via Achievement Badges</span>
+                </div>
+                <div id="rank-career-history" class="rank-career-grid">
+                    <!-- Dynamic Rank Career History cards render here via JavaScript -->
                 </div>
             </section>
+
+            <!-- Achievements & Badges Showcase -->
+            <section class="card profile-section-margin">
+                <h2>ACHIEVEMENTS & MILESTONES</h2>
+                <div id="user-badges-grid">
+                    <p class="subtext subtext">Loading achievements...</p>
+                </div>
+            </section>
+
         </div>
     </main>
 
@@ -76,10 +129,10 @@
 
     <script type="module" src="/js/pages/profile-page.js"></script>
 
-    <script src="/js/profanity-filter.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script type="module" src="/js/app.js"></script>
 </body>
+
 </html>

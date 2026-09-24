@@ -1,16 +1,28 @@
 import { auth, database } from './config.js';
 import { state } from './state.js';
 import { initializeUserCallsign } from './services/auth-service.js';
-import { initQuizPage, initResultsPage, updateBannerImage, startQuiz } from './components/quiz-engine.js';
+import { subscribeToSubjects } from './services/db-service.js';
+import { initQuizPage, initResultsPage } from './pages/quiz-page.js';
 import { initFlashcards } from './components/flashcards.js';
 import { initLeaderboardPage, updateDashboardMetrics, initTableSorting } from './components/leaderboard.js';
 import { initHubPage, renderUnifiedHub } from './pages/hub-page.js';
-import { populateBranchDropdowns, renderModuleList, renderModuleCards, updateSliderLimits } from './components/navigation.js';
+import { populateBranchDropdowns, renderSubjectList, renderSubjectCards } from './components/navigation.js';
 import { initAdminPage } from './pages/admin-page.js';
+import { initDailyChallenge } from './components/daily-challenge.js';
+import { updateBannerImage, updateSliderLimits, startQuiz } from './pages/quiz-page.js';
+import { showConfirm } from './services/modal-service.js';
 
 document.addEventListener("DOMContentLoaded", () => {
-    
-    // 1. ROUTER: Initialize view controllers
+
+    // 1. IMMEDIATE OPTIMISTIC RENDERING (0ms Delay from Cache)
+    if (document.getElementById("quiz-select")) {
+        populateBranchDropdowns();
+    }
+    if (document.getElementById("quiz-cards-grid")) {
+        renderSubjectCards();
+    }
+
+    // 2. ROUTER: Initialize view controllers
     if (document.getElementById("quiz-view")) initQuizPage();
     if (document.getElementById("results-view")) initResultsPage();
     if (document.getElementById("flashcard-view")) initFlashcards();
@@ -18,13 +30,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById("bank-inspector-list")) initHubPage();
     if (document.getElementById("admin-view")) initAdminPage();
 
-    // HOME PAGE INITIALIZATION (Loads stats grid & top honor roll table)
-    if (document.getElementById("home-view") || document.getElementById("home-top-scores-body")) {
+    // Dashboard Page Stats & Metrics
+    if (document.getElementById("dashboard-view") || document.getElementById("dashboard-top-scores-body")) {
         updateDashboardMetrics();
         initTableSorting("leaderboard-table");
     }
 
-    // 2. SETUP VIEW BINDINGS
+    // 3. SETUP VIEW BINDINGS & CONTROLS
     if (document.getElementById("setup-view")) {
         const quizSelect = document.getElementById("quiz-select");
         const slider = document.getElementById("quiz-question-count-slider");
@@ -50,65 +62,100 @@ document.addEventListener("DOMContentLoaded", () => {
         const btnStudy = document.getElementById("btn-mode-study");
         const btnFlashcards = document.getElementById("btn-mode-flashcards");
 
-        if (btnTest) btnTest.onclick = () => startQuiz("test");
-        if (btnStudy) btnStudy.onclick = () => startQuiz("study");
-        if (btnFlashcards) btnFlashcards.onclick = () => startQuiz("flashcard");
+        if (btnTest) btnTest.addEventListener("click", () => startQuiz("test"));
+        if (btnStudy) btnStudy.addEventListener("click", () => startQuiz("study"));
+        if (btnFlashcards) btnFlashcards.addEventListener("click", () => startQuiz("flashcard"));
     }
 
-    // 3. AUTH OBSERVER: Sync state, roles, and header UI
-    auth.onAuthStateChanged(async (user) => {
-        state.currentUser = user || null;
-        const header = document.querySelector("site-header");
+    // Global Interceptor for External Links
+    document.body.addEventListener("click", async (e) => {
+        const link = e.target.closest("a[href]");
+        if (!link) return;
 
-        if (user) {
-            const callsign = await initializeUserCallsign(user);
+        const href = link.getAttribute("href");
+        if (!href) return;
 
-            // Fetch and store user role in global state
-            try {
-                const roleSnap = await database.ref(`users/${user.uid}/role`).once("value");
-                state.userRole = roleSnap.val() || "user";
-            } catch (err) {
-                console.error("Error fetching user role:", err);
-                state.userRole = "user";
-            }
-
-            if (header && typeof header.renderUser === 'function') {
-                header.renderUser(callsign, state.userPoints || 0);
-            }
-        } else {
-            state.userCallsign = null;
-            state.userPoints = 0;
-            state.userRole = "guest";
-            if (header && typeof header.renderGuest === 'function') {
-                header.renderGuest();
-            }
+        // Skip internal/anchor links or javascript triggers
+        if (href.startsWith("#") || href.startsWith("javascript:") || href.startsWith("mailto:") || href.startsWith("tel:")) {
+            return;
         }
 
-        // Re-run view guards or UI updates dependent on auth role change
+        try {
+            const linkUrl = new URL(href, window.location.href);
+            const currentHost = window.location.hostname;
+
+            // Check if link goes outside current domain
+            const isExternal = linkUrl.hostname !== currentHost && linkUrl.hostname !== "";
+
+            if (isExternal) {
+                e.preventDefault(); // Pause navigation
+
+                const confirmed = await showConfirm(
+                    `You are about to leave and navigate to an external website:\n\n${linkUrl.href}\n\nDo you wish to proceed?`,
+                    "External Link Warning"
+                );
+
+                if (confirmed) {
+                    // Open in a new tab safely if user confirms
+                    window.open(linkUrl.href, "_blank", "noopener,noreferrer");
+                }
+            }
+        } catch (err) {
+            // Ignore invalid/relative URL parsing errors and allow normal navigation
+        }
+    });
+
+    // 4. AUTH OBSERVER: Centralized state sync
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            try {
+                const [callsign, roleSnap, pointsSnap] = await Promise.all([
+                    initializeUserCallsign(user),
+                    database.ref(`users/${user.uid}/role`).once("value"),
+                    database.ref(`users/${user.uid}/points`).once("value")
+                ]);
+
+                const points = pointsSnap.val() || 0;
+                state.userRole = roleSnap.val() || "user";
+
+                state.setUser(user, callsign, points);
+
+            } catch (err) {
+                console.error("Error syncing auth state:", err);
+                state.setUser(user, "User", 0);
+            }
+        } else {
+            state.setUser(null, null, 0);
+            state.userRole = "guest";
+        }
+
         if (document.getElementById("admin-view")) initAdminPage();
         if (document.getElementById("bank-inspector-list")) renderUnifiedHub();
     });
 
-    // 4. DATABASE SYNC: Maintain dynamic question registry & UI elements
-    database.ref("subjects").on("value", (snapshot) => {
-        state.QUESTION_REGISTRY = snapshot.val() || {};
+    // 5. DATABASE SYNC: Real-time subject registry updates via db-service.js
+    subscribeToSubjects(() => {
+        requestAnimationFrame(() => {
+            populateBranchDropdowns();
+            renderSubjectList();
+            renderSubjectCards();
 
-        populateBranchDropdowns();
-        renderModuleList();
-        renderModuleCards();
+            if (document.getElementById("dashboard-view") || document.getElementById("stat-modules-count") || document.getElementById("stat-subjects-count") || document.getElementById("dashboard-top-scores-body")) {
+                updateDashboardMetrics();
+            }
 
-        // Refresh metrics counter when modules load or change
-        if (document.getElementById("home-view") || document.getElementById("home-top-scores-body")) {
-            updateDashboardMetrics();
-        }
+            if (document.getElementById("setup-view")) {
+                updateSliderLimits();
+                updateBannerImage();
+            }
 
-        if (document.getElementById("setup-view")) {
-            updateSliderLimits();
-            updateBannerImage();
-        }
+            if (document.getElementById("bank-inspector-list")) {
+                renderUnifiedHub();
+            }
 
-        if (document.getElementById("bank-inspector-list")) {
-            renderUnifiedHub();
-        }
+            if (document.getElementById("daily-question-text")) {
+                initDailyChallenge();
+            }
+        });
     });
 });

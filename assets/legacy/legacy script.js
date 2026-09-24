@@ -8,7 +8,7 @@ let activeQuestions = [];
 let currentIdx = 0;
 let score = 0;
 let currentUser = null;
-let activeModuleListenerRef = null;
+let activeSubjectListenerRef = null;
 
 const SUPER_UID = 'e8cCmxtEqMN4pr9i3DCkl2yo2iz2';
 
@@ -34,7 +34,7 @@ const googleProvider = new firebase.auth.GoogleAuthProvider();
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
     // Nav Bar Click Event Handlers
-    document.getElementById("nav-home").addEventListener("click", () => showView('home-view'));
+    document.getElementById("nav-dashboard").addEventListener("click", () => showView('dashboard-view'));
     document.getElementById("nav-setup").addEventListener("click", () => showView('setup-view'));
     document.getElementById("nav-leaderboard").addEventListener("click", () => showView('leaderboard-view'));
     document.getElementById("nav-hub").addEventListener("click", () => { 
@@ -52,20 +52,20 @@ document.addEventListener("DOMContentLoaded", () => {
     // Result View Navigation
     document.getElementById("btn-res-another").addEventListener("click", () => showView('setup-view'));
     document.getElementById("btn-res-leaderboard").addEventListener("click", () => showView('leaderboard-view'));
-    document.getElementById("btn-res-home").addEventListener("click", () => showView('home-view'));
+    document.getElementById("btn-res-dashboard").addEventListener("click", () => showView('dashboard-view'));
 
     // Leaderboard Filter
     document.getElementById("filter-leaderboard").addEventListener("change", renderLeaderboard);
 
     // Hub Accordions & Controls
-    document.getElementById("trig-module-form").addEventListener("click", () => toggleAccordion('module-form-accordion'));
+    document.getElementById("trig-subject-form").addEventListener("click", () => toggleAccordion('subject-form-accordion'));
     document.getElementById("trig-question-form").addEventListener("click", () => toggleAccordion('question-form-accordion'));
-    document.getElementById("btn-create-module").addEventListener("click", createNewQuizModule);
+    document.getElementById("btn-create-subject").addEventListener("click", createNewQuizSubject);
     document.getElementById("btn-add-question").addEventListener("click", addCustomQuestion);
     
-    // Unified Hub Module Select & Delete
+    // Unified Hub Subject Select & Delete
     document.getElementById("bank-inspect-select").addEventListener("change", renderUnifiedHub);
-    document.getElementById("btn-delete-module").addEventListener("click", deleteQuizModule);
+    document.getElementById("btn-delete-subject").addEventListener("click", deleteQuizSubject);
 
     // Setup Firebase Auth State Observer
     auth.onAuthStateChanged((user) => {
@@ -89,13 +89,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Global Real-Time Database Reader for Modules Metadata
+    // Global Real-Time Database Reader for Subjects Metadata
     database.ref("subjects").on("value", (snapshot) => {
         const data = snapshot.val();
         if (data) {
             QUESTION_REGISTRY = data;
             populateBranchDropdowns();
-            renderModuleList();
+            renderSubjectList();
             
             const hubView = document.getElementById("hub-view");
             if (hubView && !hubView.classList.contains("hidden")) {
@@ -105,7 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const treeEl = document.getElementById("dynamic-publications-tree");
             if (treeEl) {
                 treeEl.innerHTML = `<div style="color: var(--alert-color); padding: 0.5em; border: 1px dashed var(--alert-color);">
-                    ❌ No quiz modules found in database under 'subjects/'. Use Quiz Hub to create one!
+                    No quiz subjects found in database under 'subjects/'. Use Quiz Hub to create one!
                 </div>`;
             }
         }
@@ -145,7 +145,7 @@ function populateBranchDropdowns() {
     const inspectSelect = document.getElementById("bank-inspect-select");
     const leaderboardSelect = document.getElementById("filter-leaderboard");
 
-    const moduleKeys = Object.keys(QUESTION_REGISTRY);
+    const subjectKeys = Object.keys(QUESTION_REGISTRY);
 
     if (setupSelect) setupSelect.innerHTML = "";
     if (builderTargetSelect) builderTargetSelect.innerHTML = "";
@@ -153,17 +153,17 @@ function populateBranchDropdowns() {
 
     const currentFilter = leaderboardSelect ? leaderboardSelect.value : "ALL";
     if (leaderboardSelect) {
-        leaderboardSelect.innerHTML = `<option value="ALL">All Modules</option>`;
+        leaderboardSelect.innerHTML = `<option value="ALL">All Subjects</option>`;
     }
 
-    if (moduleKeys.length === 0) {
-        if (setupSelect) setupSelect.innerHTML = `<option value="">No Modules Available</option>`;
-        if (builderTargetSelect) builderTargetSelect.innerHTML = `<option value="">No Modules Available</option>`;
-        if (inspectSelect) inspectSelect.innerHTML = `<option value="">No Modules Available</option>`;
+    if (subjectKeys.length === 0) {
+        if (setupSelect) setupSelect.innerHTML = `<option value="">No Subjects Available</option>`;
+        if (builderTargetSelect) builderTargetSelect.innerHTML = `<option value="">No Subjects Available</option>`;
+        if (inspectSelect) inspectSelect.innerHTML = `<option value="">No Subjects Available</option>`;
         return;
     }
 
-    moduleKeys.forEach((key) => {
+    subjectKeys.forEach((key) => {
         const item = QUESTION_REGISTRY[key];
         const label = `${item.branchName || key} (${item.publication || 'Standard'})`;
 
@@ -177,19 +177,19 @@ function populateBranchDropdowns() {
     if (setupSelect && setupSelect.value) activeBranchKey = setupSelect.value;
 }
 
-function renderModuleList() {
+function renderSubjectList() {
     const treeContainer = document.getElementById("dynamic-publications-tree");
     if (!treeContainer) return;
 
-    const moduleKeys = Object.keys(QUESTION_REGISTRY);
+    const subjectKeys = Object.keys(QUESTION_REGISTRY);
 
-    if (moduleKeys.length === 0) {
-        treeContainer.innerHTML = `<span style="color: var(--light-text-color);">No modules registered in database yet.</span>`;
+    if (subjectKeys.length === 0) {
+        treeContainer.innerHTML = `<span style="color: var(--light-text-color);">No subjects registered in database yet.</span>`;
         return;
     }
 
     let html = `<ul class="tree">`;
-    moduleKeys.forEach((key) => {
+    subjectKeys.forEach((key) => {
         const item = QUESTION_REGISTRY[key];
         const rawQs = item.questions;
         const count = rawQs ? (Array.isArray(rawQs) ? rawQs.length : Object.keys(rawQs).length) : 0;
@@ -209,14 +209,14 @@ function renderModuleList() {
 }
 
 function showView(viewId) {
-    const views = ['home-view', 'setup-view', 'quiz-view', 'results-view', 'leaderboard-view', 'hub-view'];
+    const views = ['dashboard-view', 'setup-view', 'quiz-view', 'results-view', 'leaderboard-view', 'hub-view'];
     views.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.toggle('hidden', id !== viewId);
     });
 
     const navMap = {
-        'home-view': 'nav-home',
+        'dashboard-view': 'nav-dashboard',
         'setup-view': 'nav-setup',
         'leaderboard-view': 'nav-leaderboard',
         'hub-view': 'nav-hub'
@@ -227,7 +227,7 @@ function showView(viewId) {
         document.getElementById(navMap[viewId]).classList.add('active-nav');
     }
 
-    if (viewId === 'home-view') updateDashboardMetrics();
+    if (viewId === 'dashboard-view') updateDashboardMetrics();
     if (viewId === 'leaderboard-view') renderLeaderboard();
     if (viewId === 'hub-view') renderUnifiedHub();
 }
@@ -273,18 +273,18 @@ function updateDashboardMetrics() {
         const totalEl = document.getElementById("stat-total-evals");
         if (totalEl) totalEl.innerText = logs.length;
 
-        const modulesCountEl = document.getElementById("stat-modules-count");
-        if (modulesCountEl) modulesCountEl.innerText = Object.keys(QUESTION_REGISTRY).length;
+        const subjectsCountEl = document.getElementById("stat-subjects-count");
+        if (subjectsCountEl) subjectsCountEl.innerText = Object.keys(QUESTION_REGISTRY).length;
 
-        const homeTopBody = document.getElementById("home-top-scores-body");
-        if (homeTopBody) {
+        const dashboardTopBody = document.getElementById("dashboard-top-scores-body");
+        if (dashboardTopBody) {
             logs.sort((a, b) => b.pct - a.pct);
             const topPerformers = logs.slice(0, 5);
 
             if (topPerformers.length === 0) {
-                homeTopBody.innerHTML = `<tr><td colspan="4" class="text-center" style="color: var(--light-text-color);">No scores logged yet. Be the first!</td></tr>`;
+                dashboardTopBody.innerHTML = `<tr><td colspan="4" class="text-center" style="color: var(--light-text-color);">No scores logged yet. Be the first!</td></tr>`;
             } else {
-                homeTopBody.innerHTML = topPerformers.map((entry, idx) => `
+                dashboardTopBody.innerHTML = topPerformers.map((entry, idx) => `
                     <tr>
                         <td><strong>#${idx + 1} ${entry.name}</strong></td>
                         <td>${entry.branch}</td>
@@ -306,7 +306,7 @@ function startQuiz() {
     
     const selectEl = document.getElementById("quiz-select");
     if (!selectEl || !selectEl.value) {
-        alert("Please select a quiz module first!");
+        alert("Please select a quiz subject first!");
         return;
     }
     
@@ -314,7 +314,7 @@ function startQuiz() {
     const registryEntry = QUESTION_REGISTRY[activeBranchKey];
 
     if (!registryEntry || !registryEntry.questions) {
-        alert("No questions found for this module in Firebase.");
+        alert("No questions found for this subject in Firebase.");
         return;
     }
 
@@ -324,14 +324,14 @@ function startQuiz() {
         : Object.values(rawQuestions);
 
     if (activeQuestions.length === 0) {
-        alert("This module does not have any questions added yet!");
+        alert("This subject does not have any questions added yet!");
         return;
     }
 
     currentIdx = 0;
     score = 0;
 
-    document.getElementById("quiz-standard-badge").innerText = `[MODULE: ${activeBranchKey}]`;
+    document.getElementById("quiz-standard-badge").innerText = `[SUBJECT: ${activeBranchKey}]`;
     showView('quiz-view');
     loadQuestion();
 }
@@ -350,7 +350,7 @@ function loadQuestion() {
 
     q.options.forEach((opt, idx) => {
         const btn = document.createElement("button");
-        btn.className = "option-btn";
+        btn.className = "btn-option";
         btn.innerText = `${idx + 1}. ${opt}`;
         btn.onclick = () => selectOption(idx);
         container.appendChild(btn);
@@ -359,7 +359,7 @@ function loadQuestion() {
 
 function selectOption(selectedIdx) {
     const q = activeQuestions[currentIdx];
-    const buttons = document.querySelectorAll("#options-container .option-btn");
+    const buttons = document.querySelectorAll("#options-container .btn-option");
 
     buttons.forEach(btn => btn.disabled = true);
 
@@ -548,7 +548,7 @@ window.voteQuestion = voteQuestion;
 function renderUnifiedHub() {
     const inspectSelect = document.getElementById("bank-inspect-select");
     const container = document.getElementById("bank-inspector-list");
-    const deleteModBtn = document.getElementById("btn-delete-module");
+    const deleteModBtn = document.getElementById("btn-delete-subject");
     const authStatus = document.getElementById("hub-auth-status");
 
     if (!inspectSelect || !inspectSelect.value || !container) return;
@@ -557,7 +557,7 @@ function renderUnifiedHub() {
     const data = QUESTION_REGISTRY[branch];
     const userUid = currentUser ? currentUser.uid : null;
     const isSuper = userUid === SUPER_UID;
-    const isModuleOwner = data && data.createdBy && data.createdBy === userUid;
+    const isSubjectOwner = data && data.createdBy && data.createdBy === userUid;
 
     if (authStatus) {
         if (isSuper) {
@@ -572,15 +572,15 @@ function renderUnifiedHub() {
     if (!data) return;
 
     if (deleteModBtn) {
-        deleteModBtn.classList.toggle("hidden", !(isSuper || isModuleOwner));
+        deleteModBtn.classList.toggle("hidden", !(isSuper || isSubjectOwner));
     }
 
-    if (activeModuleListenerRef) {
-        activeModuleListenerRef.off();
+    if (activeSubjectListenerRef) {
+        activeSubjectListenerRef.off();
     }
 
-    activeModuleListenerRef = database.ref(`subjects/${branch}/questions`);
-    activeModuleListenerRef.on("value", (snapshot) => {
+    activeSubjectListenerRef = database.ref(`subjects/${branch}/questions`);
+    activeSubjectListenerRef.on("value", (snapshot) => {
         const rawQs = snapshot.val() || {};
         const questionsList = Array.isArray(rawQs) 
             ? rawQs.map((q, idx) => ({ id: idx, ...q }))
@@ -588,13 +588,13 @@ function renderUnifiedHub() {
 
         if (questionsList.length === 0) {
             container.innerHTML = `<div style="padding: 0.8em; color: var(--light-text-color); border: 1px dashed var(--primary-color);">
-                No questions exist in module '${branch}' yet. Use the accordion above to add one!
+                No questions exist in subject '${branch}' yet. Use the accordion above to add one!
             </div>`;
             return;
         }
 
         container.innerHTML = questionsList.map((q, idx) => {
-            const canEditQuestion = isSuper || isModuleOwner || (q.createdBy && q.createdBy === userUid);
+            const canEditQuestion = isSuper || isSubjectOwner || (q.createdBy && q.createdBy === userUid);
             const optsArray = Array.isArray(q.options) ? q.options : Object.values(q.options || []);
 
             // 1. Calculate Votes (Support BOTH new 'votes' map AND legacy 'upvotes'/'downvotes' numbers)
@@ -646,7 +646,7 @@ function renderUnifiedHub() {
                     <div style="padding: 1em; border-radius: 4px; margin-bottom: 0.8em; background: rgba(0,0,0,0.05); border: 1px solid var(--primary-color);">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5em;">
                             <strong>Q${idx + 1} (Owner / Admin Control)</strong>
-                            <button onclick="window.deleteQuestion('${branch}', '${q.id}')" class="btn-tactical btn-clear">Delete</button>
+                            <button onclick="window.deleteQuestion('${branch}', '${q.id}')" class="btn-tactical btn-red">Delete</button>
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 0.4em;">
                             <input type="text" id="edit-q-${q.id}" value="${q.q ? q.q.replace(/"/g, '&quot;') : ''}">
@@ -687,7 +687,7 @@ function renderUnifiedHub() {
     });
 }
 
-function createNewQuizModule() {
+function createNewQuizSubject() {
     const keyInput = document.getElementById("new-quiz-key").value.trim();
     const titleInput = document.getElementById("new-quiz-title").value.trim();
     const catInput = document.getElementById("new-quiz-category").value.trim();
@@ -696,17 +696,17 @@ function createNewQuizModule() {
     const cleanKey = keyInput.toUpperCase().replace(/[^A-Z0-9_]/g, '');
 
     if (!cleanKey || !titleInput) {
-        alert("Please provide at least a Module Key and Quiz Title.");
+        alert("Please provide at least a Subject Key and Quiz Title.");
         return;
     }
 
     if (!window.validateInputsClean([keyInput, titleInput, catInput, publicationInput])) {
-        alert("Inappropriate language detected in your module fields. Please revise your text.");
+        alert("Inappropriate language detected in your subject fields. Please revise your text.");
         return;
     }
 
     if (!currentUser) {
-        alert("You must be logged in to create a module!");
+        alert("You must be logged in to create a subject!");
         return;
     }
 
@@ -721,17 +721,17 @@ function createNewQuizModule() {
         document.getElementById("new-quiz-title").value = "";
         document.getElementById("new-quiz-category").value = "";
         document.getElementById("new-quiz-publication").value = "";
-        toggleAccordion('module-form-accordion');
-        alert(`Module '${cleanKey}' created successfully in cloud database!`);
+        toggleAccordion('subject-form-accordion');
+        alert(`Subject '${cleanKey}' created successfully in cloud database!`);
     }).catch((err) => {
-        alert("Error creating module: " + err.message);
+        alert("Error creating subject: " + err.message);
     });
 }
 
 function addCustomQuestion() {
     const selectEl = document.getElementById("builder-target-quiz");
     if (!selectEl || !selectEl.value) {
-        alert("Please select a target module first.");
+        alert("Please select a target subject first.");
         return;
     }
 
@@ -829,18 +829,18 @@ function deleteQuestion(branchKey, questionId) {
     }
 }
 
-function deleteQuizModule() {
+function deleteQuizSubject() {
     const selectEl = document.getElementById("bank-inspect-select");
     if (!selectEl || !selectEl.value) return;
 
     const branchKey = selectEl.value;
 
-    if (confirm(`CRITICAL WARNING: Permanently delete module '${branchKey}' and ALL its questions from Firebase?`)) {
+    if (confirm(`CRITICAL WARNING: Permanently delete subject '${branchKey}' and ALL its questions from Firebase?`)) {
         database.ref(`subjects/${branchKey}`).remove()
             .then(() => {
-                alert(`Module '${branchKey}' deleted!`);
+                alert(`Subject '${branchKey}' deleted!`);
             })
-            .catch(err => alert("Module delete failed: " + err.message));
+            .catch(err => alert("Subject delete failed: " + err.message));
     }
 }
 

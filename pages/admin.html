@@ -5,41 +5,69 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="/assets/images/emblems/icon.svg">
-    <title>PROP - Personnel Management</title>
+    <title>Personnel Management</title>
     <link rel="stylesheet" href="../styles.css">
 
     <!-- Web Components -->
     <script type="module" src="/js/components/header.js"></script>
     <script type="module" src="/js/components/footer.js"></script>
-    <script type="module" src="/js/pages/modal-element.js"></script>
+    <script type="module" src="/js/components/modal-element.js"></script>
 </head>
 
 <body>
 
-    <site-header></site-header>
+    <site-header>
+        <!-- Static Skeleton Shell (Prevents Header Glitch) -->
+        <nav id="navbar">
+            <div class="nav-links">
+                <a href="index.html" class="active-nav">Dashboard</a>
+                <a href="setup.html">Practice</a>
+                <a href="leaderboard.html">Leaderboard</a>
+            </div>
+            <div class="nav-search-wrapper">
+                <input type="text" class="nav-search-input" placeholder="Search Subjects..." disabled />
+            </div>
+            <div class="nav-controls">
+                <div class="badge-status badge-verified nav-pts-badge">⭐ ...</div>
+            </div>
+        </nav>
+    </site-header>
 
     <main>
         <section id="admin-view" class="col">
-            <h1>Personnel &amp; Moderation Hub</h1>
+            <h1 class="margin-none">Personnel &amp; Moderation</h1>
             <p style="font-size: 0.85rem; color: var(--light-text-color);">
-                Look up cadets, review performance logs, inspect user-submitted questions, or adjust authorization roles.
+                Look up cadets, review performance logs, inspect user-submitted questions, or adjust authorization
+                roles.
             </p>
 
             <div id="admin-auth-guard" class="advisory" style="margin-bottom: 1.5em;">
                 Checking authorization privileges...
             </div>
 
-            <!-- Search Panel -->
-            <div class="quiz-card" style="margin-bottom: 1.5em; padding: 1.2em;">
-                <h3 style="margin-top: 0;">🔍 Inspector</h3>
+            <!-- Search Bar Panel -->
+            <div>
+                <h3 style="margin-top: 0;">Personnel Directory Inspector</h3>
                 <div style="display: flex; gap: 0.5em; flex-wrap: wrap;">
-                    <input type="text" id="admin-user-search" placeholder="Enter Email, Callsign, or UID..." style="flex: 1; min-width: 140px;">
+                    <input type="text" id="admin-user-search" placeholder="Search by Email, Callsign, or UID..."
+                        style="flex: 1; min-width: 200px;">
                     <button id="btn-admin-search" class="btn-tactical btn-gold">Search</button>
                 </div>
             </div>
+            <hr>
+            <!-- Full Registered Personnel Directory List -->
+            <div>
+                <h3 style="margin-top: 0;">Personnel Roster</h3>
+                <div id="admin-user-list-container">
+                    <p class="subtext">Loading personnel roster...</p>
+                </div>
+            </div>
 
-            <!-- Results Container -->
+            <!-- Profile & Activity Inspector Container -->
             <div id="admin-user-profile-container"></div>
+
+            <!-- Flagged Questions Moderation Queue -->
+            <div id="admin-flagged-questions-container" class="margin-top-md"></div>
         </section>
     </main>
 

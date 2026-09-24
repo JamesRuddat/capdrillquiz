@@ -1,11 +1,57 @@
 import { database, SUPER_UID } from '../config.js';
 import { state } from '../state.js';
 import { validateInputsClean } from '../profanity-filter.js';
-import { awardPoints, showToast, updateUserRole, findUserByQuery } from '../services/user-service.js';
+import { awardPoints, showToast } from '../services/user-service.js';
 import { voteQuestion, toggleQuestionFlag, verifyQuestion, deleteQuestion } from '../services/db-service.js';
-import { showConfirm } from './modal.js';
+import { showConfirm } from '/js/services/modal-service.js';
 
 let isInitialLoadComplete = false;
+
+/**
+ * Global helper attached to window to append dynamic link rows in Hub forms
+ */
+window.addLinkRow = function (containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const rowDiv = document.createElement("div");
+    rowDiv.className = "dynamic-link-row flex-row-between gap-sm margin-top-xs";
+    rowDiv.innerHTML = `
+        <input type="text" class="link-label flex-1" placeholder="Button Label (e.g., Leadership Practice Test)">
+        <input type="text" class="link-url flex-1" placeholder="URL path or https://...">
+        <select class="link-type">
+            <option value="quiz">Quiz</option>
+            <option value="simulator">Simulator</option>
+            <option value="pdf">PDF Handbook</option>
+        </select>
+        <button type="button" class="btn-tactical btn-red btn-sm" onclick="this.parentElement.remove()">✕</button>
+    `;
+    container.appendChild(rowDiv);
+};
+
+/**
+ * Scans a container for dynamic link rows and extracts an array of link objects
+ */
+function collectDynamicLinksFromDOM(containerId) {
+    const rows = document.querySelectorAll(`#${containerId} .dynamic-link-row`);
+    const links = [];
+
+    rows.forEach(row => {
+        const label = row.querySelector('.link-label')?.value.trim();
+        const url = row.querySelector('.link-url')?.value.trim();
+        const type = row.querySelector('.link-type')?.value;
+
+        if (url) {
+            links.push({
+                label: label || 'Resource',
+                url: url,
+                type: type || 'quiz'
+            });
+        }
+    });
+
+    return links;
+}
 
 /**
  * Utility: Converts uploaded image file to a compressed Base64 string
@@ -56,8 +102,86 @@ function formatTextWithLinks(text = "") {
     if (!text) return "";
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     return text.replace(urlRegex, (url) => {
-        return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: var(--primary-color, #4ea8de); text-decoration: underline;">${url}</a>`;
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-link">${url}</a>`;
     });
+}
+
+/**
+ * Utility: Resolves custom launcher page URL
+ */
+function getSubjectLaunchUrl(data, branchKey) {
+    if (data && data.url) return data.url;
+
+    if (branchKey === "DRILL_36_2203") return "/pages/drill.html";
+    if (branchKey === "ELT_DF_SIM" || branchKey === "DF_SEARCH_SIM") return "/pages/df-search.html";
+
+    return null;
+}
+
+/**
+ * Utility: Sorts subject keys based on chosen sort criteria
+ */
+export function getSortedSubjectKeys(registry = {}, sortBy = "newest") {
+    const keys = Object.keys(registry || {});
+
+    return keys.sort((a, b) => {
+        const itemA = registry[a] || {};
+        const itemB = registry[b] || {};
+
+        const timeA = itemA.createdAt ? new Date(itemA.createdAt).getTime() : 0;
+        const timeB = itemB.createdAt ? new Date(itemB.createdAt).getTime() : 0;
+
+        if (sortBy === "newest") {
+            if (timeB !== timeA) return timeB - timeA;
+            return (itemA.branchName || a).localeCompare(itemB.branchName || b);
+        }
+
+        if (sortBy === "oldest") {
+            if (timeA !== timeB) return timeA - timeB;
+            return (itemA.branchName || a).localeCompare(itemB.branchName || b);
+        }
+
+        if (sortBy === "title") {
+            const nameA = (itemA.branchName || a).toLowerCase();
+            const nameB = (itemB.branchName || b).toLowerCase();
+            return nameA.localeCompare(nameB);
+        }
+
+        if (sortBy === "questions") {
+            const countA = Array.isArray(itemA.questions) ? itemA.questions.length : Object.keys(itemA.questions || {}).length;
+            const countB = Array.isArray(itemB.questions) ? itemB.questions.length : Object.keys(itemB.questions || {}).length;
+            if (countB !== countA) return countB - countA;
+            return timeB - timeA;
+        }
+
+        return 0;
+    });
+}
+
+/**
+ * Populates dropdown inspector options sorted by selected order
+ */
+export function populateInspectSelectOptions(sortBy = "newest") {
+    const inspectSelect = document.getElementById("bank-inspect-select");
+    if (!inspectSelect) return;
+
+    const registry = state.QUESTION_REGISTRY || {};
+    const sortedKeys = getSortedSubjectKeys(registry, sortBy);
+
+    let optionsHTML = `<option value="">-- Select a Subject --</option>`;
+
+    sortedKeys.forEach(key => {
+        const mod = registry[key];
+        let timeLabel = "";
+        if (mod.createdAt) {
+            const d = new Date(mod.createdAt);
+            timeLabel = ` (${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`;
+        }
+
+        optionsHTML += `<option value="${key}">${mod.branchName || key}${timeLabel}</option>`;
+    });
+
+    inspectSelect.innerHTML = optionsHTML;
 }
 
 /**
@@ -70,10 +194,10 @@ export function initHubPage() {
         inspectSelect.addEventListener("change", handleSubjectSelectChange);
     }
 
-    const deleteModBtn = document.getElementById("btn-delete-module");
+    const deleteModBtn = document.getElementById("btn-delete-subject");
     if (deleteModBtn) {
-        deleteModBtn.removeEventListener("click", deleteQuizModule);
-        deleteModBtn.addEventListener("click", deleteQuizModule);
+        deleteModBtn.removeEventListener("click", deleteQuizSubject);
+        deleteModBtn.addEventListener("click", deleteQuizSubject);
     }
 
     const addQuestionBtn = document.getElementById("btn-add-question-card");
@@ -88,9 +212,16 @@ export function initHubPage() {
         };
     }
 
-    const createCardBtn = document.getElementById("btn-create-module-card");
+    const sortSelect = document.getElementById("hub-sort-select");
+    if (sortSelect) {
+        sortSelect.addEventListener("change", (e) => {
+            populateInspectSelectOptions(e.target.value);
+        });
+    }
+
+    const createCardBtn = document.getElementById("btn-create-subject-card");
     if (createCardBtn) {
-        createCardBtn.onclick = () => toggleCreateModuleCard(true);
+        createCardBtn.onclick = () => toggleCreateSubjectCard(true);
     }
 
     // Dynamic Click & Change Handler
@@ -105,16 +236,22 @@ export function initHubPage() {
             const qid = btn.dataset.qid;
 
             switch (action) {
-                case "submit-new-module": submitNewModuleCard(); break;
-                case "cancel-create-module": toggleCreateModuleCard(false); break;
-                case "edit-module": toggleEditModule(branch); break;
-                case "save-module": saveModuleEdit(branch); break;
-                case "cancel-edit-module": toggleEditModule(null); break;
-                case "launch-module":
-                    const selectEl = document.getElementById("quiz-select") || document.getElementById("bank-inspect-select");
-                    if (selectEl) selectEl.value = branch;
-                    window.location.href = "setup.html";
+                case "submit-new-subject": submitNewSubjectCard(); break;
+                case "cancel-create-subject": toggleCreateSubjectCard(false); break;
+                case "edit-subject": toggleEditSubject(branch); break;
+                case "save-subject": saveSubjectEdit(branch); break;
+                case "cancel-edit-subject": toggleEditSubject(null); break;
+                case "launch-subject": {
+                    const targetUrl = btn.dataset.url;
+                    if (targetUrl) {
+                        window.location.href = targetUrl;
+                    } else {
+                        const selectEl = document.getElementById("quiz-select") || document.getElementById("bank-inspect-select");
+                        if (selectEl) selectEl.value = branch;
+                        window.location.href = `setup.html?subject=${branch}`;
+                    }
                     break;
+                }
                 case "save-q": saveQuestionEdit(branch, qid); break;
                 case "delete-q": deleteQuestion(branch, qid); break;
                 case "vote":
@@ -126,12 +263,13 @@ export function initHubPage() {
                 case "verify-q":
                     verifyQuestion(branch, qid);
                     break;
-                case "trigger-create-from-blank": toggleCreateModuleCard(true); break;
-                case "trigger-file-upload":
+                case "trigger-create-from-blank": toggleCreateSubjectCard(true); break;
+                case "trigger-file-upload": {
                     const targetInputId = btn.dataset.target;
                     const fileInput = document.getElementById(`${targetInputId}-file`);
                     if (fileInput) fileInput.click();
                     break;
+                }
             }
         };
 
@@ -145,46 +283,39 @@ export function initHubPage() {
         };
     }
 
-    // Wait for database sync before initial state selection
     database.ref('subjects').once('value', (snapshot) => {
         state.QUESTION_REGISTRY = snapshot.val() || {};
         isInitialLoadComplete = true;
-        
-        populateInspectSelectOptions();
+
+        const currentSort = sortSelect ? sortSelect.value : "newest";
+        populateInspectSelectOptions(currentSort);
         processUrlRouteParameters();
     });
-}
-
-function populateInspectSelectOptions() {
-    const inspectSelect = document.getElementById("bank-inspect-select");
-    if (!inspectSelect) return;
-
-    const keys = Object.keys(state.QUESTION_REGISTRY || {});
-    let optionsHTML = `<option value="">-- Select a Subject --</option>`;
-
-    keys.forEach(key => {
-        const mod = state.QUESTION_REGISTRY[key];
-        optionsHTML += `<option value="${key}">${mod.branchName || key}</option>`;
-    });
-
-    inspectSelect.innerHTML = optionsHTML;
 }
 
 function processUrlRouteParameters() {
     const urlParams = new URLSearchParams(window.location.search);
     const searchQuery = urlParams.get("search")?.trim();
     const editSubjectKey = urlParams.get("subject")?.trim();
+    const autoEditMode = urlParams.get("edit") === "true";
     const inspectSelect = document.getElementById("bank-inspect-select");
 
     if (editSubjectKey && state.QUESTION_REGISTRY[editSubjectKey]) {
         if (inspectSelect) inspectSelect.value = editSubjectKey;
-        state.isCreatingNewModule = false;
+        state.isCreatingNewSubject = false;
+
+        if (autoEditMode) {
+            state.editingSubjectKey = editSubjectKey;
+        } else {
+            state.editingSubjectKey = null;
+        }
+
         renderUnifiedHub();
         return;
     }
 
     if (searchQuery) {
-        state.isCreatingNewModule = true;
+        state.isCreatingNewSubject = true;
         if (inspectSelect) inspectSelect.value = "";
         renderUnifiedHub();
 
@@ -196,44 +327,45 @@ function processUrlRouteParameters() {
             }
         }, 50);
 
-        showToast(`Creating new module for "${searchQuery}"`, "info");
+        showToast(`Creating new subject for "${searchQuery}"`, "info");
         return;
     }
 
-    // Default: Blank State
     if (inspectSelect) inspectSelect.value = "";
-    state.isCreatingNewModule = false;
+    state.isCreatingNewSubject = false;
     renderUnifiedHub();
 }
 
 function handleSubjectSelectChange(e) {
-    state.isCreatingNewModule = false;
-    state.editingModuleKey = null;
+    state.isCreatingNewSubject = false;
+    state.editingSubjectKey = null;
     renderUnifiedHub();
 }
 
-export function toggleEditModule(key) {
-    state.isCreatingNewModule = false;
-    state.editingModuleKey = state.editingModuleKey === key ? null : key;
+export function toggleEditSubject(key) {
+    state.isCreatingNewSubject = false;
+    state.editingSubjectKey = state.editingSubjectKey === key ? null : key;
     renderUnifiedHub();
 }
 
-export function toggleCreateModuleCard(show) {
-    state.editingModuleKey = null;
-    state.isCreatingNewModule = show;
-    
+export function toggleCreateSubjectCard(show) {
+    state.editingSubjectKey = null;
+    state.isCreatingNewSubject = show;
+
     const inspectSelect = document.getElementById("bank-inspect-select");
     if (show && inspectSelect) inspectSelect.value = "";
-    
+
     renderUnifiedHub();
 }
 
-export function saveModuleEdit(key) {
+export function saveSubjectEdit(key) {
     const catVal = document.getElementById("edit-mod-category")?.value.trim();
     const titleVal = document.getElementById("edit-mod-title")?.value.trim();
     const publicationVal = document.getElementById("edit-mod-publication")?.value.trim();
     const descVal = document.getElementById("edit-mod-description")?.value.trim() || "";
     const bgVal = document.getElementById("edit-mod-bg")?.value.trim() || "";
+
+    const dynamicLinks = collectDynamicLinksFromDOM("edit-dynamic-links-container");
 
     if (!catVal || !titleVal || !publicationVal) return;
 
@@ -246,6 +378,7 @@ export function saveModuleEdit(key) {
         category: catVal || "General",
         branchName: titleVal || key,
         publication: publicationVal || "Standard Regulation",
+        links: dynamicLinks,
         description: descVal,
         imageUrl: bgVal
     };
@@ -255,16 +388,16 @@ export function saveModuleEdit(key) {
             if (state.QUESTION_REGISTRY[key]) {
                 Object.assign(state.QUESTION_REGISTRY[key], updatedData);
             }
-            state.editingModuleKey = null;
+            state.editingSubjectKey = null;
             renderUnifiedHub();
-            showToast("Module updated successfully!", "success");
+            showToast("Subject updated successfully!", "success");
         })
-        .catch(err => showToast("Failed to save module: " + err.message, "error"));
+        .catch(err => showToast("Failed to save subject: " + err.message, "error"));
 }
 
-export function submitNewModuleCard() {
+export function submitNewSubjectCard() {
     if (!state.currentUser) {
-        showToast("You must be logged in to create a module!", "error");
+        showToast("You must be logged in to create a subject!", "error");
         return;
     }
 
@@ -275,10 +408,11 @@ export function submitNewModuleCard() {
     const descVal = document.getElementById("create-mod-description")?.value.trim() || "";
     const bgVal = document.getElementById("create-mod-bg")?.value.trim() || "";
 
+    const dynamicLinks = collectDynamicLinksFromDOM("create-dynamic-links-container");
     const cleanKey = keyVal.toUpperCase().replace(/[^A-Z0-9_]/g, '');
 
     if (!cleanKey || !titleVal) {
-        showToast("Please enter a Module Key ID and Title.", "error");
+        showToast("Please enter a Subject Key ID and Title.", "error");
         return;
     }
 
@@ -292,29 +426,34 @@ export function submitNewModuleCard() {
         return;
     }
 
-    const newModuleData = {
+    const newSubjectData = {
         branchName: titleVal,
         category: catVal,
         publication: publicationVal,
+        links: dynamicLinks,
         description: descVal,
         imageUrl: bgVal,
         createdBy: state.currentUser.uid,
+        createdAt: new Date().toISOString(),
         questions: {}
     };
 
-    database.ref(`subjects/${cleanKey}`).set(newModuleData)
+    database.ref(`subjects/${cleanKey}`).set(newSubjectData)
         .then(() => {
-            state.isCreatingNewModule = false;
-            state.editingModuleKey = cleanKey;
+            state.isCreatingNewSubject = false;
+            state.editingSubjectKey = cleanKey;
+
+            const sortSelect = document.getElementById("hub-sort-select");
+            populateInspectSelectOptions(sortSelect ? sortSelect.value : "newest");
 
             const selectEl = document.getElementById("bank-inspect-select");
             if (selectEl) selectEl.value = cleanKey;
 
-            awardPoints(100, "Creating a New Subject Module");
+            awardPoints(100, "Creating a New Subject");
             renderUnifiedHub();
             showToast("New subject published!", "success");
         })
-        .catch(err => showToast("Failed to publish module: " + err.message, "error"));
+        .catch(err => showToast("Failed to publish subject: " + err.message, "error"));
 }
 
 export function addBlankQuestionCard(branchKey) {
@@ -326,10 +465,8 @@ export function addBlankQuestionCard(branchKey) {
     const userUid = state.currentUser.uid;
     const isSuper = userUid === SUPER_UID;
     const userRole = state.userRole || (isSuper ? "admin" : "user");
-    
-    // Verified Authors (Admins & Moderators) auto-verify their creations
-    const isVerifiedAuthor = isSuper || userRole === "admin" || userRole === "mod";
 
+    const isVerifiedAuthor = isSuper || userRole === "admin" || userRole === "mod";
     const newQRef = database.ref(`subjects/${branchKey}/questions`).push();
 
     const newQuestionData = {
@@ -355,7 +492,7 @@ export function addBlankQuestionCard(branchKey) {
 export function renderUnifiedHub() {
     const inspectSelect = document.getElementById("bank-inspect-select");
     const container = document.getElementById("bank-inspector-list");
-    const deleteModBtn = document.getElementById("btn-delete-module");
+    const deleteModBtn = document.getElementById("btn-delete-subject");
     const authStatus = document.getElementById("hub-auth-status");
 
     if (!container) return;
@@ -363,58 +500,50 @@ export function renderUnifiedHub() {
     const userUid = state.currentUser ? state.currentUser.uid : null;
     const isSuper = userUid === SUPER_UID;
     const userRole = state.userRole || (isSuper ? "admin" : "user");
-    const isAdmin = isSuper || userRole === "admin";
 
-if (authStatus) {
+    if (authStatus) {
         let roleBadge = "Guest";
         if (isSuper) roleBadge = "SUPER ADMIN";
         else if (userRole === "admin") roleBadge = "ADMIN";
         else if (userRole === "mod") roleBadge = "MODERATOR";
         else if (state.currentUser) roleBadge = "CADET";
 
-        const isModOrAdmin = isSuper || userRole === "admin" || userRole === "mod";
-
         authStatus.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div class="hub-auth-banner">
                 <span>Status: <strong>${roleBadge}</strong> (${state.userCallsign || state.currentUser?.email || 'Read-Only'})</span>
-                ${isModOrAdmin ? `
-                    <button id="btn-manage-roles" class="btn-tactical btn-gold btn-sm" style="padding: 0.3em 0.7em;">
-                        ⚙️ Open Personnel Panel
-                    </button>
-                ` : ''}
             </div>
         `;
-
-        // Wire click handler to open admin.html panel
-        const manageBtn = document.getElementById("btn-manage-roles");
-        if (manageBtn) {
-            manageBtn.onclick = () => {
-                window.location.href = "admin.html";
-            };
-        }
     }
 
-    // 1. Create New Subject View
-    if (state.isCreatingNewModule) {
+    // 1. Create New Subject Form
+    if (state.isCreatingNewSubject) {
         container.innerHTML = `
-            <div class="quiz-card" style="margin-bottom: 1.2em; border: 2px dashed var(--primary-color); padding: 1.2em;">
-                <h3 style="margin: 0 0 0.6em 0; color: var(--primary-color);">➕ Create New Subject</h3>
-                <div style="display: flex; flex-direction: column; gap: 0.5em;">
-                    <input type="text" id="create-mod-key" placeholder="Module Key ID (e.g., CAP_AERO_CH1)">
-                    <input type="text" id="create-mod-title" placeholder="Module Title (e.g., Aerospace Chapter 1)">
-                    <input type="text" id="create-mod-category" placeholder="Category (e.g., Leadership, Drill, Aero)">
+            <div class="quiz-card hub-create-card">
+                <h3 class="hub-create-title">Create New Subject</h3>
+                <div class="hub-form-stack">
+                    <input type="text" id="create-mod-key" placeholder="Subject Key ID (e.g., CAP_DRILL, CAP_STAFF)">
+                    <input type="text" id="create-mod-title" placeholder="Subject Title (e.g., Civil Air Patrol Drill)">
+                    <input type="text" id="create-mod-category" placeholder="Category (e.g., Drill, Leadership, ES)">
                     <input type="text" id="create-mod-publication" placeholder="Publication Citation (e.g., CAPP 60-33)">
-                    <textarea id="create-mod-description" placeholder="Subject Description & Study Links (http://...)" rows="3" style="width: 100%; font-family: inherit; padding: 0.5em; border-radius: 4px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-color);"></textarea>
                     
-                    <div style="display: flex; gap: 0.5em; align-items: center;">
-                        <input type="text" id="create-mod-bg" placeholder="Background Image URL or Upload Image" style="flex: 1;">
-                        <input type="file" id="create-mod-bg-file" data-text-target="create-mod-bg" accept="image/*" style="display: none;">
-                        <button type="button" class="btn-tactical btn-gold" data-action="trigger-file-upload" data-target="create-mod-bg">📁 Upload</button>
+                    <div id="create-dynamic-links-container" class="hub-form-stack-xs margin-top-xs">
+                        <label class="font-bold text-sm">Action Buttons / Practice Sets:</label>
+                    </div>
+                    <button type="button" class="btn-tactical btn-gold btn-sm margin-bottom-xs" onclick="window.addLinkRow('create-dynamic-links-container')">
+                        Add Link
+                    </button>
+
+                    <textarea id="create-mod-description" placeholder="Subject Description" rows="3" class="hub-textarea"></textarea>
+                    
+                    <div class="hub-file-upload-row">
+                        <input type="text" id="create-mod-bg" placeholder="Card Background Image URL or Upload Image" class="flex-1">
+                        <input type="file" id="create-mod-bg-file" data-text-target="create-mod-bg" accept="image/*" class="hidden">
+                        <button type="button" class="btn-tactical btn-gold" data-action="trigger-file-upload" data-target="create-mod-bg">Upload</button>
                     </div>
                 </div>
-                <div class="quiz-card-footer" style="display: flex; gap: 0.5em; margin-top: 0.8em;">
-                    <button class="btn-tactical" data-action="submit-new-module" style="flex: 1;">Publish Subject</button>
-                    <button class="btn-tactical btn-clear" data-action="cancel-create-module" style="flex: 1;">Cancel</button>
+                <div class="quiz-card-footer hub-card-footer">
+                    <button class="btn-tactical flex-1" data-action="submit-new-subject">Publish Subject</button>
+                    <button class="btn-tactical btn-red flex-1" data-action="cancel-create-subject">Cancel</button>
                 </div>
             </div>
         `;
@@ -423,20 +552,19 @@ if (authStatus) {
 
     const branch = inspectSelect ? inspectSelect.value : "";
     const data = state.QUESTION_REGISTRY[branch];
-    const isModuleOwner = data && data.createdBy && data.createdBy === userUid;
+    const isSubjectOwner = data && data.createdBy && data.createdBy === userUid;
 
-    if (deleteModBtn) deleteModBtn.classList.toggle("hidden", !(isSuper || isModuleOwner));
+    if (deleteModBtn) deleteModBtn.classList.toggle("hidden", !(isSuper || isSubjectOwner));
 
     // 2. Blank State View
     if (!branch || !data) {
         container.innerHTML = `
-            <div class="quiz-card" style="text-align: center; padding: 2.5em 1.5em; border: 2px dashed var(--border-color); margin-bottom: 1.2em;">
-                <div style="font-size: 3rem; margin-bottom: 0.3em;">📋</div>
-                <h3 style="margin-bottom: 0.4em;">Subject Hub Manager</h3>
-                <p style="color: var(--light-text-color); font-size: 0.9rem; max-width: 480px; margin: 0 auto 1.5em auto;">
-                    Select an existing subject from the dropdown above to manage its question bank, or click below to publish a brand-new module.
+            <div class="quiz-card hub-blank-card">
+                <h3 class="hub-blank-title">Subject Hub Manager</h3>
+                <p class="hub-blank-desc">
+                    Select an existing subject from the dropdown above to manage its question bank, or click below to publish a brand-new subject.
                 </p>
-                <button class="btn-tactical btn-gold" data-action="trigger-create-from-blank">➕ Create New Subject</button>
+                <button class="btn-tactical btn-gold" data-action="trigger-create-from-blank">Create New Subject</button>
             </div>
         `;
         return;
@@ -445,91 +573,126 @@ if (authStatus) {
     // 3. Selected Subject View
     const rawQs = data.questions || {};
     const totalQs = Array.isArray(rawQs) ? rawQs.length : Object.keys(rawQs).length;
-    const isEditingModule = state.editingModuleKey === branch;
+    const isEditingSubject = state.editingSubjectKey === branch;
 
-    const bgStyle = data.imageUrl
-        ? `background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url('${data.imageUrl}') center/cover no-repeat; color: #fff;`
-        : '';
+    const bgClass = data.imageUrl ? 'hub-card-custom-bg' : '';
+    const bgStyleAttr = data.imageUrl ? `style="background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url('${data.imageUrl}');"` : '';
 
-    let moduleCardHTML = "";
-    if (isEditingModule) {
-        moduleCardHTML = `
-            <div class="quiz-card" style="margin-bottom: 1.2em; border: 2px dashed var(--primary-color); padding: 1em; ${bgStyle}">
+    let subjectCardHTML = "";
+    if (isEditingSubject) {
+        const existingLinks = data.links || [];
+
+        subjectCardHTML = `
+            <div class="quiz-card hub-edit-card ${bgClass}" ${bgStyleAttr}>
                 <div>
-                    <div class="quiz-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5em;">
-                        <input type="text" id="edit-mod-category" value="${(data.category || 'General').replace(/"/g, '&quot;')}" placeholder="Category" style="width: auto; font-size: 0.75rem; font-weight: bold; text-transform: uppercase;">
-                        <span style="font-size: 0.8rem;">${totalQs} Questions</span>
+                    <div class="quiz-card-header hub-card-header-row">
+                        <input type="text" id="edit-mod-category" value="${(data.category || 'General').replace(/"/g, '&quot;')}" placeholder="Category" class="hub-category-input">
+                        <span class="hub-question-count">${totalQs} Questions</span>
                     </div>
                     
-                    <div style="margin: 0.4em 0;">
-                        <input type="text" id="edit-mod-title" value="${(data.branchName || branch).replace(/"/g, '&quot;')}" placeholder="Module Title" style="font-size: 1.1rem; font-weight: bold; width: 100%;">
+                    <div class="hub-field-margin">
+                        <input type="text" id="edit-mod-title" value="${(data.branchName || branch).replace(/"/g, '&quot;')}" placeholder="Subject Title" class="hub-title-input">
                     </div>
                     
-                    <div style="margin-bottom: 0.6em;">
-                        <strong>Publication:</strong> 
-                        <input type="text" id="edit-mod-publication" value="${(data.publication || 'Standard Regulation').replace(/"/g, '&quot;')}" placeholder="Publication Citation" style="font-size: 0.85rem; width: 70%; display: inline-block;">
+                    <div class="hub-field-margin-sm">
+                        <strong>Publication Citation:</strong> 
+                        <input type="text" id="edit-mod-publication" value="${(data.publication || 'Standard Regulation').replace(/"/g, '&quot;')}" placeholder="Publication Citation" class="hub-publication-input">
                     </div>
 
-                    <div style="margin-top: 0.4em;">
-                        <textarea id="edit-mod-description" placeholder="Subject Description & Links (http://...)" rows="3" style="width: 100%; font-family: inherit; padding: 0.5em; border-radius: 4px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-color);">${data.description || ''}</textarea>
+                    <div id="edit-dynamic-links-container" class="hub-form-stack-xs hub-field-margin-sm">
+                        <label class="font-bold text-sm">Action Buttons / Practice Links:</label>
+                        ${existingLinks.map(link => `
+                            <div class="dynamic-link-row flex-row-between gap-sm">
+                                <input type="text" class="link-label flex-1" placeholder="Button Label" value="${(link.label || '').replace(/"/g, '&quot;')}">
+                                <input type="text" class="link-url flex-1" placeholder="URL or setup.html?subject=XYZ" value="${(link.url || '').replace(/"/g, '&quot;')}">
+                                <select class="link-type">
+                                    <option value="quiz" ${link.type === 'quiz' ? 'selected' : ''}>Quiz</option>
+                                    <option value="simulator" ${link.type === 'simulator' ? 'selected' : ''}>Simulator</option>
+                                    <option value="pdf" ${link.type === 'pdf' ? 'selected' : ''}>PDF</option>
+                                </select>
+                                <button type="button" class="btn-tactical btn-red btn-sm" onclick="this.parentElement.remove()">✕</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button type="button" class="btn-tactical btn-gold btn-sm margin-bottom-sm" onclick="window.addLinkRow('edit-dynamic-links-container')">
+                        Add Link
+                    </button>
+
+                    <div class="hub-field-margin-xs">
+                        <textarea id="edit-mod-description" placeholder="Subject Description" rows="3" class="hub-textarea">${data.description || ''}</textarea>
                     </div>
 
-                    <div style="display: flex; gap: 0.5em; align-items: center; margin-top: 0.4em;">
-                        <input type="text" id="edit-mod-bg" value="${(data.imageUrl || '').replace(/"/g, '&quot;')}" placeholder="Card Background Image URL or Upload Image" style="font-size: 0.8rem; flex: 1;">
-                        <input type="file" id="edit-mod-bg-file" data-text-target="edit-mod-bg" accept="image/*" style="display: none;">
-                        <button type="button" class="btn-tactical btn-gold" data-action="trigger-file-upload" data-target="edit-mod-bg">📁 Upload</button>
+                    <div class="hub-file-upload-row hub-field-margin-xs">
+                        <input type="text" id="edit-mod-bg" value="${(data.imageUrl || '').replace(/"/g, '&quot;')}" placeholder="Card Background Image URL or Upload Image" class="hub-bg-input flex-1">
+                        <input type="file" id="edit-mod-bg-file" data-text-target="edit-mod-bg" accept="image/*" class="hidden">
+                        <button type="button" class="btn-tactical btn-gold" data-action="trigger-file-upload" data-target="edit-mod-bg">Upload</button>
                     </div>
                 </div>
 
-                <div class="quiz-card-footer" style="display: flex; gap: 0.5em; margin-top: 0.8em;">
-                    <button class="btn-tactical" data-action="save-module" data-key="${branch}" style="flex: 1;">Save Info</button>
-                    <button class="btn-tactical btn-clear" data-action="cancel-edit-module" style="flex: 1;">Cancel</button>
+                <div class="quiz-card-footer hub-card-footer">
+                    <button class="btn-tactical flex-1" data-action="save-subject" data-key="${branch}">Save Info</button>
+                    <button class="btn-tactical btn-red flex-1" data-action="cancel-edit-subject">Cancel</button>
                 </div>
             </div>
         `;
     } else {
-        const canEditModule = isSuper || isModuleOwner;
+        const canEditSubject = isSuper || isSubjectOwner;
         const formattedDescription = formatTextWithLinks(data.description || '');
 
-        moduleCardHTML = `
-            <div class="quiz-card" style="margin-bottom: 1.2em; ${bgStyle}">
+        const customLaunchUrl = getSubjectLaunchUrl(data, branch);
+        const isSimulator = Boolean(customLaunchUrl);
+        const hasQuestions = totalQs > 0;
+        const showLaunchButton = isSimulator || hasQuestions;
+
+        const launchButtonText = isSimulator ? "Launch Simulator ➔" : "Take Quiz ➔";
+        const launchBtnClass = isSimulator ? "btn-gold" : "btn-blue";
+
+        subjectCardHTML = `
+            <div class="quiz-card hub-display-card ${bgClass}" ${bgStyleAttr}>
                 <div>
                     <div class="quiz-card-header">
                         <span class="quiz-card-badge">${data.category || 'General'}</span>
-                        <span style="font-size: 0.8rem; color: ${data.imageUrl ? '#ddd' : 'var(--light-text-color)'};">${totalQs} Questions</span>
+                        <span class="hub-question-count ${data.imageUrl ? 'text-light-overlay' : 'subtext'}">${totalQs} Questions</span>
                     </div>
                     <div class="quiz-card-title">${data.branchName || branch}</div>
-                    <div class="quiz-card-meta" style="color: ${data.imageUrl ? '#eee' : 'inherit'};">
+                    <div class="quiz-card-meta ${data.imageUrl ? 'text-light-overlay' : ''}">
                         <strong>Publication:</strong> ${data.publication || 'Standard Regulation'}
                     </div>
                     ${formattedDescription ? `
-                        <div style="margin-top: 0.6em; font-size: 0.85rem; color: ${data.imageUrl ? '#f0f0f0' : 'var(--text-color)'}; line-height: 1.4;">
+                        <div class="hub-desc-container ${data.imageUrl ? 'text-bright-overlay' : ''}">
                             ${formattedDescription}
                         </div>
                     ` : ''}
                 </div>
-                <div class="quiz-card-footer" style="display: flex; gap: 0.5em; margin-top: 0.8em; flex-wrap: wrap;">
-                    ${canEditModule ? `<button class="btn-tactical" data-action="edit-module" data-key="${branch}" style="flex: 1;">Edit Info</button>` : ''}
-                    <button class="btn-tactical btn-blue" data-action="launch-module" data-key="${branch}" style="flex: 1;">Take Quiz</button>
+                <div class="quiz-card-footer hub-card-footer flex-wrap">
+                    ${canEditSubject ? `<button class="btn-tactical flex-1" data-action="edit-subject" data-key="${branch}">Edit Info</button>` : ''}
+                    ${showLaunchButton ? `
+                        <button class="btn-tactical ${launchBtnClass} flex-1" 
+                                data-action="launch-subject" 
+                                data-key="${branch}" 
+                                ${customLaunchUrl ? `data-url="${customLaunchUrl}"` : ''}>
+                            ${launchButtonText}
+                        </button>
+                    ` : ''}
                 </div>
             </div>
         `;
     }
 
-    if (state.activeModuleListenerRef) state.activeModuleListenerRef.off();
+    if (state.activeSubjectListenerRef) state.activeSubjectListenerRef.off();
 
-    state.activeModuleListenerRef = database.ref(`subjects/${branch}/questions`);
-    state.activeModuleListenerRef.on("value", (snapshot) => {
+    state.activeSubjectListenerRef = database.ref(`subjects/${branch}/questions`);
+    state.activeSubjectListenerRef.on("value", (snapshot) => {
         const qSnap = snapshot.val() || {};
         const questionsList = Array.isArray(qSnap)
             ? qSnap.map((q, idx) => ({ id: idx, ...q }))
             : Object.keys(qSnap).map(k => ({ id: k, ...qSnap[k] }));
 
-        let questionsHTML = questionsList.length === 0 
-            ? `<div style="padding: 0.8em; color: var(--light-text-color);">No questions exist in subject '${branch}' yet. Tap '➕ Add Question Card' above to create one!</div>`
-            : questionsList.map((q, idx) => renderQuestionItem(q, idx, branch, isSuper || isModuleOwner, userUid)).join('');
+        let questionsHTML = questionsList.length === 0
+            ? `<div class="hub-no-questions">No questions exist in subject '${branch}' yet. Tap 'Add Question Card' above to create one!</div>`
+            : questionsList.map((q, idx) => renderQuestionItem(q, idx, branch, isSuper || isSubjectOwner, userUid)).join('');
 
-        container.innerHTML = moduleCardHTML + questionsHTML;
+        container.innerHTML = subjectCardHTML + questionsHTML;
     });
 }
 
@@ -555,95 +718,104 @@ function renderQuestionItem(q, idx, branch, canEditSubject, userUid) {
     const userRole = state.userRole || (userUid === SUPER_UID ? "admin" : "user");
     const isModOrAdmin = userRole === "admin" || userRole === "mod";
 
-    const verificationBadge = isVerified 
-        ? `<span style="background: rgba(46, 160, 67, 0.2); color: #2ea043; padding: 0.2em 0.5em; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">VERIFIED</span>`
-        : `<span style="background: rgba(255, 205, 0, 0.2); color: #ffcd00; padding: 0.2em 0.5em; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">UNVERIFIED</span>`;
+    const verificationBadge = isVerified
+        ? `<span class="badge-verified">VERIFIED</span>`
+        : `<span class="badge-unverified">UNVERIFIED</span>`;
 
     const questionImgHTML = q.imageUrl
-        ? `<div style="margin: 0.5em 0; text-align: center;"><img src="${q.imageUrl}" alt="Visual Cue" style="max-width: 100%; max-height: 200px; border-radius: 4px; border: 1px solid #ccc; object-fit: contain;"></div>`
+        ? `<div class="visual-cue-wrapper"><img src="${q.imageUrl}" alt="Visual Cue" class="visual-cue"></div>`
         : '';
 
     const actionControlsHTML = `
-        <div style="display: flex; align-items: center; gap: 0.4em;">
-            <!-- Vote Controls -->
-            <button data-action="vote" data-type="up" data-branch="${branch}" data-qid="${q.id}" class="btn-tactical btn-sm" style="padding: 0.2em 0.5em;" title="Helpful Question">
-                👍 ${upvoteCount}
-            </button>
-            <button data-action="vote" data-type="down" data-branch="${branch}" data-qid="${q.id}" class="btn-tactical btn-sm" style="padding: 0.2em 0.5em;" title="Needs Rewording / Poor Quality">
-                👎 ${downvoteCount}
-            </button>
-
-            <!-- Separator Gap & Divider -->
-            <div style="margin: 0 0.4em; border-left: 1px solid var(--border-color, rgba(255,255,255,0.2)); height: 1.2em;"></div>
-
-            <!-- Moderation Controls -->
-            <button data-action="flag-q" data-branch="${branch}" data-qid="${q.id}" class="btn-tactical btn-sm btn-clear" style="padding: 0.2em 0.5em; color: ${flagCount > 0 ? '#f85149' : 'inherit'};" title="Inappropriate or Incorrect">
-                🚩 ${flagCount}
-            </button>
-            ${(!isVerified && isModOrAdmin) ? `
-                <button data-action="verify-q" data-branch="${branch}" data-qid="${q.id}" class="btn-tactical btn-blue btn-sm" style="padding: 0.2em 0.6em;">
-                    Verify
+        <div class="hub-q-controls flex-row-between width-full">
+            <div class="hub-voting-controls">
+                <button data-action="vote" data-type="up" data-branch="${branch}" data-qid="${q.id}" class="btn-tactical btn-sm btn-padding-tight" title="Helpful Question">
+                    👍 ${upvoteCount}
                 </button>
-            ` : ''}
+                <button data-action="vote" data-type="down" data-branch="${branch}" data-qid="${q.id}" class="btn-tactical btn-sm btn-padding-tight" title="Needs Rewording / Poor Quality">
+                    👎 ${downvoteCount}
+                </button>
+            </div>
+
+            <div class="hub-footer-actions-right">
+                ${(!isVerified && isModOrAdmin) ? `
+                    <button data-action="verify-q" data-branch="${branch}" data-qid="${q.id}" class="btn-tactical btn-blue btn-sm btn-padding-normal">
+                        Verify
+                    </button>
+                ` : ''}
+                <button data-action="flag-q" data-branch="${branch}" data-qid="${q.id}" class="btn-tactical btn-sm btn-red btn-padding-tight ${flagCount > 0 ? 'text-flagged' : ''}" title="Inappropriate or Incorrect">
+                    🚩 ${flagCount}
+                </button>
+            </div>
         </div>
     `;
 
     if (canEditQuestion) {
         return `
-            <div style="padding: 1em; border-radius: 4px; margin-bottom: 0.8em; background: rgba(0,0,0,0.05); border: 1px solid ${isVerified ? 'var(--border-color)' : 'rgba(255,205,0,0.4)'};">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5em; flex-wrap: wrap; gap: 0.5em;">
-                    <div style="display: flex; align-items: center; gap: 0.5em;">
-                        <strong>Q${idx + 1} (Control)</strong>
-                        ${verificationBadge}
-                    </div>
-                    ${actionControlsHTML}
+        <div class="hub-q-card ${isVerified ? 'hub-q-card-verified' : 'hub-q-card-unverified'}">
+            <div class="hub-q-header">
+                <div class="hub-q-title-group">
+                    <strong>Question ${idx + 1}</strong>
+                    ${verificationBadge}
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 0.3em;">
-                    <input type="text" id="edit-q-${q.id}" value="${q.q ? q.q.replace(/"/g, '&quot;') : ''}">
-                    
-                    <div style="display: flex; gap: 0.5em; align-items: center;">
-                        <input type="text" id="edit-qimg-${q.id}" placeholder="Image URL or Upload Image" value="${q.imageUrl ? q.imageUrl.replace(/"/g, '&quot;') : ''}" style="flex: 1;">
-                        <input type="file" id="edit-qimg-${q.id}-file" data-text-target="edit-qimg-${q.id}" accept="image/*" style="display: none;">
-                        <button type="button" class="btn-tactical btn-gold btn-sm" data-action="trigger-file-upload" data-target="edit-qimg-${q.id}">📁 Upload</button>
+            </div>
+            <div class="hub-form-stack-xs">
+                <input type="text" id="edit-q-${q.id}" value="${q.q ? q.q.replace(/"/g, '&quot;') : ''}">
+                
+                <div class="hub-file-upload-row">
+                    <input type="text" id="edit-qimg-${q.id}" placeholder="Image URL or Upload Image" value="${q.imageUrl ? q.imageUrl.replace(/"/g, '&quot;') : ''}" class="flex-1">
+                    <input type="file" id="edit-qimg-${q.id}-file" data-text-target="edit-qimg-${q.id}" accept="image/*" class="hidden">
+                    <button type="button" class="btn-tactical btn-gold btn-sm" data-action="trigger-file-upload" data-target="edit-qimg-${q.id}">Upload</button>
+                </div>
+
+                <input type="text" id="edit-opt0-${q.id}" value="${optsArray[0] ? optsArray[0].replace(/"/g, '&quot;') : ''}">
+                <input type="text" id="edit-opt1-${q.id}" value="${optsArray[1] ? optsArray[1].replace(/"/g, '&quot;') : ''}">
+                <input type="text" id="edit-opt2-${q.id}" value="${optsArray[2] ? optsArray[2].replace(/"/g, '&quot;') : ''}">
+                <input type="text" id="edit-opt3-${q.id}" value="${optsArray[3] ? optsArray[3].replace(/"/g, '&quot;') : ''}">
+                <select id="edit-ans-${q.id}">
+                    <option value="0" ${q.answer == 0 ? 'selected' : ''}>Correct: Option 1</option>
+                    <option value="1" ${q.answer == 1 ? 'selected' : ''}>Correct: Option 2</option>
+                    <option value="2" ${q.answer == 2 ? 'selected' : ''}>Correct: Option 3</option>
+                    <option value="3" ${q.answer == 3 ? 'selected' : ''}>Correct: Option 4</option>
+                </select>
+                <input type="text" id="edit-exp-${q.id}" value="${q.explanation ? q.explanation.replace(/"/g, '&quot;') : ''}">
+                ${questionImgHTML}
+                
+                <div class="hub-q-card-footer">
+                    <div class="hub-footer-actions-left">
+                        <div class="hub-voting-controls">
+                            <button type="button" class="btn-tactical btn-sm" data-action="vote-up" data-branch="${branch}" data-qid="${q.id}">👍 ${q.upvotes || 0}</button>
+                            <button type="button" class="btn-tactical btn-sm" data-action="vote-down" data-branch="${branch}" data-qid="${q.id}">👎 ${q.downvotes || 0}</button>
+                        </div>
+                        <button data-action="save-q" data-branch="${branch}" data-qid="${q.id}" class="btn-tactical btn-gold">Update</button>
                     </div>
 
-                    <input type="text" id="edit-opt0-${q.id}" value="${optsArray[0] ? optsArray[0].replace(/"/g, '&quot;') : ''}">
-                    <input type="text" id="edit-opt1-${q.id}" value="${optsArray[1] ? optsArray[1].replace(/"/g, '&quot;') : ''}">
-                    <input type="text" id="edit-opt2-${q.id}" value="${optsArray[2] ? optsArray[2].replace(/"/g, '&quot;') : ''}">
-                    <input type="text" id="edit-opt3-${q.id}" value="${optsArray[3] ? optsArray[3].replace(/"/g, '&quot;') : ''}">
-                    <select id="edit-ans-${q.id}">
-                        <option value="0" ${q.answer == 0 ? 'selected' : ''}>Correct: Option 1</option>
-                        <option value="1" ${q.answer == 1 ? 'selected' : ''}>Correct: Option 2</option>
-                        <option value="2" ${q.answer == 2 ? 'selected' : ''}>Correct: Option 3</option>
-                        <option value="3" ${q.answer == 3 ? 'selected' : ''}>Correct: Option 4</option>
-                    </select>
-                    <input type="text" id="edit-exp-${q.id}" value="${q.explanation ? q.explanation.replace(/"/g, '&quot;') : ''}">
-                    ${questionImgHTML}
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.6em;">
-                        <button data-action="save-q" data-branch="${branch}" data-qid="${q.id}" class="btn-tactical btn-gold">Update</button>
-                        <button data-action="delete-q" data-branch="${branch}" data-qid="${q.id}" class="btn-tactical btn-clear btn-sm">Delete</button>
+                    <div class="hub-footer-actions-right">
+                        <button type="button" data-action="flag-q" data-branch="${branch}" data-qid="${q.id}" class="btn-tactical btn-sm ${q.isFlagged ? 'btn-red' : 'btn-red'}" title="Flag Question">Flag</button>
+                        <button data-action="delete-q" data-branch="${branch}" data-qid="${q.id}" class="btn-tactical btn-red btn-sm">Delete</button>
                     </div>
                 </div>
             </div>
-        `;
+        </div>
+    `;
     }
 
     return `
-        <div style="padding: 0.8em; border-radius: 4px; margin-bottom: 0.6em; background: rgba(0,0,0,0.05); border: 1px solid ${isVerified ? 'var(--primary-color)' : 'rgba(255,205,0,0.4)'};">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5em; flex-wrap: wrap; gap: 0.5em;">
-                <div style="display: flex; align-items: center; gap: 0.5em;">
-                    <span style="font-weight: bold;">Q${idx + 1}: ${q.q}</span>
+        <div class="hub-q-card ${isVerified ? 'hub-q-card-verified' : 'hub-q-card-unverified'}">
+            <div class="hub-q-header">
+                <div class="hub-q-title-group">
+                    <span class="font-bold">Question ${idx + 1}: ${q.q}</span>
                     ${verificationBadge}
                 </div>
                 ${actionControlsHTML}
             </div>
             ${questionImgHTML}
-            <div style="color: var(--primary-color);"><strong>Correct Answer:</strong> ${optsArray[q.answer] || 'N/A'}</div>
-            <div style="margin: 0.4em 0; font-size: 0.8rem; color: var(--light-text-color);">
-                <strong>Options:</strong> ${optsArray.map((opt, i) => `${i + 1}. ${opt}`).join(' | ')}
+            <div class="text-primary font-bold"><strong>Correct Answer:</strong> ${optsArray[q.answer] || 'N/A'}</div>
+            <div class="hub-q-options-text">
+                <strong>Options:</strong> ${optsArray.map((opt, i) => `${i + 1}.${opt}`).join(' | ')}
             </div>
-            <div style="color: var(--light-text-color); font-size: 0.8rem; margin-top: 0.2em;">
-                <em>Citation:</em> ${q.explanation || 'N/A'}
+            <div class="hub-q-citation-text">
+                <em>Citation:</em> ${formatTextWithLinks(q.explanation || 'N/A')}
             </div>
         </div>
     `;
@@ -684,7 +856,6 @@ export async function saveQuestionEdit(branchKey, questionId) {
         explanation: explanation
     };
 
-    // If an Admin/Mod edits an item, auto-verify it upon saving
     if (isVerifiedAuthor) {
         updatePayload.verified = true;
         updatePayload.verifiedBy = userUid;
@@ -696,15 +867,15 @@ export async function saveQuestionEdit(branchKey, questionId) {
         .catch(err => showToast("Update failed: " + err.message, "error"));
 }
 
-export async function deleteQuizModule() {
+export async function deleteQuizSubject() {
     const selectEl = document.getElementById("bank-inspect-select");
     if (!selectEl || !selectEl.value) return;
 
     const branchKey = selectEl.value;
-    const confirmed = await showConfirm(`CRITICAL WARNING: Delete subject '${branchKey}' and ALL questions?`, "Delete Subject Module");
+    const confirmed = await showConfirm(`CRITICAL WARNING: Delete subject '${branchKey}' and ALL questions?`, "Delete Subject");
     if (confirmed) {
         database.ref(`subjects/${branchKey}`).remove()
-            .then(() => showToast(`Module '${branchKey}' deleted`, "info"))
-            .catch(err => showToast("Module delete failed: " + err.message, "error"));
+            .then(() => showToast(`Subject '${branchKey}' deleted`, "info"))
+            .catch(err => showToast("Subject delete failed: " + err.message, "error"));
     }
 }

@@ -14,5 +14,14 @@ firebase.initializeApp(firebaseConfig);
 
 export const database = firebase.database();
 export const auth = firebase.auth();
-export const googleProvider = new firebase.auth.GoogleAuthProvider();
 export const SUPER_UID = 'e8cCmxtEqMN4pr9i3DCkl2yo2iz2';
+
+// OAuth Providers
+export const googleProvider = new firebase.auth.GoogleAuthProvider();
+export const microsoftProvider = new firebase.auth.OAuthProvider('microsoft.com');
+
+microsoftProvider.setCustomParameters({
+    prompt: 'select_account',
+    authority: 'https://login.microsoftonline.com/consumers',
+    tenant: 'consumers'
+});

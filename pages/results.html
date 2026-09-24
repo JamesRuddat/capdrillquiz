@@ -2,53 +2,67 @@
 <html lang="en" data-theme="light">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="google-adsense-account" content="ca-pub-1864969470317711">
-    <link rel="icon" type="image/x-icon" href="/assets/images/emblems/icon.svg">
-    <title>PROP - Results</title>
-    <link rel="stylesheet" href="/styles.css">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1864969470317711"
-        crossorigin="anonymous"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google-adsense-account" content="ca-pub-1864969470317711">
+  <link rel="icon" type="image/x-icon" href="/assets/images/emblems/icon.svg">
+  <title>Results</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1864969470317711"
+    crossorigin="anonymous"></script>
 
-    <!-- Load Component Partials -->
-    <script type="module" src="/js/components/header.js"></script>
-    <script type="module" src="/js/components/footer.js"></script>
-    <script type="module" src="/js/pages/modal-element.js"></script>
+  <!-- Load Component Partials -->
+  <script type="module" src="/js/components/header.js"></script>
+  <script type="module" src="/js/components/footer.js"></script>
+  <script type="module" src="/js/components/modal-element.js"></script>
 </head>
 
 <body>
 
-    <site-header></site-header>
+  <site-header>
+    <!-- Static Skeleton Shell (Prevents Header Glitch) -->
+    <nav id="navbar">
+      <div class="nav-links">
+        <a href="index.html" class="active-nav">Dashboard</a>
+        <a href="setup.html">Practice</a>
+        <a href="leaderboard.html">Leaderboard</a>
+      </div>
+      <div class="nav-search-wrapper">
+        <input type="text" class="nav-search-input" placeholder="Search Subjects..." disabled />
+      </div>
+      <div class="nav-controls">
+        <div class="badge-status badge-verified nav-pts-badge">⭐ ...</div>
+      </div>
+    </nav>
+  </site-header>
 
-    <main>
-        <!-- RESULTS VIEW -->
-        <section id="results-view" class="col text-center">
-            <div id="results-advisory" class="advisory">[EVALUATION COMPLETE] Assessment recorded to leaderboard.</div>
+  <main>
+    <!-- RESULTS VIEW -->
+    <section id="results-view" class="col text-center">
+      <div id="results-advisory" class="advisory">[EVALUATION COMPLETE] Assessment recorded to leaderboard.</div>
 
-            <h1 id="results-title" style="font-size: 1.8rem; margin-bottom: 0.5em;">Score Summary</h1>
-            <p id="score-summary" style="font-size: 1.05rem; line-height: 1.5; margin: 1em 0;"></p>
+      <h1 id="results-title" class="results-title">Score Summary</h1>
+      <p id="score-summary" class="results-summary"></p>
 
-            <div style="display: flex; justify-content: center; gap: 0.8em; flex-wrap: wrap; margin-top: 1.5em;">
-                <button id="btn-res-another" class="btn-tactical btn-gold" type="button">Take Another Quiz</button>
-                <button id="btn-res-leaderboard" class="btn-tactical btn-blue" type="button">View Leaderboard</button>
-                <button id="btn-res-home" class="btn-tactical btn-red" type="button">Return Home</button>
-            </div>
-        </section>
+      <div class="results-actions-row">
+        <button id="btn-res-another" class="btn-tactical btn-gold" type="button">Take Another Quiz</button>
+        <button id="btn-res-leaderboard" class="btn-tactical btn-blue" type="button">View Leaderboard</button>
+        <button id="btn-res-dashboard" class="btn-tactical btn-red" type="button">Return Dashboard</button>
+      </div>
+    </section>
 
-        <section id="breakdown-view" class="col">
-            <div id="results-breakdown"></div>
-        </section>
-    </main>
+    <section id="breakdown-view" class="col">
+      <div id="results-breakdown"></div>
+    </section>
+  </main>
 
-    <custom-modal></custom-modal>
-    <site-footer></site-footer>
+  <custom-modal></custom-modal>
+  <site-footer></site-footer>
 
-    <script src="/js/profanity-filter.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <script type="module" src="/js/app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script type="module" src="/js/app.js"></script>
 </body>
 
 </html>

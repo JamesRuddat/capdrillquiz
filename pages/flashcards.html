@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-adsense-account" content="ca-pub-1864969470317711">
     <link rel="icon" type="image/x-icon" href="/assets/images/emblems/icon.svg">
-    <title>PROP - Flashcards</title>
+    <title>Flashcards</title>
     <link rel="stylesheet" href="../styles.css">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1864969470317711"
         crossorigin="anonymous"></script>
@@ -14,31 +14,47 @@
     <!-- Load Component Partials -->
     <script type="module" src="/js/components/header.js"></script>
     <script type="module" src="/js/components/footer.js"></script>
-    <script type="module" src="/js/pages/modal-element.js"></script>
+    <script type="module" src="/js/components/modal-element.js"></script>
 </head>
 
 <body>
 
-    <site-header></site-header>
+    <site-header>
+        <!-- Static Skeleton Shell (Prevents Header Glitch) -->
+        <nav id="navbar">
+            <div class="nav-links">
+                <a href="index.html" class="active-nav">Dashboard</a>
+                <a href="setup.html">Practice</a>
+                <a href="leaderboard.html">Leaderboard</a>
+            </div>
+            <div class="nav-search-wrapper">
+                <input type="text" class="nav-search-input" placeholder="Search Subjects..." disabled />
+            </div>
+            <div class="nav-controls">
+                <div class="badge-status badge-verified nav-pts-badge">⭐ ...</div>
+            </div>
+        </nav>
+    </site-header>
 
     <main>
         <!-- FLASHCARD CONTAINER VIEW -->
         <section id="flashcard-view" class="col">
-    <!-- Header Bar -->
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1em; gap: 0.5em;">
-        <!-- Left Cluster: Badge & Exit Button Underneath -->
-        <div style="display: flex; flex-direction: column; gap: 0.4em; align-items: flex-start;">
-            <span id="flashcard-module-badge" class="quiz-card-badge">[MODULE: UNSET]</span>
-            <button id="btn-fc-exit" class="btn-tactical btn-red btn-sm" type="button">
-                Exit Session
-            </button>
-        </div>
+            <!-- Header Bar -->
+            <div
+                style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1em; gap: 0.5em;">
+                <!-- Left Cluster: Badge & Exit Button Underneath -->
+                <div style="display: flex; flex-direction: column; gap: 0.4em; align-items: flex-start;">
+                    <span id="flashcard-subject-badge" class="quiz-card-badge">[MODULE: UNSET]</span>
+                    <button id="btn-fc-exit" class="btn-tactical btn-red btn-sm" type="button">
+                        Exit Session
+                    </button>
+                </div>
 
-        <!-- Right Cluster: Card Counter -->
-        <div style="display: flex; align-items: center;">
-            <span id="flashcard-tracker" style="font-weight: bold; font-size: 0.85rem;">Card 1 of X</span>
-        </div>
-    </div>
+                <!-- Right Cluster: Card Counter -->
+                <div style="display: flex; align-items: center;">
+                    <span id="flashcard-tracker" style="font-weight: bold; font-size: 0.85rem;">Card 1 of X</span>
+                </div>
+            </div>
 
             <!-- 3D FLIP CARD STAGE -->
             <div class="flashcard-stage">

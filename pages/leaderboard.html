@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-adsense-account" content="ca-pub-1864969470317711">
     <link rel="icon" type="image/x-icon" href="/assets/images/emblems/icon.svg">
-    <title>PROP - Leaderboard</title>
+    <title>Leaderboard</title>
     <link rel="stylesheet" href="/styles.css">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1864969470317711"
         crossorigin="anonymous"></script>
@@ -14,69 +14,100 @@
     <!-- Load Component Partials -->
     <script type="module" src="/js/components/header.js"></script>
     <script type="module" src="/js/components/footer.js"></script>
-    <script type="module" src="/js/pages/modal-element.js"></script>
+    <script type="module" src="/js/components/modal-element.js"></script>
 </head>
 
 <body>
 
-    <site-header></site-header>
+    <site-header>
+        <!-- Static Skeleton Shell (Prevents Header Glitch) -->
+        <nav id="navbar">
+            <div class="nav-links">
+                <a href="index.html" class="active-nav">Dashboard</a>
+                <a href="setup.html">Practice</a>
+                <a href="leaderboard.html">Leaderboard</a>
+            </div>
+            <div class="nav-search-wrapper">
+                <input type="text" class="nav-search-input" placeholder="Search Subjects..." disabled />
+            </div>
+            <div class="nav-controls">
+                <div class="badge-status badge-verified nav-pts-badge">⭐ ...</div>
+            </div>
+        </nav>
+    </site-header>
 
-<main>
-    <section id="leaderboard-view" class="col">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8em; margin-bottom: 1em;">
-            <div>
-                <h1 style="margin: 0;">Leaderboard</h1>
-                <p style="margin: 0.2em 0 0 0; font-size: 0.85rem; color: var(--light-text-color);">
-                    Sign in to claim your callsign on the public rankings!
+    <main>
+        <section id="leaderboard-view" class="col">
+            <div class="leaderboard-header-row">
+                <div>
+                    <h1 class="margin-none">Leaderboard</h1>
+                    <p class="subtext">
+                        Sign in to claim your callsign on the public rankings!
+                    </p>
+                </div>
+
+                <div class="leaderboard-filter-controls">
+                    <div class="leaderboard-control-group">
+                        <label for="leaderboard-mode-select" class="leaderboard-label">Type:</label>
+                        <select id="leaderboard-mode-select" class="leaderboard-select">
+                            <option value="test-scores">Top Evaluations</option>
+                            <option value="user-points">Most Lifetime Points ⭐</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div id="subject-filter-wrapper" class="leaderboard-control-group">
+                        <label for="filter-leaderboard" class="leaderboard-label">Subject:</label>
+                        <select id="filter-leaderboard" class="leaderboard-select">
+                            <option value="ALL">All Subjects</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="leaderboard-disclaimer-wrapper">
+                <p class="leaderboard-disclaimer">
+                    * Entries prior to the 3.9.1 update have been automatically altered.
                 </p>
             </div>
-            
-            <div style="display: flex; gap: 0.8em; flex-wrap: wrap; align-items: center;">
-                <div>
-                    <label for="leaderboard-mode-select" style="font-size: 0.8rem; display: block; font-weight: bold;">Type:</label>
-                    <select id="leaderboard-mode-select" style="width: auto; padding: 0.3em 0.6em; margin: 0;">
-                        <option value="test-scores">Top Evaluations</option>
-                        <option value="user-points">Most Lifetime Points ⭐</option>
-                    </select>
-                </div>
 
-                <div id="subject-filter-wrapper">
-                    <label for="filter-leaderboard" style="font-size: 0.8rem; display: block; font-weight: bold;">Subject:</label>
-                    <select id="filter-leaderboard" style="width: auto; padding: 0.3em 0.6em; margin: 0;">
-                        <option value="ALL">All Subjects</option>
-                    </select>
-                </div>
-
-                <p style="font-size: 0.75rem; color: var(--light-text-color); margin-top: 0.5em;">
-    * Entries prior to the 3.9.1. update have been automatically altered.
-</p>
-            </div>
-        </div>
-
-        <table id="leaderboard-table">
-            <thead id="leaderboard-thead">
-                <tr>
-                    <th class="sortable" data-sort="name">Callsign <span class="sort-icon">↕</span></th>
-                    <th class="sortable" data-sort="module">Subject <span class="sort-icon">↕</span></th>
-                    <th class="sortable" data-sort="score">Score <span class="sort-icon">↕</span></th>
-                    <th class="sortable" data-sort="date">Date <span class="sort-icon">↕</span></th>
-                </tr>
-            </thead>
-            <tbody id="leaderboard-body">
-                <tr>
-                    <td colspan="4" class="text-center">
-                        Connecting to cloud database...
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </section>
-</main>
+            <table id="leaderboard-table" class="leaderboard-table">
+                <thead id="leaderboard-thead">
+                    <tr>
+                        <th class="sortable" data-sort="name">Callsign <span class="arrow-icon arrow-sort"></span></th>
+                        <th class="sortable" data-sort="subject">Subject <span class="arrow-icon arrow-sort"></span>
+                        </th>
+                        <th class="sortable" data-sort="score">Score <span class="arrow-icon arrow-sort"></span></th>
+                        <th class="sortable" data-sort="date">Date <span class="arrow-icon arrow-sort"></span></th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    <!-- Static Skeleton Rows (prevents layout shifts while Firebase syncs) -->
+                    <tr class="skeleton-row">
+                        <td class="subtext">Loading evaluation data...</td>
+                        <td class="subtext">--</td>
+                        <td class="subtext">--</td>
+                        <td class="subtext">--</td>
+                    </tr>
+                    <tr class="skeleton-row">
+                        <td class="subtext">Loading evaluation data...</td>
+                        <td class="subtext">--</td>
+                        <td class="subtext">--</td>
+                        <td class="subtext">--</td>
+                    </tr>
+                    <tr class="skeleton-row">
+                        <td class="subtext">Loading evaluation data...</td>
+                        <td class="subtext">--</td>
+                        <td class="subtext">--</td>
+                        <td class="subtext">--</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
 
     <custom-modal></custom-modal>
     <site-footer></site-footer>
 
-    <script src="/js/profanity-filter.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>

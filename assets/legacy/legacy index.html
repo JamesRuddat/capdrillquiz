@@ -23,7 +23,7 @@
 
             <!-- NAVIGATION LINKS CONTAINER -->
             <div id="nav-drawer" class="nav-links">
-                <a id="nav-home" class="active-nav">Home</a>
+                <a id="nav-dashboard" class="active-nav">Dashboard</a>
                 <a id="nav-setup">Start Quiz</a>
                 <a id="nav-leaderboard">Leaderboard</a>
                 <a id="nav-hub">Quiz Hub</a>
@@ -41,27 +41,27 @@
     </header>
 
     <main>
-        <!-- HOME DASHBOARD VIEW -->
-        <section id="home-view" class="col">
+        <!-- DASHBOARD DASHBOARD VIEW -->
+        <section id="dashboard-view" class="col">
             <h1>Overview</h1>
             <p>
                 Whether you are preparing for test evaluations, studying publication & regulations, or brushing up on leadership concepts, test your knowledge here with interactive quizzes built by the community.
             </p>
 
             <h3>100% Free Access</h3>
-            <p>No paywalls or premium tiers. Practice all study modules and test your recall as often as you need.</p>
+            <p>No paywalls or premium tiers. Practice all study subjects and test your recall as often as you need.</p>
 
             <h3>Community-Powered</h3>
             <p>Add your own practice questions, rate community items, and earn author reputation stars.</p>
 
-            <div class="stats-grid" id="home-stats-grid">
+            <div class="grid-auto" id="dashboard-grid-auto">
                 <div class="stat-card">
                     <span class="stat-number" id="stat-total-evals">0</span>
                     <span class="stat-label">Total Tests Taken</span>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-number" id="stat-modules-count">0</span>
-                    <span class="stat-label">Active Modules & quizzes</span>
+                    <span class="stat-number" id="stat-subjects-count">0</span>
+                    <span class="stat-label">Active Subjects & quizzes</span>
                 </div>
             </div>
 
@@ -74,12 +74,12 @@
                         <thead>
                             <tr>
                                 <th>Participant</th>
-                                <th>Module</th>
+                                <th>Subject</th>
                                 <th>Score</th>
                                 <th>Date</th>
                             </tr>
                         </thead>
-                        <tbody id="home-top-scores-body">
+                        <tbody id="dashboard-top-scores-body">
                             <tr><td colspan="4" class="text-center">Loading top entries...</td></tr>
                         </tbody>
                     </table>
@@ -92,7 +92,7 @@
         <section id="setup-view" class="col hidden">
             <h1> Study CONFIGURATION</h1>
             <div style="width: 50%;">
-                <label for="quiz-select">Target Quiz Module:</label>
+                <label for="quiz-select">Target Quiz Subject:</label>
                 <select id="quiz-select"></select>
 
                 <label for="name">Name & Rank (Leaderboard):</label>
@@ -113,16 +113,16 @@
         </section>
 
         <section id="select-view" class="col">
-            <h1>Modules & quizzes</h1>
+            <h1>Subjects & quizzes</h1>
             <div id="quiz-cards-grid" class="cards-grid">
-                <div class="text-center">Loading available modules...</div>
+                <div class="text-center">Loading available subjects...</div>
             </div>
         </section>
 
         <!-- QUIZ RUNNER VIEW -->
         <section id="quiz-view" class="col hidden">
             <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.8em;">
-                <span id="quiz-standard-badge" style="font-weight: bold;">[MODULE: UNSET]</span>
+                <span id="quiz-standard-badge" style="font-weight: bold;">[SUBJECT: UNSET]</span>
                 <span id="question-tracker">Question 1 of X</span>
             </div>
 
@@ -148,7 +148,7 @@
             <div style="display: flex; justify-content: center; gap: 0.8em; flex-wrap: wrap;">
                 <button id="btn-res-another" class="btn-tactical">Take Another Quiz</button>
                 <button id="btn-res-leaderboard" class="btn-tactical btn-blue">View Leaderboard</button>
-                <button id="btn-res-home" class="btn-tactical btn-clear">Return Home</button>
+                <button id="btn-res-dashboard" class="btn-tactical btn-red">Return Dashboard</button>
             </div>
         </section>
 
@@ -158,9 +158,9 @@
                 <h1>Leaderboard</h1>
                 <p>Sign in to see your name on the leaderboard!</p>
                 <div>
-                    <label for="filter-leaderboard" style="font-size: 0.8rem;">Filter Module:</label>
+                    <label for="filter-leaderboard" style="font-size: 0.8rem;">Filter Subject:</label>
                     <select id="filter-leaderboard" style="width: auto; padding: 0.3em; margin: 0;">
-                        <option value="ALL">All Modules</option>
+                        <option value="ALL">All Subjects</option>
                     </select>
                 </div>
             </div>
@@ -169,7 +169,7 @@
                 <thead>
                     <tr>
                         <th>Participant</th>
-                        <th>Module</th>
+                        <th>Subject</th>
                         <th>Score</th>
                         <th>Date</th>
                     </tr>
@@ -186,7 +186,7 @@
         <section id="hub-view" class="col hidden">
             <h1>QUIZ CREATOR & HUB</h1>
             <p style="font-size: 0.8rem; color: var(--light-text-color);">
-                Create modules, append questions, inspect community items, or manage database records.
+                Create subjects, append questions, inspect community items, or manage database records.
             </p>
 
             <!-- STATUS BAR / AUTH BADGE -->
@@ -198,37 +198,37 @@
 
             <!-- SECTION 2: UNIFIED INSPECTOR & INLINE CARD EDITOR -->
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 0.8em; gap: 0.5em;">
-                <h1 style="margin: 0;">Module &amp; Questions</h1>
+                <h1 style="margin: 0;">Subject &amp; Questions</h1>
                 <hr>
                 <div style="display: flex; align-items: center; gap: 0.5em; flex-wrap: wrap;">
-                    <button id="btn-create-module-card" class="btn-tactical" style="padding: 0.4em 0.8em;">
-                        ➕ Create New Module
+                    <button id="btn-create-subject-card" class="btn-tactical" style="padding: 0.4em 0.8em;">
+                        Create New Subject
                     </button>
                 </div>
                 
                 <div style="display: flex; align-items: center; gap: 0.5em; flex-wrap: wrap;">
-                    <label for="bank-inspect-select" style="font-size: 0.8rem; margin: 0;">Edit Selected Module:</label>
+                    <label for="bank-inspect-select" style="font-size: 0.8rem; margin: 0;">Edit Selected Subject:</label>
                     <select id="bank-inspect-select" style="width: auto; padding: 0.3em; margin: 0;"></select>
                     <br>
-                    <button id="btn-delete-module" class="btn-tactical btn-clear hidden">
-                        Delete Module
+                    <button id="btn-delete-subject" class="btn-tactical btn-red hidden">
+                        Delete Subject
                     </button>
                 </div>
             </div>
 
             <!-- QUESTION ACTION CONTROL BAR -->
 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin: 1em 0 0.8em 0; gap: 0.5em; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 1em;">
-    <h2 style="margin: 0; font-size: 1.2rem;">Module Questions</h2>
+    <h2 style="margin: 0; font-size: 1.2rem;">Subject Questions</h2>
     <div style="display: flex; align-items: center; gap: 0.5em; flex-wrap: wrap;">
         <button id="btn-add-question-card" class="btn-tactical" style="padding: 0.4em 0.8em;">
-            ➕ Add Question Card
+            Add Question Card
         </button>
     </div>
 </div>
 
             <!-- QUESTIONS DISPLAY & INLINE EDITING CONTAINER -->
             <div id="bank-inspector-list">
-                <div style="color: var(--light-text-color); font-size: 0.8rem;">Select a module above to manage or inspect questions...</div>
+                <div style="color: var(--light-text-color); font-size: 0.8rem;">Select a subject above to manage or inspect questions...</div>
             </div>
         </section>
     </main>
@@ -241,7 +241,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <!-- Load Custom JavaScript File -->
-    <script type="module" src="js/app.js"></script>
+    <script type="subject" src="js/app.js"></script>
 </body>
 
 <footer>

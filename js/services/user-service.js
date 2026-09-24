@@ -3,8 +3,6 @@ import { state } from '../state.js';
 
 /**
  * Assigns a role ('admin', 'mod', or 'user') to a target user UID
- * @param {string} targetUid 
- * @param {string} newRole - 'admin' | 'mod' | 'user'
  */
 export async function updateUserRole(targetUid, newRole) {
     if (!state.currentUser) {
@@ -36,7 +34,6 @@ export async function updateUserRole(targetUid, newRole) {
 
 /**
  * Searches users node by email or callsign to find target UID
- * @param {string} query 
  */
 export async function findUserByQuery(query) {
     const cleanQuery = query.trim().toLowerCase();
@@ -59,9 +56,7 @@ export async function findUserByQuery(query) {
 }
 
 /**
- * Awards points to the logged-in user or triggers a prompt to non-logged-in guests.
- * @param {number} pointsToEarn - Number of points to credit.
- * @param {string} reason - Description of the achievement.
+ * Awards points to the logged-in user with instant optimistic UI update + DB transaction sync
  */
 export async function awardPoints(pointsToEarn, reason = "completing an activity") {
     const user = state.currentUser;
@@ -71,25 +66,27 @@ export async function awardPoints(pointsToEarn, reason = "completing an activity
         return;
     }
 
+    // 1. Calculate optimistic new total and update UI instantly (0ms latency)
+    const currentPoints = state.userPoints || 0;
+    const optimisticTotal = currentPoints + pointsToEarn;
+    state.updatePoints(optimisticTotal);
+
+    showToast(`+${pointsToEarn} Points Earned for ${reason}! Total: ${optimisticTotal} pts`, "success");
+
+    // 2. Synchronize in the background with Firebase Realtime DB
     const pointsRef = database.ref(`users/${user.uid}/points`);
 
     try {
-        const { snapshot } = await pointsRef.transaction((currentPoints) => {
-            return (currentPoints || 0) + pointsToEarn;
+        const { snapshot } = await pointsRef.transaction((dbPoints) => {
+            return (dbPoints || 0) + pointsToEarn;
         });
 
-        const newPoints = snapshot.val();
-        state.userPoints = newPoints; // Update local state
-
-        // Sync header badge immediately
-        const header = document.querySelector("site-header");
-        if (header && typeof header.renderUser === 'function') {
-            header.renderUser(state.userCallsign, state.userPoints);
+        const syncedPoints = snapshot.val();
+        if (syncedPoints !== optimisticTotal) {
+            state.updatePoints(syncedPoints);
         }
-
-        showToast(`+${pointsToEarn} Points Earned for ${reason}! Total: ${newPoints} pts`, "success");
     } catch (err) {
-        console.error("Error updating user points:", err);
+        console.error("Error syncing user points to database:", err);
     }
 }
 
@@ -98,7 +95,7 @@ export async function awardPoints(pointsToEarn, reason = "completing an activity
  */
 function showGuestPointPrompt(points, reason) {
     showToast(
-        `💡 Log in to claim ${points} points for ${reason}!`,
+        `Log in to claim ${points} points for ${reason}!`,
         "info"
     );
 
@@ -107,9 +104,7 @@ function showGuestPointPrompt(points, reason) {
     if (lastToast) {
         lastToast.style.cursor = "pointer";
         lastToast.addEventListener("click", () => {
-            const header = document.querySelector("site-header");
-            const googleAuthBtn = header ? header.querySelector("#google-auth-btn") : document.getElementById("google-auth-btn");
-            if (googleAuthBtn) googleAuthBtn.click();
+            import('./auth-service.js').then(m => m.triggerAuthFlow());
         });
     }
 }
@@ -137,4 +132,48 @@ export function showToast(message, type = "info") {
         toast.classList.remove("toast-show");
         setTimeout(() => toast.remove(), 300);
     }, 4000);
+}
+
+/**
+ * Converts a File object into a compressed Base64 Data URI.
+ */
+export function convertImageToBase64(file, maxWidth = 800, quality = 0.75) {
+    return new Promise((resolve, reject) => {
+        if (!file || !file.type.startsWith('image/')) {
+            reject(new Error("Please select a valid image file."));
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+
+            img.onload = () => {
+                let width = img.width;
+                let height = img.height;
+
+                if (width > maxWidth) {
+                    height = Math.round((height * maxWidth) / width);
+                    width = maxWidth;
+                }
+
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                const base64String = canvas.toDataURL('image/jpeg', quality);
+                resolve(base64String);
+            };
+
+            img.onerror = (err) => reject(new Error("Failed to load image into canvas: " + err));
+        };
+
+        reader.onerror = (err) => reject(new Error("Failed to read image file: " + err));
+    });
 }

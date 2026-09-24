@@ -18,7 +18,7 @@ export function initFlashcards() {
     const questions = session.activeQuestions;
 
     const cardEl = document.getElementById("flashcard");
-    const badgeEl = document.getElementById("flashcard-module-badge");
+    const badgeEl = document.getElementById("flashcard-subject-badge");
     const trackerEl = document.getElementById("flashcard-tracker");
     const questionTextEl = document.getElementById("flashcard-question-text");
     const answerTextEl = document.getElementById("flashcard-answer-text");
@@ -33,12 +33,12 @@ export function initFlashcards() {
 
     function renderCard(index) {
         if (cardEl) {
-            cardEl.style.transition = "none";
+            cardEl.classList.add("no-transition");
             currentRotation = 0;
             cardEl.style.transform = "rotateY(0deg)";
-            
+
             void cardEl.offsetHeight; // Force browser repaint
-            cardEl.style.transition = "";
+            cardEl.classList.remove("no-transition");
         }
 
         const q = questions[index];
@@ -49,21 +49,21 @@ export function initFlashcards() {
 
         // Render Question Visual Cue Image if available
         const frontContainer = questionTextEl ? questionTextEl.parentNode : null;
-        let imgEl = document.getElementById("flashcard-visual-cue");
+        let imgEl = document.getElementById("visual-cue");
 
         if (q.imageUrl && q.imageUrl.trim() !== "") {
             if (!imgEl && frontContainer) {
                 imgEl = document.createElement("img");
-                imgEl.id = "flashcard-visual-cue";
-                imgEl.style.cssText = "max-width: 100%; max-height: 160px; border-radius: 6px; margin: 0.8em 0; object-fit: contain;";
+                imgEl.id = "visual-cue";
+                imgEl.className = "visual-cue";
                 frontContainer.insertBefore(imgEl, questionTextEl.nextSibling);
             }
             if (imgEl) {
                 imgEl.src = q.imageUrl;
-                imgEl.style.display = "block";
+                imgEl.classList.remove("hidden");
             }
         } else if (imgEl) {
-            imgEl.style.display = "none";
+            imgEl.classList.add("hidden");
         }
 
         let rawAnswer = (q.options && q.options[q.answer] !== undefined)

@@ -1,34 +1,50 @@
-# Evaluator (v3.0)
+# Evaluator (v4.0.1 - Shadowfox)
 
-A lightweight, student-focused, free-to-use study and assessment platform designed to help cadets and service members master official marching regulations, command structures, and ceremony procedures.
+A lightweight, student-focused, free-to-use study and assessment platform designed to help Civil Air Patrol (CAP) cadets and service members master official marching regulations, command structures, aerospace topics, and ceremony procedures.
 
-Built using plain JavaScript (ES Modules), HTML5, CSS3, and Firebase Realtime Database.
+Built using native vanilla JavaScript (ES Modules), HTML5, CSS3, and Firebase Realtime Database without heavy frameworks or build tool overhead.
 
 ---
 
-js/
-├── config.js
-├── state.js
-├── app.js                   <-- Global Auth & Router ONLY (~35 lines)
-├── components/
-│   ├── header.js            <-- Encapsulates avatar/menu/dropdown behavior
-│   ├── modal.js             <-- Encapsulates custom promise dialogs
-│   ├── quiz-engine.js       <-- Quiz/Test pages
-│   ├── flashcards.js        <-- Flashcards page
-│   ├── leaderboard.js       <-- Leaderboard page
-│   └── hub.js               <-- Question creation/edit page
-└── services/
-    ├── auth-service.js
-    └── user-service.js
+## Repository Structure
+
+├── index.html
+├── setup.html
+├── quiz.html
+├── flashcards.html
+├── leaderboard.html
+├── hub.html
+├── results.html
+├── styles.css
+└── js/
+    ├── config.js               <-- Firebase initialization & global config
+    ├── state.js                <-- Centralized application state
+    ├── app.js                  <-- Application entry point & router (~35 lines)
+    ├── components/
+    │   ├── header.js           <-- Site header Web Component (site-header>)
+    │   ├── footer.js           <-- Site footer Web Component (site-footer>) with commit history
+    │   ├── modal-element.js    <-- Custom modal Web Component (custom-modal>)
+    │   ├── quiz-engine.js      <-- Quiz runner, Study, and Timed Evaluation modes
+    │   ├── flashcards.js       <-- Study Flashcard engine
+    │   ├── leaderboard.js      <-- Individual & Flight Battle standings
+    │   └── hub-page.js         <-- Personnel Hub & question moderation
+    ├── pages/
+    │   ├── modal.js            <-- Promise-based showModal, showConfirm, showPrompt dialogs
+    │   └── navigation.js       <-- Input sanitization & view routing
+    └── services/
+        ├── auth-service.js     <-- Firebase Authentication & Google OAuth handlers
+        ├── db-service.js       <-- Firebase Realtime Database read/write operations
+        ├── user-service.js     <-- User profiles, callsigns, & points allocation
+        └── badge-service.js    <-- Achievement badge checks & awards
 
 ## Features
 
 * **100% Free & Open Access:** No paywalls, subscription tiers, or hidden charges.
 * **Modular ES Architecture:** Clean, maintainable codebase separated into state, services, and UI component modules.
-* **Community Quiz Engine:** Select any registered study module, choose how many randomized questions to evaluate, and practice recall.
+* **Community Quiz Engine:** Select any registered study subject, choose how many randomized questions to evaluate, and practice recall.
 * **Author & Reputation System:** Community members can add questions, receive community upvotes/downvotes, and build their profile score.
 * **Dynamic Leaderboard:** Automated scoring leaderboard with gold, silver, and bronze podium styling, tie-breaker sorting by date, and zebra-striped rows.
-* **Admin & Creator Inspector:** Dedicated management panel for creating quiz modules, appending citation-backed questions, and updating records.
+* **Admin & Creator Inspector:** Dedicated management panel for creating quiz subjects, appending citation-backed questions, and updating records.
 
 ---
 
@@ -39,27 +55,27 @@ The application relies on three core cloud services:
 1. **Google Cloud Console** ([console.cloud.google.com](https://console.cloud.google.com/))
    * Handles Google OAuth 2.0 authentication credentials and authorized JavaScript origins/redirect URIs.
 2. **Firebase Console** ([console.firebase.google.com](https://console.firebase.google.com/))
-   * Controls the **Firebase Realtime Database** for storing modules, user-submitted questions, scores, and star transactions.
+   * Controls the **Firebase Realtime Database** for storing subjects, user-submitted questions, scores, and star transactions.
    * Manages database security rules and Google Authentication user logs.
 3. **Netlify** ([app.netlify.com](https://app.netlify.com/))
    * Provides continuous deployment and free production web hosting directly connected to the repository.
 
 ---
 
-## ⚙️ How the Application Works
+## How the Application Works
 
 ### 1. Client-Side ES Modules Architecture
 
 The frontend runs natively in the browser without build tools or bundlers. The entry point is `js/app.js` loaded via `<script type="module">`.
 
 * `js/config.js` — Initializes Firebase SDK instances and global constants.
-* `js/state.js` — Holds mutable global state (e.g., loaded modules, active session score, current user).
+* `js/state.js` — Holds mutable global state (e.g., loaded subjects, active session score, current user).
 * `js/services/` — Contains database and auth handlers (`auth-service.js`, `db-service.js`).
 * `js/components/` — Isolated UI logic for views (`navigation.js`, `quiz-engine.js`, `leaderboard.js`, `hub.js`).
 
 ### 2. Quiz Evaluation Flow
 
-1. **Setup:** The user selects a target module. The dynamic slider automatically reads the module size and updates its `max` bounds.
+1. **Setup:** The user selects a target subject. The dynamic slider automatically reads the subject size and updates its `max` bounds.
 2. **Execution:** The quiz engine uses a Fisher-Yates shuffle algorithm to randomly order the question set and slices it to match the requested slider count.
 3. **Scoring:** Answers are checked in real-time with citation feedback. Completed scores are saved directly to Firebase (`/scores`) and automatically update the honor roll.
 
