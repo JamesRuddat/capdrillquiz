@@ -110,6 +110,22 @@ export function updateBannerImage() {
 
     if (!selectEl || !bannerEl) return;
 
+    // --- NEW: Read URL Query Parameter (?subject=KEY or ?branch=KEY) on initial load ---
+    if (!selectEl.dataset.initialized) {
+        selectEl.dataset.initialized = "true";
+        const urlParams = new URLSearchParams(window.location.search);
+        const incomingSubject = urlParams.get("subject") || urlParams.get("branch") || urlParams.get("quiz");
+
+        if (incomingSubject) {
+            const optionExists = Array.from(selectEl.options).some(opt => opt.value === incomingSubject);
+            if (optionExists) {
+                selectEl.value = incomingSubject;
+            } else {
+                console.warn(`Subject parameter "${incomingSubject}" not found in registry options.`);
+            }
+        }
+    }
+
     const activeBranchKey = selectEl.value;
     const registryEntry = state.QUESTION_REGISTRY ? state.QUESTION_REGISTRY[activeBranchKey] : null;
 
@@ -176,7 +192,7 @@ export function updateBannerImage() {
         }
     }
 
-    // Always re-evaluate slider and button states on selection change
+    // Always re-evaluate slider limits and mode button states on selection change
     updateSliderLimits();
 }
 
