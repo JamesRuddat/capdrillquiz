@@ -1,11 +1,10 @@
 import { state } from '../state.js';
-import { awardPoints, showToast } from '../services/user-service.js';
+import { awardPoints, showToast} from '../services/user-service.js';
 import { saveScoreToDB } from '../services/db-service.js';
 import { checkAndAwardBadges } from '../services/badge-service.js';
 import {
     SYMBOL_LEGEND,
     DRILL_COMMANDS,
-    generateFlight,
     gradeFormation,
     iconPath
 } from '../library/drill-formations.js';
@@ -97,24 +96,29 @@ function renderSymbolQuestion() {
     const options = shuffle([roleKey, ...distractorKeys]);
 
     container.innerHTML = `
-        <div class="quiz-card drill-symbol-card">
-            <div class="drill-progress-row">
-                <span>Symbol ${symbolIdx + 1} of ${symbolQueue.length}</span>
-                <span>Score: ${symbolScore}</span>
+        <div class="quiz-card">
+            <div class="quiz-runner-header flex-row-between">
+                <span class="text-dim text-sm font-bold">Question ${symbolIdx + 1} of ${symbolQueue.length}</span>
+                <span class="badge-status badge-verified">Score: ${symbolScore}</span>
             </div>
-            <div class="drill-symbol-stage">
-                <img src="${iconPath(roleKey)}" alt="Drill symbol" class="drill-symbol-img">
+            
+            <div class="text-center">
+                <img src="${iconPath(roleKey)}" alt="Drill symbol" class="question-visual-cue">
             </div>
-            <p class="drill-question-prompt">What position does this symbol represent?</p>
-            <div id="drill-symbol-options" class="drill-options-stack">
+
+            <h3 class="quiz-card-title margin-none">What position does this symbol represent?</h3>
+            <p class="quiz-card-meta">Identify the correct drill &amp; ceremonies formation position shown above.</p>
+
+            <div id="drill-symbol-options" class="width-full">
                 ${options.map(k => `
-                    <button type="button" class="btn-tactical btn-daily-option width-full text-left"
+                    <button type="button" class="option-btn btn-option width-full text-left"
                         data-drill-action="answer-symbol" data-role="${k}">
                         ${SYMBOL_LEGEND[k]?.label || k}
                     </button>
                 `).join('')}
             </div>
-            <div id="drill-symbol-feedback" class="daily-feedback-panel hidden"></div>
+
+            <div id="drill-symbol-feedback" class="hidden"></div>
         </div>
     `;
 }
@@ -127,15 +131,24 @@ function answerSymbol(chosenRole) {
     const buttons = document.querySelectorAll('[data-drill-action="answer-symbol"]');
     buttons.forEach(btn => {
         btn.disabled = true;
-        if (btn.dataset.role === roleKey) btn.classList.add("btn-correct");
-        else if (btn.dataset.role === chosenRole) btn.classList.add("btn-incorrect");
+        if (btn.dataset.role === roleKey) {
+            btn.classList.add("correct", "btn-correct");
+        } else if (btn.dataset.role === chosenRole) {
+            btn.classList.add("incorrect", "btn-incorrect");
+        }
     });
 
     const feedback = document.getElementById("drill-symbol-feedback");
     if (feedback) {
         feedback.classList.remove("hidden");
-        feedback.className = isCorrect ? "daily-feedback-panel daily-feedback-success" : "daily-feedback-panel daily-feedback-error";
-        feedback.innerHTML = `<strong>${isCorrect ? 'Correct.' : 'Incorrect.'}</strong> ${correct.label} — ${correct.desc}`;
+        feedback.id = "feedback-panel";
+        feedback.className = isCorrect ? "correct-panel" : "incorrect-panel";
+        feedback.innerHTML = `
+            <span class="feedback-status-tag ${isCorrect ? 'tag-correct' : 'tag-incorrect'}">
+                ${isCorrect ? 'Correct' : 'Incorrect'}
+            </span>
+            <strong>${correct.label}</strong> — ${correct.desc}
+        `;
     }
 
     if (isCorrect) symbolScore++;
@@ -154,7 +167,7 @@ async function finishSymbolSession() {
     if (container) {
         container.innerHTML = `
             <div class="quiz-card text-center">
-                <h3>Symbol ID Complete</h3>
+                <h3>Drill Symbol Identification Complete</h3>
                 <p>${symbolScore} / ${symbolQueue.length} correct (${pct}%)</p>
                 <button type="button" class="btn-tactical btn-gold" data-drill-action="restart-symbol">
                     Practice Again
@@ -175,7 +188,7 @@ async function finishSymbolSession() {
 }
 
 // ---------------------------------------------------------------------------
-// FORMATION BUILDER MODE (WITH GHOST HINTS)
+// FORMATION BUILDER MODE
 // ---------------------------------------------------------------------------
 function currentCommandDef() {
     return DRILL_COMMANDS[SEQUENCE[sequenceIdx]];
@@ -216,7 +229,6 @@ function renderFormationDOM(cmd, correctFlight) {
     const totalRows = correctFlight.gridRows;
     const totalCols = correctFlight.gridCols;
 
-    // Create lookup map for ghost icons
     const targetMap = new Map();
     correctFlight.positions.forEach(p => {
         targetMap.set(`${p.col},${p.row}`, p.role);
@@ -228,7 +240,6 @@ function renderFormationDOM(cmd, correctFlight) {
             const actualRow = r - rowShift;
             const targetRole = targetMap.get(`${c},${actualRow}`);
 
-            // Injects ghost icon overlay if this cell requires a target symbol
             const ghostHTML = targetRole
                 ? `<img src="${iconPath(targetRole)}" class="drill-cell-ghost" alt="Hint Target">`
                 : "";
@@ -259,14 +270,16 @@ function renderFormationDOM(cmd, correctFlight) {
                 <span>Score: ${formationScore.correct} / ${formationScore.total}</span>
             </div>
             <h3 class="drill-command-title">${cmd.command}</h3>
-            <p class="text-dim">${cmd.description}</p>
+            <p class="text-dim margin-none">${cmd.description}</p>
             <p class="drill-citation">${cmd.citation}</p>
 
             <div class="drill-builder-layout">
+                <!-- Borderless Unit Palette along TOP -->
                 <div id="drill-tray" class="drill-tray">
                     ${trayHTML}
                 </div>
-                <div id="drill-grid" class="drill-grid"
+                <!-- Compact Formation Grid BELOW -->
+                <div id="drill-grid" class="drill-grid drill-grid-compact"
                     style="--drill-grid-cols: ${totalCols}; --drill-grid-rows: ${totalRows};">
                     ${gridHTML}
                 </div>
@@ -286,7 +299,7 @@ function renderFormationDOM(cmd, correctFlight) {
 }
 
 // ---------------------------------------------------------------------------
-// CUSTOM SANDBOX FORMATION BUILDER MODE
+// PIR EXPANDED SANDBOX BUILDER MODE (12x12 CANVAS)
 // ---------------------------------------------------------------------------
 function renderCustomBuilder() {
     const container = document.getElementById("drill-view-container");
@@ -296,14 +309,13 @@ function renderCustomBuilder() {
     selectedRole = null;
     trayRemaining = {};
 
-    // Unlimited Sandbox Tray
     Object.keys(SYMBOL_LEGEND).forEach(role => {
         trayRemaining[role] = 99;
     });
 
-    const totalCols = 5;
-    const totalRows = 8;
-    const rowShift = 4;
+    const totalCols = 12;
+    const totalRows = 12;
+    const rowShift = 6;
 
     let gridHTML = "";
     for (let r = 0; r < totalRows; r++) {
@@ -324,29 +336,70 @@ function renderCustomBuilder() {
         `;
     }).join('');
 
+    const savedDesigns = getSavedDesigns();
+    const savedListHTML = savedDesigns.length === 0
+        ? `<p class="text-dim text-sm">No saved formation training samples yet.</p>`
+        : savedDesigns.map(d => `
+            <div class="col flex-row-between margin-none" style="padding: 0.6em 0.8em; margin-bottom: 0.4em;">
+                <div>
+                    <strong>${d.name}</strong>
+                    <div class="text-dim text-sm">${d.positions.length} Units placed</div>
+                </div>
+                <div class="flex-row gap-sm">
+                    <button type="button" class="btn-tactical btn-blue btn-sm" data-drill-action="load-design" data-id="${d.id}">Load</button>
+                    <button type="button" class="btn-tactical btn-red btn-sm" data-drill-action="delete-design" data-id="${d.id}">Delete</button>
+                </div>
+            </div>
+        `).join('');
+
     container.innerHTML = `
         <div class="quiz-card drill-formation-card">
             <div class="drill-progress-row">
-                <span>Custom Sandbox Mode</span>
-                <span>Free Placement Grid</span>
+                <span>Pass in Review (PIR) Sandbox</span>
+                <span>Expanded 12x12 Grid</span>
             </div>
-            <h3 class="drill-command-title">Custom Formation Canvas</h3>
-            <p class="text-dim">Place, rearrange, and experiment with drill symbols to design your own custom flight diagrams.</p>
+            <h3 class="drill-command-title">PIR Parade Formation Canvas</h3>
+            <p class="text-dim margin-none">Place Commanders, Staff, Colors, Flight Commanders, and Guideons across this expanded field layout.</p>
 
             <div class="drill-builder-layout">
+                <!-- Borderless Unit Palette TOP -->
                 <div id="drill-tray" class="drill-tray">
                     ${trayHTML}
                 </div>
-                <div id="drill-grid" class="drill-grid"
+                <!-- 12x12 PIR Grid BELOW -->
+                <div id="drill-grid" class="drill-grid drill-grid-pir"
                     style="--drill-grid-cols: ${totalCols}; --drill-grid-rows: ${totalRows};">
                     ${gridHTML}
                 </div>
             </div>
 
-            <div class="drill-builder-actions">
-                <button type="button" class="btn-tactical btn-clear" data-drill-action="clear-custom">
-                    Clear Grid
-                </button>
+            <!-- Save / Tag Controls -->
+            <div class="col flex-col gap-sm margin-none" style="margin-top: 1em;">
+                <h4 class="margin-none">Save Design for Training</h4>
+                <div class="flex-row gap-sm">
+                    <input type="text" id="drill-design-name" placeholder="Design Title (e.g., Open Ranks Mass Parade)" class="flex-1" style="margin:0;">
+                    <button type="button" class="btn-tactical btn-gold" data-drill-action="save-active-design">
+                        Save Design
+                    </button>
+                    <button type="button" class="btn-tactical btn-clear" data-drill-action="clear-custom">
+                        Clear Grid
+                    </button>
+                </div>
+            </div>
+
+            <!-- Saved Formations Library -->
+            <div style="margin-top: 1.2em;">
+                <div class="flex-row-between margin-none" style="margin-bottom: 0.6em;">
+                    <h4 class="margin-none">Saved Training Samples (${savedDesigns.length})</h4>
+                    ${savedDesigns.length > 0 ? `
+                        <button type="button" class="btn-tactical btn-sm" data-drill-action="export-designs-json">
+                            Export JSON Dataset
+                        </button>
+                    ` : ''}
+                </div>
+                <div class="flex-col gap-sm">
+                    ${savedListHTML}
+                </div>
             </div>
         </div>
     `;
@@ -363,14 +416,34 @@ function selectRole(role) {
     });
 }
 
+function clearAllCells() {
+    const gridEl = document.getElementById("drill-grid");
+    if (!gridEl) return;
+
+    const filledCells = gridEl.querySelectorAll('[data-filled="true"]');
+    filledCells.forEach(cellEl => {
+        const role = cellEl.dataset.role;
+        cellEl.removeAttribute("data-filled");
+        cellEl.removeAttribute("data-role");
+
+        const activeImg = cellEl.querySelector("img:not(.drill-cell-ghost)");
+        if (activeImg) activeImg.remove();
+
+        if (mode !== "custom" && role && trayRemaining[role] !== undefined) {
+            trayRemaining[role]++;
+        }
+    });
+
+    placedCells = [];
+    refreshTrayCounts();
+}
+
 function placeAt(col, row, cellEl, forcedRole = null) {
-    // 1. Return placed icon to tray
     if (cellEl.dataset.filled === "true" && !forcedRole) {
         const role = cellEl.dataset.role;
         cellEl.removeAttribute("data-filled");
         cellEl.removeAttribute("data-role");
 
-        // Remove active placed image element, leave ghost intact if present
         const activeImg = cellEl.querySelector("img:not(.drill-cell-ghost)");
         if (activeImg) activeImg.remove();
 
@@ -382,12 +455,10 @@ function placeAt(col, row, cellEl, forcedRole = null) {
         return;
     }
 
-    // 2. Safety check for active role
     const roleToPlace = forcedRole || selectedRole;
     if (!roleToPlace || !SYMBOL_LEGEND[roleToPlace]) return;
     if (mode !== "custom" && (trayRemaining[roleToPlace] || 0) <= 0) return;
 
-    // 3. Handle cell overwrite
     if (cellEl.dataset.filled === "true") {
         const oldRole = cellEl.dataset.role;
         placedCells = placedCells.filter(p => !(p.col === col && p.row === row));
@@ -398,7 +469,6 @@ function placeAt(col, row, cellEl, forcedRole = null) {
         if (activeImg) activeImg.remove();
     }
 
-    // 4. Place new icon overlay
     const label = SYMBOL_LEGEND[roleToPlace]?.label || roleToPlace;
     cellEl.dataset.filled = "true";
     cellEl.dataset.role = roleToPlace;
@@ -411,7 +481,6 @@ function placeAt(col, row, cellEl, forcedRole = null) {
 
     placedCells.push({ col, row, role: roleToPlace });
 
-    // 5. Decrement tray count
     if (mode !== "custom") {
         trayRemaining[roleToPlace]--;
         if (trayRemaining[roleToPlace] <= 0 && selectedRole === roleToPlace) {
@@ -435,7 +504,9 @@ function refreshTrayCounts() {
 }
 
 function resetFormation() {
-    renderFormationDOM(currentCommandDef(), currentCommandDef().buildFlight(FORMATION_CONFIG));
+    clearAllCells();
+    const feedback = document.getElementById("drill-formation-feedback");
+    if (feedback) feedback.classList.add("hidden");
 }
 
 function checkFormation() {
@@ -627,7 +698,7 @@ function handleContainerClick(e) {
     if (restartFormation) return startMode("formation");
 
     const clearCustom = e.target.closest('[data-drill-action="clear-custom"]');
-    if (clearCustom) return renderCustomBuilder();
+    if (clearCustom) return clearAllCells();
 
     const roleBtn = e.target.closest('[data-drill-action="select-role"]');
     if (roleBtn) return selectRole(roleBtn.dataset.role);
@@ -644,4 +715,96 @@ function handleContainerClick(e) {
         const row = parseInt(cell.dataset.row, 10);
         return placeAt(col, row, cell);
     }
+
+    const saveDesignBtn = e.target.closest('[data-drill-action="save-active-design"]');
+    if (saveDesignBtn) {
+        const nameInput = document.getElementById("drill-design-name");
+        const name = nameInput ? nameInput.value.trim() : "Custom Formation";
+        if (placedCells.length === 0) {
+            showToast("Place at least one unit before saving!");
+            return;
+        }
+        saveDesignToStorage(name, "", placedCells);
+        return;
+    }
+
+    const loadDesignBtn = e.target.closest('[data-drill-action="load-design"]');
+    if (loadDesignBtn) return loadDesignToCanvas(loadDesignBtn.dataset.id);
+
+    const deleteDesignBtn = e.target.closest('[data-drill-action="delete-design"]');
+    if (deleteDesignBtn) return deleteDesign(deleteDesignBtn.dataset.id);
+
+    const exportJsonBtn = e.target.closest('[data-drill-action="export-designs-json"]');
+    if (exportJsonBtn) {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(getSavedDesigns(), null, 2));
+        const downloadAnchor = document.createElement("a");
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", `drill_formations_${Date.now()}.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+        return;
+    }
+}
+
+// Add to top of js/pages/drill.js
+const LOCAL_DESIGNS_KEY = "drill_saved_designs";
+
+/**
+ * Retrieve saved formation designs from LocalStorage
+ */
+function getSavedDesigns() {
+    try {
+        return JSON.parse(localStorage.getItem(LOCAL_DESIGNS_KEY) || "[]");
+    } catch {
+        return [];
+    }
+}
+
+/**
+ * Persist design entry to LocalStorage
+ */
+function saveDesignToStorage(name, description, positions) {
+    const designs = getSavedDesigns();
+    const newEntry = {
+        id: `design_${Date.now()}`,
+        name: name || "Custom Formation",
+        description: description || "",
+        timestamp: new Date().toISOString(),
+        gridCols: 12,
+        gridRows: 12,
+        positions: [...positions]
+    };
+    designs.push(newEntry);
+    localStorage.setItem(LOCAL_DESIGNS_KEY, JSON.stringify(designs));
+    showToast(`Saved "${newEntry.name}" to local library!`);
+    renderCustomBuilder(); // Re-render to refresh saved library list
+}
+
+/**
+ * Delete design entry
+ */
+function deleteDesign(id) {
+    const designs = getSavedDesigns().filter(d => d.id !== id);
+    localStorage.setItem(LOCAL_DESIGNS_KEY, JSON.stringify(designs));
+    renderCustomBuilder();
+}
+
+/**
+ * Load saved design back onto the sandbox grid
+ */
+function loadDesignToCanvas(id) {
+    const design = getSavedDesigns().find(d => d.id === id);
+    if (!design) return;
+
+    clearAllCells();
+
+    design.positions.forEach(p => {
+        const cell = document.querySelector(`[data-col="${p.col}"][data-row="${p.row}"]`);
+        if (cell) {
+            placeAt(p.col, p.row, cell, p.role);
+        }
+    });
+
+    showToast(`Loaded "${design.name}" onto grid.`);
 }

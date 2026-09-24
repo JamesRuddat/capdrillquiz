@@ -466,6 +466,8 @@ hr {
     border-radius: 8px;
     background: var(--card-background);
     border-left: 3px solid var(--alert-color);
+    min-height: 220px;
+    contain: layout style;
 }
 
 .daily-challenge-header {
@@ -535,6 +537,8 @@ hr {
     justify-content: center;
     align-items: center;
     gap: 0.3em;
+    min-height: 140px;
+    contain: layout style;
 }
 
 .stat-number {
@@ -543,6 +547,7 @@ hr {
     font-family: var(--font-heading);
     color: var(--primary-color);
     display: block;
+    min-height: 2.2rem;
 }
 
 .stat-label {
@@ -592,12 +597,14 @@ hr {
 }
 
 /* ==========================================================================
-   6. SUBJECT CARDS & GRID
+   6. SUBJECT CARDS, GRID & SKELETON STYLES
    ========================================================================== */
 .cards-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 1.2em;
+    min-height: 400px;
+    contain: layout style;
 }
 
 .quiz-card {
@@ -611,6 +618,7 @@ hr {
     min-height: 240px;
     line-height: 1.5;
     position: relative;
+    contain: layout style;
 }
 
 .quiz-card:hover {
@@ -714,6 +722,47 @@ hr {
     border-color: var(--border-color) !important;
 }
 
+/* Static Skeleton Loading State Rules */
+.skeleton-row td {
+    opacity: 0.5;
+}
+
+.quiz-card-skeleton {
+    min-height: 240px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    pointer-events: none;
+}
+
+.skeleton-text {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    animation: skeleton-pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-title {
+    width: 60%;
+    height: 20px;
+    margin-bottom: 8px;
+}
+
+.skeleton-badge {
+    width: 30%;
+    height: 14px;
+}
+
+.skeleton-body {
+    width: 90%;
+    height: 40px;
+    margin-top: 16px;
+}
+
+@keyframes skeleton-pulse {
+    0% { opacity: 0.3; }
+    50% { opacity: 0.7; }
+    100% { opacity: 0.3; }
+}
+
 /* ==========================================================================
    7. SETUP VIEW & BANNER CONTAINER
    ========================================================================== */
@@ -738,6 +787,7 @@ hr {
     background-repeat: no-repeat;
     border: 1px solid var(--border-color);
     margin-bottom: 2em;
+    background-color: rgba(255, 255, 255, 0.02);
 }
 
 .subject-banner-container .banner-title,
@@ -1301,136 +1351,54 @@ tbody tr:hover { background-color: rgba(255, 205, 0, 0.1) !important; }
 /* ==========================================================================
    16. DRILL & CEREMONIES (DAFPAM 34-1203) MODULE STYLES
    ========================================================================== */
-.drill-symbol-card,
-.drill-formation-card {
-    position: relative;
-    overflow: hidden;
-}
-
-.drill-progress-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--light-text-color);
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    padding-bottom: 0.8em;
-    margin-bottom: 1em;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.drill-command-title {
-    font-size: 1.6rem;
-    color: var(--alert-color);
-    margin: 0.2em 0 0.1em 0;
-}
-
-.drill-citation {
-    font-size: 0.78rem;
-    color: var(--light-text-color);
-    font-style: italic;
-    margin-bottom: 1.2em;
-}
-
-/* Symbol ID Stage */
-.drill-symbol-stage {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 140px;
-    padding: 1.5em;
-    margin: 0.8em 0 1.2em 0;
-    background-color: var(--input-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-}
-
-.drill-symbol-img {
-    max-width: 100px;
-    max-height: 100px;
-    width: auto;
-    height: auto;
-    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
-}
-
-.drill-question-prompt {
-    font-weight: 600;
-    font-size: 1.05rem;
-    margin-bottom: 0.8em;
-}
-
-/* Formation Builder Layout */
+/* ==========================================================================
+   16. DRILL & CEREMONIES (DAFPAM 34-1203) MODULE STYLES
+   ========================================================================== */
 .drill-builder-layout {
     display: flex;
     flex-direction: column;
-    gap: 1.5em;
-    margin: 1.2em 0;
+    gap: 1em;
+    margin: 1em 0;
+    width: 100%;
 }
 
-@media (min-width: 768px) {
-    .drill-builder-layout {
-        flex-direction: row;
-        align-items: flex-start;
-    }
-}
-
+/* Top Palette Tray (Re-uses .grid-auto) */
 .drill-tray {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: 0.6em;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em;
     background-color: var(--input-bg);
     padding: 0.8em;
     border-radius: 8px;
     border: 1px solid var(--border-color);
-    flex: 1 1 240px;
+    width: 100%;
+    max-height: 180px;
+    overflow-y: auto;
 }
 
 .drill-tray-item {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0.6em;
-    padding: 0.6em 0.8em;
+    gap: 0.5em;
+    padding: 0.4em 0.8em;
     background-color: var(--card-background);
-    border: 2px solid var(--border-color);
+    border: 1px solid var(--border-color);
     border-radius: 6px;
     color: var(--text-color);
     cursor: pointer;
-    font-family: inherit;
     font-size: 0.8rem;
-    text-align: left;
-    transition: all 0.15s ease;
     user-select: none;
-    -webkit-tap-highlight-color: transparent;
 }
 
 .drill-tray-item img {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     object-fit: contain;
-}
-
-.drill-tray-item span {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.2;
-}
-
-.drill-tray-item strong {
-    font-size: 0.75rem;
-    color: var(--alert-color);
-}
-
-.drill-tray-item:hover:not(:disabled) {
-    border-color: var(--alert-color);
-    transform: translateY(-1px);
 }
 
 .drill-tray-item.drill-tray-item-selected {
     border-color: var(--alert-color) !important;
     background-color: rgba(255, 205, 0, 0.15) !important;
-    box-shadow: 0 0 8px rgba(255, 205, 0, 0.3);
 }
 
 .drill-tray-item:disabled {
@@ -1439,55 +1407,41 @@ tbody tr:hover { background-color: rgba(255, 205, 0, 0.1) !important; }
     filter: grayscale(100%);
 }
 
+/* Formation Grids */
 .drill-grid {
     display: grid;
     grid-template-columns: repeat(var(--drill-grid-cols, 4), 1fr);
     grid-template-rows: repeat(var(--drill-grid-rows, 7), 1fr);
-    gap: 6px;
-    padding: 12px;
-    background-color: var(--input-bg);
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
-    flex: 2 1 320px;
-    max-width: 100%;
+    gap: 1px;
+    padding: 4px;
+    background-color: var(--card-background);
+    border-radius: 4px;
+    width: 100%;
+    max-width: 340px;
     margin: 0 auto;
-    background-image: radial-gradient(circle, var(--border-color) 1px, transparent 1px);
-    background-size: 16px 16px;
 }
 
+.drill-grid-pir {
+    max-width: 100% !important;
+    overflow-x: auto;
+}
+
+/* Compact Grid Cells */
 .drill-cell {
     position: relative;
-    overflow: hidden;
     aspect-ratio: 1 / 1;
-    min-height: 48px;
-    border: 1.5px dashed var(--border-color);
-    border-radius: 6px;
-    background-color: rgba(0, 0, 0, 0.05);
+    min-height: 32px;
+    border: 1px dashed var(--input-bg);
+    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.15s ease;
-    touch-action: manipulation;
-}
-
-:root[data-theme="dark"] .drill-cell {
-    background-color: rgba(255, 255, 255, 0.02);
-}
-
-.drill-cell:hover {
-    border-color: var(--alert-color);
-    background-color: rgba(255, 205, 0, 0.08);
 }
 
 .drill-cell[data-filled="true"] {
-    border: 2px solid var(--primary-color);
+    border: 1px solid var(--primary-color);
     background-color: var(--card-background);
-    box-shadow: 0 2px 6px var(--card-shadow);
-}
-
-.drill-cell[data-filled="true"]:hover {
-    border-color: var(--alt-color);
 }
 
 .drill-cell-ghost {
@@ -1496,19 +1450,12 @@ tbody tr:hover { background-color: rgba(255, 205, 0, 0.1) !important; }
     width: 70%;
     height: 70%;
     object-fit: contain;
-    opacity: 0.22;
+    opacity: 0.25;
     filter: grayscale(100%);
     pointer-events: none;
-    z-index: 1;
-}
-
-:root[data-theme="dark"] .drill-cell-ghost {
-    filter: grayscale(100%) invert(100%);
 }
 
 .drill-cell-icon {
-    position: relative;
-    z-index: 2;
     width: 75%;
     height: 75%;
     object-fit: contain;
@@ -1517,33 +1464,14 @@ tbody tr:hover { background-color: rgba(255, 205, 0, 0.1) !important; }
 
 .drill-cell.drill-cell-hover {
     border-color: var(--alert-color) !important;
-    background-color: rgba(255, 205, 0, 0.25) !important;
-    box-shadow: 0 0 10px var(--alert-color);
+    background-color: rgba(255, 205, 0, 0.2) !important;
 }
 
 .drill-touch-avatar {
     position: fixed;
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     pointer-events: none;
     z-index: 9999;
     opacity: 0.85;
-    transform: scale(1.15);
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
-}
-
-.drill-builder-actions {
-    display: flex;
-    gap: 0.8em;
-    justify-content: flex-end;
-    margin-top: 1.2em;
-}
-
-.drill-builder-actions .btn-tactical {
-    min-width: 120px;
-}
-
-#drill-formation-feedback,
-#drill-symbol-feedback {
-    margin-top: 1.2em;
 }
