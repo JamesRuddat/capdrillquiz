@@ -14,7 +14,7 @@
     <!-- Load Component Partials -->
     <script type="module" src="/js/components/header.js"></script>
     <script type="module" src="/js/components/footer.js"></script>
-    <script type="module" src="/js/pages/modal-element.js"></script>
+    <script type="module" src="/js/components/modal-element.js"></script>
 </head>
 
 <body>
@@ -23,7 +23,7 @@
         <!-- Static Skeleton Shell (Prevents Header Glitch) -->
         <nav id="navbar">
             <div class="nav-links">
-                <a href="index.html" class="active-nav">Home</a>
+                <a href="index.html" class="active-nav">Dashboard</a>
                 <a href="setup.html">Practice</a>
                 <a href="leaderboard.html">Leaderboard</a>
             </div>
@@ -39,7 +39,7 @@
     <main>
         <section id="hub-view" class="col">
             <h1 class="margin-none">Subject HUB</h1>
-            <p class="hub-subtitle">
+            <p class="subtext">
                 Create subjects, append questions, inspect community items, or manage database records.
             </p>
 
@@ -60,7 +60,7 @@
                 </div>
 
                 <div class="flex-center gap-sm flex-wrap">
-                    <label for="bank-inspect-select" class="hub-select-label">View Subject:</label>
+                    <label for="bank-inspect-select" class="subtext">View Subject:</label>
                     <select id="bank-inspect-select" class=""></select>
                     <div class="flex-row gap-sm align-center margin-bottom-sm">
                         <label for="hub-sort-select" class="font-bold text-sm">Sort By:</label>
@@ -71,7 +71,7 @@
                             <option value="questions">Question Count</option>
                         </select>
                     </div>
-                    <button id="btn-delete-subject" class="btn-tactical btn-clear hidden">
+                    <button id="btn-delete-subject" class="btn-tactical btn-red hidden">
                         Delete Subject
                     </button>
                 </div>

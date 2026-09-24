@@ -49,13 +49,13 @@ export function initFlashcards() {
 
         // Render Question Visual Cue Image if available
         const frontContainer = questionTextEl ? questionTextEl.parentNode : null;
-        let imgEl = document.getElementById("flashcard-visual-cue");
+        let imgEl = document.getElementById("visual-cue");
 
         if (q.imageUrl && q.imageUrl.trim() !== "") {
             if (!imgEl && frontContainer) {
                 imgEl = document.createElement("img");
-                imgEl.id = "flashcard-visual-cue";
-                imgEl.className = "flashcard-visual-cue";
+                imgEl.id = "visual-cue";
+                imgEl.className = "visual-cue";
                 frontContainer.insertBefore(imgEl, questionTextEl.nextSibling);
             }
             if (imgEl) {

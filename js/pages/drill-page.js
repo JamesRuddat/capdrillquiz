@@ -98,12 +98,12 @@ function renderSymbolQuestion() {
     container.innerHTML = `
         <div class="quiz-card">
             <div class="quiz-runner-header flex-row-between">
-                <span class="text-dim text-sm font-bold">Question ${symbolIdx + 1} of ${symbolQueue.length}</span>
+                <span class="subtext text-sm font-bold">Question ${symbolIdx + 1} of ${symbolQueue.length}</span>
                 <span class="badge-status badge-verified">Score: ${symbolScore}</span>
             </div>
             
             <div class="text-center">
-                <img src="${iconPath(roleKey)}" alt="Drill symbol" class="question-visual-cue">
+                <img src="${iconPath(roleKey)}" alt="Drill symbol" class="visual-cue">
             </div>
 
             <h3 class="quiz-card-title margin-none">What position does this symbol represent?</h3>
@@ -111,7 +111,7 @@ function renderSymbolQuestion() {
 
             <div id="drill-symbol-options" class="width-full">
                 ${options.map(k => `
-                    <button type="button" class="option-btn btn-option width-full text-left"
+                    <button type="button" class="btn-option btn-option width-full text-left"
                         data-drill-action="answer-symbol" data-role="${k}">
                         ${SYMBOL_LEGEND[k]?.label || k}
                     </button>
@@ -270,7 +270,7 @@ function renderFormationDOM(cmd, correctFlight) {
                 <span>Score: ${formationScore.correct} / ${formationScore.total}</span>
             </div>
             <h3 class="drill-command-title">${cmd.command}</h3>
-            <p class="text-dim margin-none">${cmd.description}</p>
+            <p class="subtext margin-none">${cmd.description}</p>
             <p class="drill-citation">${cmd.citation}</p>
 
             <div class="drill-builder-layout">
@@ -286,7 +286,7 @@ function renderFormationDOM(cmd, correctFlight) {
             </div>
 
             <div class="drill-builder-actions">
-                <button type="button" class="btn-tactical btn-clear" data-drill-action="reset-formation">
+                <button type="button" class="btn-tactical btn-red" data-drill-action="reset-formation">
                     Clear
                 </button>
                 <button type="button" class="btn-tactical btn-gold" data-drill-action="check-formation">
@@ -338,12 +338,12 @@ function renderCustomBuilder() {
 
     const savedDesigns = getSavedDesigns();
     const savedListHTML = savedDesigns.length === 0
-        ? `<p class="text-dim text-sm">No saved formation training samples yet.</p>`
+        ? `<p class="subtext text-sm">No saved formation training samples yet.</p>`
         : savedDesigns.map(d => `
             <div class="col flex-row-between margin-none" style="padding: 0.6em 0.8em; margin-bottom: 0.4em;">
                 <div>
                     <strong>${d.name}</strong>
-                    <div class="text-dim text-sm">${d.positions.length} Units placed</div>
+                    <div class="subtext text-sm">${d.positions.length} Units placed</div>
                 </div>
                 <div class="flex-row gap-sm">
                     <button type="button" class="btn-tactical btn-blue btn-sm" data-drill-action="load-design" data-id="${d.id}">Load</button>
@@ -359,7 +359,7 @@ function renderCustomBuilder() {
                 <span>Expanded 12x12 Grid</span>
             </div>
             <h3 class="drill-command-title">PIR Parade Formation Canvas</h3>
-            <p class="text-dim margin-none">Place Commanders, Staff, Colors, Flight Commanders, and Guideons across this expanded field layout.</p>
+            <p class="subtext margin-none">Place Commanders, Staff, Colors, Flight Commanders, and Guideons across this expanded field layout.</p>
 
             <div class="drill-builder-layout">
                 <!-- Borderless Unit Palette TOP -->
@@ -381,7 +381,7 @@ function renderCustomBuilder() {
                     <button type="button" class="btn-tactical btn-gold" data-drill-action="save-active-design">
                         Save Design
                     </button>
-                    <button type="button" class="btn-tactical btn-clear" data-drill-action="clear-custom">
+                    <button type="button" class="btn-tactical btn-red" data-drill-action="clear-custom">
                         Clear Grid
                     </button>
                 </div>

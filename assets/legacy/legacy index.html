@@ -23,7 +23,7 @@
 
             <!-- NAVIGATION LINKS CONTAINER -->
             <div id="nav-drawer" class="nav-links">
-                <a id="nav-home" class="active-nav">Home</a>
+                <a id="nav-dashboard" class="active-nav">Dashboard</a>
                 <a id="nav-setup">Start Quiz</a>
                 <a id="nav-leaderboard">Leaderboard</a>
                 <a id="nav-hub">Quiz Hub</a>
@@ -41,8 +41,8 @@
     </header>
 
     <main>
-        <!-- HOME DASHBOARD VIEW -->
-        <section id="home-view" class="col">
+        <!-- DASHBOARD DASHBOARD VIEW -->
+        <section id="dashboard-view" class="col">
             <h1>Overview</h1>
             <p>
                 Whether you are preparing for test evaluations, studying publication & regulations, or brushing up on leadership concepts, test your knowledge here with interactive quizzes built by the community.
@@ -54,7 +54,7 @@
             <h3>Community-Powered</h3>
             <p>Add your own practice questions, rate community items, and earn author reputation stars.</p>
 
-            <div class="stats-grid" id="home-stats-grid">
+            <div class="grid-auto" id="dashboard-grid-auto">
                 <div class="stat-card">
                     <span class="stat-number" id="stat-total-evals">0</span>
                     <span class="stat-label">Total Tests Taken</span>
@@ -79,7 +79,7 @@
                                 <th>Date</th>
                             </tr>
                         </thead>
-                        <tbody id="home-top-scores-body">
+                        <tbody id="dashboard-top-scores-body">
                             <tr><td colspan="4" class="text-center">Loading top entries...</td></tr>
                         </tbody>
                     </table>
@@ -148,7 +148,7 @@
             <div style="display: flex; justify-content: center; gap: 0.8em; flex-wrap: wrap;">
                 <button id="btn-res-another" class="btn-tactical">Take Another Quiz</button>
                 <button id="btn-res-leaderboard" class="btn-tactical btn-blue">View Leaderboard</button>
-                <button id="btn-res-home" class="btn-tactical btn-clear">Return Home</button>
+                <button id="btn-res-dashboard" class="btn-tactical btn-red">Return Dashboard</button>
             </div>
         </section>
 
@@ -210,7 +210,7 @@
                     <label for="bank-inspect-select" style="font-size: 0.8rem; margin: 0;">Edit Selected Subject:</label>
                     <select id="bank-inspect-select" style="width: auto; padding: 0.3em; margin: 0;"></select>
                     <br>
-                    <button id="btn-delete-subject" class="btn-tactical btn-clear hidden">
+                    <button id="btn-delete-subject" class="btn-tactical btn-red hidden">
                         Delete Subject
                     </button>
                 </div>

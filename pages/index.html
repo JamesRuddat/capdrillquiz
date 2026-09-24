@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-adsense-account" content="ca-pub-1864969470317711">
     <link rel="icon" type="image/x-icon" href="/assets/images/emblems/icon.svg">
-    <title>Home</title>
+    <title>Dashboard</title>
     <link rel="stylesheet" href="/styles.css">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1864969470317711"
         crossorigin="anonymous"></script>
@@ -14,7 +14,7 @@
     <!-- Load Component Partials -->
     <script type="module" src="/js/components/header.js"></script>
     <script type="module" src="/js/components/footer.js"></script>
-    <script type="module" src="/js/pages/modal-element.js"></script>
+    <script type="module" src="/js/components/modal-element.js"></script>
 </head>
 
 <body>
@@ -23,7 +23,7 @@
         <!-- Static Skeleton Shell (Prevents Header Glitch) -->
         <nav id="navbar">
             <div class="nav-links">
-                <a href="index.html" class="active-nav">Home</a>
+                <a href="index.html" class="active-nav">Dashboard</a>
                 <a href="setup.html">Practice</a>
                 <a href="leaderboard.html">Leaderboard</a>
             </div>
@@ -38,13 +38,13 @@
 
     <main>
         <!-- 1. OPERATIONAL COMMAND DASHBOARD -->
-        <section id="home-view" class="col">
+        <section id="dashboard-view" class="col">
 
             <!-- Universal Briefing Banner -->
             <div class="briefing-card">
                 <div class="briefing-header">
-                    <span class="briefing-title">Operational Briefing</span>
-                    <span class="briefing-status">Status: Active</span>
+                    <span class="briefing-title">Welcome!</span>
+                    <span class="briefing-status">Mr Ruddat</span>
                 </div>
                 <p class="briefing-text">
                     Welcome to <strong>PROP</strong>. Master aerospace, leadership, emergency services, and STEM
@@ -57,7 +57,7 @@
             <div class="dashboard-grid">
 
                 <!-- Daily Readiness Question Widget -->
-                <div id="daily-challenge-card" class="quiz-card daily-challenge-card">
+                <div id="stat-card" class="stat-card">
                     <div>
                         <div class="daily-challenge-header flex-row-between">
                             <span class="daily-challenge-badge">Question Review</span>
@@ -73,7 +73,7 @@
 
                 <!-- Stats & Direct Action Buttons -->
                 <div class="flex-col gap-md">
-                    <div id="home-stats-grid" class="stats-grid grid-two-col">
+                    <div id="dashboard-grid-auto" class="grid-auto grid-two-col">
                         <div class="stat-card">
                             <span id="stat-total-evals" class="stat-number">--</span>
                             <span class="stat-label">Tests Completed</span>
@@ -100,11 +100,11 @@
                         <div class="rank-icon"></div>
                         <div class="rank-info flex-1">
                             <div class="rank-header-row">
-                                <span id="home-user-rank">Guest Operator</span>
-                                <span id="home-user-pts">Sign In to Track Progress</span>
+                                <span id="dashboard-user-rank">Guest Operator</span>
+                                <span id="dashboard-user-pts">Sign In to Track Progress</span>
                             </div>
                             <div class="rank-progress-track">
-                                <div id="home-rank-progress" class="rank-progress-fill"></div>
+                                <div id="dashboard-rank-progress" class="rank-progress-fill"></div>
                             </div>
                         </div>
                     </div>
@@ -129,25 +129,25 @@
                         <th>Date</th>
                     </tr>
                 </thead>
-                <tbody id="home-top-scores-body">
+                <tbody id="dashboard-top-scores-body">
                     <!-- Static Placeholders (Replaced automatically when Firebase returns) -->
                     <tr class="skeleton-row">
-                        <td class="text-dim">Loading...</td>
-                        <td class="text-dim">--</td>
-                        <td class="text-dim">--</td>
-                        <td class="text-dim">--</td>
+                        <td class="subtext">Loading...</td>
+                        <td class="subtext">--</td>
+                        <td class="subtext">--</td>
+                        <td class="subtext">--</td>
                     </tr>
                     <tr class="skeleton-row">
-                        <td class="text-dim">Loading...</td>
-                        <td class="text-dim">--</td>
-                        <td class="text-dim">--</td>
-                        <td class="text-dim">--</td>
+                        <td class="subtext">Loading...</td>
+                        <td class="subtext">--</td>
+                        <td class="subtext">--</td>
+                        <td class="subtext">--</td>
                     </tr>
                     <tr class="skeleton-row">
-                        <td class="text-dim">Loading...</td>
-                        <td class="text-dim">--</td>
-                        <td class="text-dim">--</td>
-                        <td class="text-dim">--</td>
+                        <td class="subtext">Loading...</td>
+                        <td class="subtext">--</td>
+                        <td class="subtext">--</td>
+                        <td class="subtext">--</td>
                     </tr>
                 </tbody>
             </table>

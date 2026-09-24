@@ -406,7 +406,7 @@ input[type="range"]::-moz-range-thumb {
 /* ==========================================================================
    7. STATS & TABLES
    ========================================================================== */
-.stats-grid {
+.grid-auto {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 1em;
@@ -486,7 +486,7 @@ th.sort-desc .sort-icon {
 /* ==========================================================================
    8. QUIZ OPTIONS & FEEDBACK
    ========================================================================== */
-.option-btn {
+.btn-option {
     display: block;
     width: 100%;
     text-align: left;
@@ -501,19 +501,19 @@ th.sort-desc .sort-icon {
     transition: all 0.15s ease;
 }
 
-.option-btn:hover:not(:disabled) {
+.btn-option:hover:not(:disabled) {
     border-color: var(--alert-color);
     background-color: rgba(255, 205, 0, 0.1);
 }
 
-.option-btn.correct {
+.btn-option.correct {
     border-color: #2ea043 !important;
     background-color: rgba(46, 160, 67, 0.2) !important;
     color: #2ea043 !important;
     font-weight: bold;
 }
 
-.option-btn.incorrect {
+.btn-option.incorrect {
     border-color: #f85149 !important;
     background-color: rgba(248, 81, 73, 0.2) !important;
     color: #f85149 !important;
@@ -640,7 +640,7 @@ th.sort-desc .sort-icon {
 
 .btn-gold, .btn-warning { background-color: var(--alert-color); color: #000; }
 .btn-blue, .btn-primary { background-color: var(--primary-color); color: #fff; border-color: var(--border-color); }
-.btn-red, .btn-danger, .btn-clear { background-color: var(--alt-color); color: #fff; }
+.btn-red, .btn-danger, .btn-red { background-color: var(--alt-color); color: #fff; }
 
 .btn-outline {
     background-color: transparent;
@@ -970,7 +970,7 @@ th.sort-desc .sort-icon {
 .flex-wrap { flex-wrap: wrap; }
 .font-bold { font-weight: bold; }
 .text-link { color: var(--primary-color, #4ea8de); text-decoration: underline; }
-.text-dim { color: var(--light-text-color); }
+.subtext { color: var(--light-text-color); }
 .text-correct { color: #2ea043; }
 .text-incorrect, .text-flagged, .auth-denied { color: #f85149; }
 .text-light-overlay { color: #ddd !important; }
@@ -1007,7 +1007,7 @@ th.sort-desc .sort-icon {
 /* ==========================================================================
    2. QUIZ RUNNER & SELECTION STYLES
    ========================================================================== */
-.question-visual-cue {
+.visual-cue {
     max-width: 100%;
     max-height: 250px;
     border-radius: 8px;
@@ -1016,7 +1016,7 @@ th.sort-desc .sort-icon {
     object-fit: contain;
 }
 
-.option-btn.selected-option {
+.btn-option.selected-option {
     border-color: var(--alert-color) !important;
     background-color: rgba(255, 205, 0, 0.25) !important;
     font-weight: bold;
@@ -1131,9 +1131,9 @@ th.sort-desc .sort-icon {
 .result-option-correct { background: rgba(46, 160, 67, 0.2); color: #2ea043; font-weight: bold; }
 .result-option-incorrect { background: rgba(248, 81, 73, 0.2); color: #f85149; font-weight: bold; }
 .result-option-dim { opacity: 0.7; }
-.result-visual-cue-container { margin: 0.5em 0; }
+.visual-cue-container { margin: 0.5em 0; }
 
-.result-visual-cue {
+.visual-cue {
     max-width: 100%;
     max-height: 200px;
     border-radius: 4px;
@@ -1150,7 +1150,7 @@ th.sort-desc .sort-icon {
 /* ==========================================================================
    4. HUB, CARDS & QUESTION BANK
    ========================================================================== */
-.hub-subtitle, .leaderboard-subtext, .profile-subtext, .hub-select-label, 
+.subtext, .subtext, .subtext, .subtext, 
 .hub-inspector-placeholder, .admin-user-subtext, .admin-empty-text {
     font-size: 0.8rem;
     color: var(--light-text-color);
@@ -1241,7 +1241,7 @@ th.sort-desc .sort-icon {
     height: 1.2em;
 }
 
-.hub-q-img {
+.visual-cue {
     max-width: 100%;
     max-height: 200px;
     border-radius: 4px;
@@ -1252,7 +1252,7 @@ th.sort-desc .sort-icon {
 /* ==========================================================================
    5. BADGES & ACHIEVEMENTS
    ========================================================================== */
-.badge-grid, .profile-stats-grid {
+.grid-auto, .profile-grid-auto {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 1em;

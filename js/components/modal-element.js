@@ -17,7 +17,7 @@ class CustomModal extends HTMLElement {
                     </div>
 
                     <div style="display: flex; justify-content: flex-end; gap: 0.5em; margin-top: 1em;">
-                        <button id="modal-btn-cancel" class="btn-tactical btn-clear hidden" type="button">Cancel</button>
+                        <button id="modal-btn-cancel" class="btn-tactical btn-red hidden" type="button">Cancel</button>
                         <button id="modal-btn-confirm" class="btn-tactical btn-gold" type="button">Confirm</button>
                     </div>
                 </div>

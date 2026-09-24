@@ -213,7 +213,7 @@ function renderQuestionVettingWidget(qTextEl, containerEl, feedbackEl) {
                 <button type="button" id="btn-vet-upvote" class="btn-tactical btn-blue flex-1">
                     👍 Accurately Formatted / Good
                 </button>
-                <button type="button" id="btn-vet-downvote" class="btn-tactical btn-clear flex-1">
+                <button type="button" id="btn-vet-downvote" class="btn-tactical btn-red flex-1">
                     👎 Poorly Worded / Flawed
                 </button>
             </div>

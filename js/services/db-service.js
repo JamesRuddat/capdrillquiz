@@ -1,7 +1,7 @@
 import { database, SUPER_UID } from '../config.js';
 import { state } from '../state.js';
 import { showToast } from './user-service.js';
-import { showConfirm } from '../pages/modal.js';
+import { showConfirm } from './modal-service.js';
 
 /**
  * Subscribes to Realtime Firebase Subject Registry changes

@@ -107,7 +107,7 @@ export function renderSubjectList() {
 }
 
 /**
- * Renders practice subject cards on home dashboard grid.
+ * Renders practice subject cards on dashboard dashboard grid.
  * Features a top-right 3-dots menu (⋮) for editing actions.
  * Zero-question & zero-link subjects are automatically pushed to the bottom and grayed out.
  */

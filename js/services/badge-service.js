@@ -62,12 +62,12 @@ export function calculateRankProgress(userBadges = {}) {
 }
 
 /**
- * Dynamically updates the home page Operational Rank Card DOM elements
+ * Dynamically updates the dashboard page Operational Rank Card DOM elements
  */
 export async function updateRankCardUI(userBadges = null) {
-    const rankLabel = document.getElementById("home-user-rank");
-    const ptsLabel = document.getElementById("home-user-pts");
-    const progressFill = document.getElementById("home-rank-progress");
+    const rankLabel = document.getElementById("dashboard-user-rank");
+    const ptsLabel = document.getElementById("dashboard-user-pts");
+    const progressFill = document.getElementById("dashboard-rank-progress");
     const rankIcon = document.querySelector(".rank-card .rank-icon");
 
     if (!rankLabel || !progressFill) return;
@@ -245,5 +245,5 @@ export function renderUserBadges(containerId, userBadges = {}) {
         `;
     }).join('');
 
-    container.innerHTML = `<div class="badge-grid">${html}</div>`;
+    container.innerHTML = `<div class="grid-auto">${html}</div>`;
 }

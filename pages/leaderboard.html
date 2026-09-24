@@ -14,7 +14,7 @@
     <!-- Load Component Partials -->
     <script type="module" src="/js/components/header.js"></script>
     <script type="module" src="/js/components/footer.js"></script>
-    <script type="module" src="/js/pages/modal-element.js"></script>
+    <script type="module" src="/js/components/modal-element.js"></script>
 </head>
 
 <body>
@@ -23,7 +23,7 @@
         <!-- Static Skeleton Shell (Prevents Header Glitch) -->
         <nav id="navbar">
             <div class="nav-links">
-                <a href="index.html" class="active-nav">Home</a>
+                <a href="index.html" class="active-nav">Dashboard</a>
                 <a href="setup.html">Practice</a>
                 <a href="leaderboard.html">Leaderboard</a>
             </div>
@@ -41,7 +41,7 @@
             <div class="leaderboard-header-row">
                 <div>
                     <h1 class="margin-none">Leaderboard</h1>
-                    <p class="leaderboard-subtext">
+                    <p class="subtext">
                         Sign in to claim your callsign on the public rankings!
                     </p>
                 </div>
@@ -83,22 +83,22 @@
                 <tbody id="leaderboard-body">
                     <!-- Static Skeleton Rows (prevents layout shifts while Firebase syncs) -->
                     <tr class="skeleton-row">
-                        <td class="text-dim">Loading evaluation data...</td>
-                        <td class="text-dim">--</td>
-                        <td class="text-dim">--</td>
-                        <td class="text-dim">--</td>
+                        <td class="subtext">Loading evaluation data...</td>
+                        <td class="subtext">--</td>
+                        <td class="subtext">--</td>
+                        <td class="subtext">--</td>
                     </tr>
                     <tr class="skeleton-row">
-                        <td class="text-dim">Loading evaluation data...</td>
-                        <td class="text-dim">--</td>
-                        <td class="text-dim">--</td>
-                        <td class="text-dim">--</td>
+                        <td class="subtext">Loading evaluation data...</td>
+                        <td class="subtext">--</td>
+                        <td class="subtext">--</td>
+                        <td class="subtext">--</td>
                     </tr>
                     <tr class="skeleton-row">
-                        <td class="text-dim">Loading evaluation data...</td>
-                        <td class="text-dim">--</td>
-                        <td class="text-dim">--</td>
-                        <td class="text-dim">--</td>
+                        <td class="subtext">Loading evaluation data...</td>
+                        <td class="subtext">--</td>
+                        <td class="subtext">--</td>
+                        <td class="subtext">--</td>
                     </tr>
                 </tbody>
             </table>

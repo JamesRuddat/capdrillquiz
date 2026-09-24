@@ -3,7 +3,7 @@ import { sanitizeInput } from '../components/navigation.js';
 import { saveScoreToDB } from '../services/db-service.js';
 import { updateDashboardMetrics } from '../components/leaderboard.js';
 import { awardPoints, showToast } from '../services/user-service.js';
-import { showConfirm } from './modal.js';
+import { showConfirm } from '../services/modal-service.js';
 import { checkAndAwardBadges } from '../services/badge-service.js';
 
 let evalTimerInterval = null;
@@ -251,8 +251,8 @@ export function initResultsPage() {
     const leaderboardBtn = document.getElementById("btn-res-leaderboard");
     if (leaderboardBtn) leaderboardBtn.onclick = () => window.location.href = "leaderboard.html";
 
-    const homeBtn = document.getElementById("btn-res-home");
-    if (homeBtn) homeBtn.onclick = () => window.location.href = "index.html";
+    const dashboardBtn = document.getElementById("btn-res-dashboard");
+    if (dashboardBtn) dashboardBtn.onclick = () => window.location.href = "index.html";
 }
 
 /**
@@ -374,12 +374,12 @@ export function loadQuestion() {
     if (textEl) textEl.innerText = q.q;
 
     // Render Visual Cue Image
-    let imgEl = document.getElementById("question-visual-cue");
+    let imgEl = document.getElementById("visual-cue");
     if (q.imageUrl && q.imageUrl.trim() !== "") {
         if (!imgEl) {
             imgEl = document.createElement("img");
-            imgEl.id = "question-visual-cue";
-            imgEl.className = "question-visual-cue";
+            imgEl.id = "visual-cue";
+            imgEl.className = "visual-cue";
             textEl.parentNode.insertBefore(imgEl, container);
         }
         imgEl.src = q.imageUrl;
@@ -400,7 +400,7 @@ export function loadQuestion() {
     // Render Answer Buttons
     q.options.forEach((opt, idx) => {
         const btn = document.createElement("button");
-        btn.className = "option-btn";
+        btn.className = "btn-option";
         btn.innerText = `${idx + 1}. ${opt}`;
 
         if (session.mode === 'study') {
@@ -491,7 +491,7 @@ export function selectOption(selectedIdx) {
 
     const session = JSON.parse(sessionRaw);
     const q = session.activeQuestions[session.currentIdx];
-    const buttons = document.querySelectorAll("#options-container .option-btn");
+    const buttons = document.querySelectorAll("#options-container .btn-option");
 
     if (!session.userAnswers) session.userAnswers = [];
     session.userAnswers[session.currentIdx] = selectedIdx;
@@ -715,7 +715,7 @@ export function renderResults() {
             });
 
             const visualCueHtml = (q.imageUrl && q.imageUrl.trim() !== "")
-                ? `<div class="result-visual-cue-container"><img src="${q.imageUrl}" alt="Visual Cue" class="result-visual-cue"></div>`
+                ? `<div class="visual-cue-container"><img src="${q.imageUrl}" alt="Visual Cue" class="visual-cue"></div>`
                 : '';
 
             card.innerHTML = `

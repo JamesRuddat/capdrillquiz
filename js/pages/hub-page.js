@@ -3,7 +3,7 @@ import { state } from '../state.js';
 import { validateInputsClean } from '../profanity-filter.js';
 import { awardPoints, showToast } from '../services/user-service.js';
 import { voteQuestion, toggleQuestionFlag, verifyQuestion, deleteQuestion } from '../services/db-service.js';
-import { showConfirm } from './modal.js';
+import { showConfirm } from '/js/services/modal-service.js';
 
 let isInitialLoadComplete = false;
 
@@ -543,7 +543,7 @@ export function renderUnifiedHub() {
                 </div>
                 <div class="quiz-card-footer hub-card-footer">
                     <button class="btn-tactical flex-1" data-action="submit-new-subject">Publish Subject</button>
-                    <button class="btn-tactical btn-clear flex-1" data-action="cancel-create-subject">Cancel</button>
+                    <button class="btn-tactical btn-red flex-1" data-action="cancel-create-subject">Cancel</button>
                 </div>
             </div>
         `;
@@ -631,7 +631,7 @@ export function renderUnifiedHub() {
 
                 <div class="quiz-card-footer hub-card-footer">
                     <button class="btn-tactical flex-1" data-action="save-subject" data-key="${branch}">Save Info</button>
-                    <button class="btn-tactical btn-clear flex-1" data-action="cancel-edit-subject">Cancel</button>
+                    <button class="btn-tactical btn-red flex-1" data-action="cancel-edit-subject">Cancel</button>
                 </div>
             </div>
         `;
@@ -652,7 +652,7 @@ export function renderUnifiedHub() {
                 <div>
                     <div class="quiz-card-header">
                         <span class="quiz-card-badge">${data.category || 'General'}</span>
-                        <span class="hub-question-count ${data.imageUrl ? 'text-light-overlay' : 'text-dim'}">${totalQs} Questions</span>
+                        <span class="hub-question-count ${data.imageUrl ? 'text-light-overlay' : 'subtext'}">${totalQs} Questions</span>
                     </div>
                     <div class="quiz-card-title">${data.branchName || branch}</div>
                     <div class="quiz-card-meta ${data.imageUrl ? 'text-light-overlay' : ''}">
@@ -723,7 +723,7 @@ function renderQuestionItem(q, idx, branch, canEditSubject, userUid) {
         : `<span class="badge-unverified">UNVERIFIED</span>`;
 
     const questionImgHTML = q.imageUrl
-        ? `<div class="hub-q-img-wrapper"><img src="${q.imageUrl}" alt="Visual Cue" class="hub-q-img"></div>`
+        ? `<div class="visual-cue-wrapper"><img src="${q.imageUrl}" alt="Visual Cue" class="visual-cue"></div>`
         : '';
 
     const actionControlsHTML = `
@@ -743,7 +743,7 @@ function renderQuestionItem(q, idx, branch, canEditSubject, userUid) {
                         Verify
                     </button>
                 ` : ''}
-                <button data-action="flag-q" data-branch="${branch}" data-qid="${q.id}" class="btn-tactical btn-sm btn-clear btn-padding-tight ${flagCount > 0 ? 'text-flagged' : ''}" title="Inappropriate or Incorrect">
+                <button data-action="flag-q" data-branch="${branch}" data-qid="${q.id}" class="btn-tactical btn-sm btn-red btn-padding-tight ${flagCount > 0 ? 'text-flagged' : ''}" title="Inappropriate or Incorrect">
                     🚩 ${flagCount}
                 </button>
             </div>
@@ -791,8 +791,8 @@ function renderQuestionItem(q, idx, branch, canEditSubject, userUid) {
                     </div>
 
                     <div class="hub-footer-actions-right">
-                        <button type="button" data-action="flag-q" data-branch="${branch}" data-qid="${q.id}" class="btn-tactical btn-sm ${q.isFlagged ? 'btn-red' : 'btn-clear'}" title="Flag Question">Flag</button>
-                        <button data-action="delete-q" data-branch="${branch}" data-qid="${q.id}" class="btn-tactical btn-clear btn-sm">Delete</button>
+                        <button type="button" data-action="flag-q" data-branch="${branch}" data-qid="${q.id}" class="btn-tactical btn-sm ${q.isFlagged ? 'btn-red' : 'btn-red'}" title="Flag Question">Flag</button>
+                        <button data-action="delete-q" data-branch="${branch}" data-qid="${q.id}" class="btn-tactical btn-red btn-sm">Delete</button>
                     </div>
                 </div>
             </div>

@@ -1,8 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&family=Teko:wght@600;700&family=Rajdhani:wght@600;700&display=swap');
-
-/* ==========================================================================
-   1. THEMING & DESIGN TOKENS
-   ========================================================================== */
 :root {
     --watermark-opacity: 0.25;
     --font-heading: 'Rajdhani', 'Teko', 'Barlow Condensed', sans-serif;
@@ -59,22 +54,29 @@ body {
 body::before {
     content: "";
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 65vh;
-    height: 65vh;
-    background: url(/assets/images/emblems/CadetCorps.png) no-repeat center / contain;
-    opacity: var(--watermark-opacity);
+    top: -100%;
+    left: -100%;
+    width: 300%;
+    height: 300%;
+    background-image: url('/assets/images/emblems/CadetCorps.png');
+    background-repeat: repeat;
+    background-size: 140px 140px;
+    opacity: 0.08;
+    transform: rotate(45deg) translate3d(0, 0, 0);
     z-index: -10;
-    pointer-events: none;
 }
 
+/* ==========================================================================
+   2. RESETS & BASE LAYOUT (STICKY HEADER WITH TOP PADDING)
+   ========================================================================== */
 site-header {
     display: block;
-    position: relative;
+    position: sticky;
+    top: 0;
+    /* Pins sticky container to very top of viewport */
+    padding-top: 0.5em;
+    /* Creates breathing room above the navbar */
     z-index: 1000;
-    min-height: 58px;
     contain: layout;
 }
 
@@ -87,8 +89,11 @@ site-footer {
     margin-top: 2em;
 }
 
-h1, h2, h3, h4 {
-    margin: 0.5em 0 0 0;
+h1,
+h2,
+h3,
+h4 {
+    margin: 0.2em 0 0 0;
     font-family: var(--font-heading);
     text-transform: uppercase;
 }
@@ -104,12 +109,12 @@ hr {
     margin: 0.8em 0;
 }
 
-.col, .card {
+.col,
+.card {
     background-color: var(--card-background);
     padding: 1.2em;
     border-radius: 10px;
     box-shadow: 0 4px 20px var(--card-shadow);
-    border: 1px solid var(--border-color);
     margin-bottom: 1em;
 }
 
@@ -119,7 +124,6 @@ hr {
 #navbar {
     background-color: var(--primary-color);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    color: #fff;
     position: relative;
     z-index: 1001;
     border-radius: 10px;
@@ -128,7 +132,6 @@ hr {
     align-items: center;
     justify-content: space-between;
     padding: 0.4em 0.8em;
-    min-height: 58px;
 }
 
 #navbar .nav-links {
@@ -147,6 +150,7 @@ hr {
     font-weight: bold;
     font-size: 0.9rem;
     transition: background 0.2s ease, color 0.2s ease;
+    text-transform: uppercase;
 }
 
 #navbar a:hover,
@@ -314,46 +318,66 @@ hr {
 
 .nav-search-wrapper {
     position: relative;
-    max-width: 220px;
+    max-width: 270px;
     width: 100%;
-    margin: 0 8px;
 }
 
 .nav-search-input {
     margin: 0 !important;
-    padding: 0.4em 0.7em !important;
-    font-size: 0.85rem !important;
-}
-
-.nav-pts-badge {
-    font-size: 0.8rem;
-    margin-right: 4px;
 }
 
 /* ==========================================================================
    4. UTILITIES & FLEX LAYOUTS
    ========================================================================== */
-.margin-none { margin: 0 !important; }
-.hidden { display: none !important; }
-.text-center { text-align: center; }
-.text-right { text-align: right; }
-.text-left { text-align: left; }
-.width-full { width: 100%; }
-.flex-1 { flex: 1 1 0%; }
-.flex-2 { flex: 2 2 0%; }
-.flex-wrap { flex-wrap: wrap; }
-.font-bold { font-weight: bold; }
-.gap-sm { gap: 0.5em; }
-.gap-md { gap: 1em; }
+.margin-none {
+    margin: 0 !important;
+}
 
-.text-dim,
-.subtext,
-.hub-subtitle,
-.leaderboard-subtext,
-.profile-subtext,
-.hub-select-label,
-.admin-user-subtext,
-.admin-empty-text {
+.hidden {
+    display: none !important;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.width-full {
+    width: 100%;
+}
+
+.flex-1 {
+    flex: 1 1 0%;
+}
+
+.flex-2 {
+    flex: 2 2 0%;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.font-bold {
+    font-weight: bold;
+}
+
+.gap-sm {
+    gap: 0.5em;
+}
+
+.gap-md {
+    gap: 1em;
+}
+
+.subtext {
     font-size: 0.8rem;
     color: var(--light-text-color);
 }
@@ -363,10 +387,23 @@ hr {
     text-decoration: underline;
 }
 
-.text-correct { color: #2ea043; }
-.text-incorrect, .text-flagged, .auth-denied { color: #f85149; }
-.text-alert { color: var(--alert-color); }
-.text-sm { font-size: 0.85rem; }
+.text-correct {
+    color: #2ea043;
+}
+
+.text-incorrect,
+.text-flagged,
+.auth-denied {
+    color: #f85149;
+}
+
+.text-alert {
+    color: var(--alert-color);
+}
+
+.text-sm {
+    font-size: 0.85rem;
+}
 
 .flex-row,
 .flex-row-between,
@@ -398,9 +435,7 @@ hr {
 }
 
 .grid-auto,
-.stats-grid,
-.badge-grid,
-.profile-stats-grid {
+.profile-grid-auto {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 1.2em;
@@ -413,7 +448,7 @@ hr {
 }
 
 /* ==========================================================================
-   5. HOME DASHBOARD & OPERATIONAL WIDGETS
+   5. DASHBOARD DASHBOARD & OPERATIONAL WIDGETS
    ========================================================================== */
 .briefing-card {
     background: var(--card-background);
@@ -457,41 +492,12 @@ hr {
     margin-bottom: 1.5em;
 }
 
-/* Daily Challenge Widget */
-.daily-challenge-card {
-    padding: 1.5em;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    border-radius: 8px;
-    background: var(--card-background);
-    border-left: 3px solid var(--alert-color);
-    min-height: 220px;
-    contain: layout style;
-}
-
-.daily-challenge-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.8em;
-}
-
 .daily-challenge-badge {
     text-transform: uppercase;
     font-size: 0.75rem;
     font-weight: bold;
     color: #f59e0b;
     letter-spacing: 0.5px;
-}
-
-.daily-pts-badge {
-    background: rgba(245, 158, 11, 0.15);
-    color: #f59e0b;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: bold;
 }
 
 .daily-question-title {
@@ -550,11 +556,6 @@ hr {
     min-height: 2.2rem;
 }
 
-.stat-label {
-    font-size: 0.8rem;
-    opacity: 0.8;
-}
-
 .stat-action-wrapper {
     margin-top: 1em;
     width: 100%;
@@ -570,8 +571,9 @@ hr {
     border: 1px solid var(--border-color);
 }
 
-.rank-icon { font-size: 2.2rem; }
-.rank-info { flex: 1; }
+.rank-icon {
+    font-size: 2.2rem;
+}
 
 .rank-header-row {
     display: flex;
@@ -611,12 +613,11 @@ hr {
     background-color: var(--card-background);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 1.4em;
+    padding: 1em;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     min-height: 240px;
-    line-height: 1.5;
     position: relative;
     contain: layout style;
 }
@@ -647,6 +648,7 @@ hr {
 
     /* Clamp text to a maximum of 3 lines */
     display: -webkit-box;
+    line-clamp: 3;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
@@ -696,12 +698,6 @@ hr {
     border: 2px dashed var(--border-color);
 }
 
-.empty-state-icon { font-size: 2.5rem; margin-bottom: 0.3em; }
-.empty-state-title { margin-bottom: 0.4em; font-size: 1.2rem; }
-.empty-state-desc { margin-bottom: 1.2em; }
-.empty-state-btn { display: inline-block; padding: 0.6em 1.2em; font-size: 0.9rem; }
-
-/* Consolidated Zero-Content / Disabled Card State */
 .quiz-card-disabled,
 .quiz-card.card-disabled,
 .quiz-card.card-inactive {
@@ -714,53 +710,6 @@ hr {
 .quiz-card-disabled:hover {
     opacity: 0.85;
     filter: grayscale(0%);
-}
-
-.quiz-card-disabled .btn-tactical {
-    background-color: var(--input-bg) !important;
-    color: var(--light-text-color) !important;
-    border-color: var(--border-color) !important;
-}
-
-/* Static Skeleton Loading State Rules */
-.skeleton-row td {
-    opacity: 0.5;
-}
-
-.quiz-card-skeleton {
-    min-height: 240px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    pointer-events: none;
-}
-
-.skeleton-text {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-    animation: skeleton-pulse 1.5s infinite ease-in-out;
-}
-
-.skeleton-title {
-    width: 60%;
-    height: 20px;
-    margin-bottom: 8px;
-}
-
-.skeleton-badge {
-    width: 30%;
-    height: 14px;
-}
-
-.skeleton-body {
-    width: 90%;
-    height: 40px;
-    margin-top: 16px;
-}
-
-@keyframes skeleton-pulse {
-    0% { opacity: 0.3; }
-    50% { opacity: 0.7; }
-    100% { opacity: 0.3; }
 }
 
 /* ==========================================================================
@@ -785,8 +734,7 @@ hr {
     background-position: center center !important;
     background-size: cover;
     background-repeat: no-repeat;
-    border: 1px solid var(--border-color);
-    margin-bottom: 2em;
+    margin-bottom: 1em;
     background-color: rgba(255, 255, 255, 0.02);
 }
 
@@ -894,12 +842,33 @@ select:focus {
     transform: translateY(-1px);
 }
 
-.btn-sm { font-size: 0.8rem; padding: 0.3em 0.7em; min-height: 30px; }
-.btn-lg { font-size: 1.1rem; padding: 0.75em 1.4em; min-height: 48px; }
+.btn-sm {
+    font-size: 0.8rem;
+    padding: 0.3em 0.7em;
+    min-height: 30px;
+}
 
-.btn-gold { background-color: var(--alert-color); color: #000; }
-.btn-blue { background-color: var(--primary-color); color: #fff; border-color: var(--border-color); }
-.btn-red, .btn-clear { background-color: var(--alt-color); color: #fff; }
+.btn-lg {
+    font-size: 1.1rem;
+    padding: 0.75em 1.4em;
+    min-height: 48px;
+}
+
+.btn-gold {
+    background-color: var(--alert-color);
+    color: #000;
+}
+
+.btn-blue {
+    background-color: var(--primary-color);
+    color: #fff;
+    border-color: var(--border-color);
+}
+
+.btn-red {
+    background-color: var(--alt-color);
+    color: #fff;
+}
 
 .card-menu-trigger {
     background: transparent;
@@ -944,7 +913,6 @@ select:focus {
 /* ==========================================================================
    9. QUIZ RUNNER & QUESTION OPTIONS
    ========================================================================== */
-.option-btn,
 .btn-option {
     display: block;
     width: 100%;
@@ -962,29 +930,26 @@ select:focus {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.option-btn:hover:not(:disabled),
 .btn-option:hover:not(:disabled) {
     border-color: var(--alert-color);
     background-color: rgba(255, 205, 0, 0.12);
     transform: translateX(2px);
 }
 
-.option-btn.selected-option {
+.btn-option.selected-option {
     border-color: var(--alert-color) !important;
     background-color: rgba(255, 205, 0, 0.25) !important;
     font-weight: bold;
 }
 
-.option-btn.correct,
-.btn-option.btn-correct {
+.btn-option.correct {
     border-color: #2ea043 !important;
     background-color: rgba(46, 160, 67, 0.2) !important;
     color: #2ea043 !important;
     font-weight: bold;
 }
 
-.option-btn.incorrect,
-.btn-option.btn-incorrect {
+.btn-option.incorrect {
     border-color: #f85149 !important;
     background-color: rgba(248, 81, 73, 0.2) !important;
     color: #f85149 !important;
@@ -995,11 +960,6 @@ select:focus {
     gap: 0.8em;
     margin-top: 1em;
     width: 100%;
-}
-
-.quiz-nav-row .btn-tactical {
-    flex: 1 1 0%;
-    min-width: 0;
 }
 
 #feedback-panel,
@@ -1032,13 +992,17 @@ select:focus {
     text-transform: uppercase;
 }
 
-.tag-incorrect { background: rgba(248, 81, 73, 0.25); color: #f85149; }
-.tag-correct { background: rgba(46, 160, 67, 0.25); color: #2ea043; }
+.tag-incorrect {
+    background: rgba(248, 81, 73, 0.25);
+    color: #f85149;
+}
 
-.flashcard-visual-cue,
-.question-visual-cue,
-.result-visual-cue,
-.hub-q-img {
+.tag-correct {
+    background: rgba(46, 160, 67, 0.25);
+    color: #2ea043;
+}
+
+.visual-cue {
     display: block;
     margin: 0.8em auto !important;
     max-width: 100%;
@@ -1062,8 +1026,13 @@ select:focus {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
-.hub-q-card-verified { border: 2px solid var(--primary-color) !important; }
-.hub-q-card-unverified { border: 2px dashed var(--alert-color) !important; }
+.hub-q-card-verified {
+    border: 2px solid var(--primary-color) !important;
+}
+
+.hub-q-card-unverified {
+    border: 2px dashed var(--alert-color) !important;
+}
 
 .hub-file-upload-row {
     display: flex;
@@ -1085,8 +1054,18 @@ select:focus {
     border-top: 1px solid var(--border-color);
 }
 
-.hub-footer-actions-left { display: flex; align-items: center; gap: 0.6em; }
-.hub-footer-actions-right { display: flex; align-items: center; gap: 0.6em; margin-left: auto; }
+.hub-footer-actions-left {
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+}
+
+.hub-footer-actions-right {
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+    margin-left: auto;
+}
 
 .hub-voting-controls {
     display: inline-flex;
@@ -1121,17 +1100,44 @@ td {
     border-bottom: 1px solid var(--border-color);
 }
 
-tbody tr:nth-child(even) { background-color: rgba(0, 0, 0, 0.04); }
-:root[data-theme="dark"] tbody tr:nth-child(even) { background-color: rgba(255, 255, 255, 0.03); }
-tbody tr:hover { background-color: rgba(255, 205, 0, 0.1) !important; }
+tbody tr:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.04);
+}
 
-.rank-gold { background-color: rgba(255, 205, 0, 0.15); }
-.rank-silver { background-color: rgba(200, 200, 200, 0.15); }
-.rank-bronze { background-color: rgba(205, 127, 50, 0.15); }
-.rank-active-user { background-color: rgba(255, 205, 0, 0.12); }
+:root[data-theme="dark"] tbody tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.03);
+}
 
-.leaderboard-legacy-text { color: var(--light-text-color); font-style: italic; }
-.leaderboard-legacy-badge { font-size: 0.7rem; opacity: 0.8; margin-left: 4px; }
+tbody tr:hover {
+    background-color: rgba(255, 205, 0, 0.1) !important;
+}
+
+.rank-gold {
+    background-color: rgba(255, 205, 0, 0.15);
+}
+
+.rank-silver {
+    background-color: rgba(200, 200, 200, 0.15);
+}
+
+.rank-bronze {
+    background-color: rgba(205, 127, 50, 0.15);
+}
+
+.rank-active-user {
+    background-color: rgba(255, 0, 0, 0.267);
+}
+
+.leaderboard-legacy-text {
+    color: var(--light-text-color);
+    font-style: italic;
+}
+
+.leaderboard-legacy-badge {
+    font-size: 0.7rem;
+    opacity: 0.4;
+    margin-left: 4px;
+}
 
 /* ==========================================================================
    12. PROFILE BADGES
@@ -1266,19 +1272,21 @@ tbody tr:hover { background-color: rgba(255, 205, 0, 0.1) !important; }
     flex: 1 1 250px;
 }
 
-.footer-dev-title { margin: 0; font-weight: 600; color: var(--text-color); }
-.footer-accent-text { color: var(--primary-color, #3b82f6); }
-.footer-subtext { margin: 0.2em 0 0 0; font-size: 0.78rem; opacity: 0.85; }
-
-.ad-container {
-    margin: 1.5em 0;
-    text-align: center;
-    min-height: 90px;
-    background: rgba(0, 0, 0, 0.02);
-    border: 1px dashed var(--border-color);
+.footer-dev-title {
+    margin: 0;
+    font-weight: 600;
+    color: var(--text-color);
 }
 
-.ad-container ins { display: block; }
+.footer-accent-text {
+    color: var(--primary-color, #3b82f6);
+}
+
+.footer-subtext {
+    margin: 0.2em 0 0 0;
+    font-size: 0.78rem;
+    opacity: 0.85;
+}
 
 /* ==========================================================================
    15. MODAL & TOAST OVERLAYS
@@ -1341,18 +1349,24 @@ tbody tr:hover { background-color: rgba(255, 205, 0, 0.1) !important; }
     transition: transform 0.2s ease;
 }
 
-.arrow-right { clip-path: polygon(0% 20%, 60% 20%, 60% 0%, 100% 50%, 60% 100%, 60% 80%, 0% 80%); }
-.arrow-down { clip-path: polygon(20% 0%, 80% 0%, 80% 60%, 100% 60%, 50% 100%, 0% 60%, 20% 60%); }
-.arrow-up { clip-path: polygon(20% 100%, 80% 100%, 80% 40%, 100% 40%, 50% 0%, 0% 40%, 20% 40%); }
-.arrow-sort { clip-path: polygon(50% 0%, 100% 35%, 70% 35%, 70% 65%, 100% 65%, 50% 100%, 0% 65%, 30% 65%, 30% 35%, 0% 35%); }
+.arrow-right {
+    clip-path: polygon(0% 20%, 60% 20%, 60% 0%, 100% 50%, 60% 100%, 60% 80%, 0% 80%);
+}
 
-.btn-tactical:hover .arrow-right { transform: translateX(3px); }
+.arrow-down {
+    clip-path: polygon(20% 0%, 80% 0%, 80% 60%, 100% 60%, 50% 100%, 0% 60%, 20% 60%);
+}
+
+.arrow-up {
+    clip-path: polygon(20% 100%, 80% 100%, 80% 40%, 100% 40%, 50% 0%, 0% 40%, 20% 40%);
+}
+
+.arrow-sort {
+    clip-path: polygon(50% 0%, 100% 35%, 70% 35%, 70% 65%, 100% 65%, 50% 100%, 0% 65%, 30% 65%, 30% 35%, 0% 35%);
+}
 
 /* ==========================================================================
-   16. DRILL & CEREMONIES (DAFPAM 34-1203) MODULE STYLES
-   ========================================================================== */
-/* ==========================================================================
-   16. DRILL & CEREMONIES (DAFPAM 34-1203) MODULE STYLES
+   16. DRILL & CEREMONIES STYLES
    ========================================================================== */
 .drill-builder-layout {
     display: flex;

@@ -227,7 +227,7 @@ export function showDFHelpModal() {
 
         <!-- Instructional Guidance -->
         <div class="col margin-none" style="padding: 0.8em; margin-top: 0.8em;">
-            <p class="text-dim text-sm margin-none" style="line-height: 1.5;">
+            <p class="subtext text-sm margin-none" style="line-height: 1.5;">
                 Rotate the heading line until signal strength peaks, then stretch the single-steer vector forward to locate the target.
             </p>
         </div>

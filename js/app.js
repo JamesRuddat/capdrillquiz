@@ -10,7 +10,7 @@ import { populateBranchDropdowns, renderSubjectList, renderSubjectCards } from '
 import { initAdminPage } from './pages/admin-page.js';
 import { initDailyChallenge } from './components/daily-challenge.js';
 import { updateBannerImage, updateSliderLimits, startQuiz } from './pages/quiz-page.js';
-import { showConfirm } from './pages/modal.js';
+import { showConfirm } from './services/modal-service.js';
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -30,8 +30,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById("bank-inspector-list")) initHubPage();
     if (document.getElementById("admin-view")) initAdminPage();
 
-    // Home Page Stats & Metrics
-    if (document.getElementById("home-view") || document.getElementById("home-top-scores-body")) {
+    // Dashboard Page Stats & Metrics
+    if (document.getElementById("dashboard-view") || document.getElementById("dashboard-top-scores-body")) {
         updateDashboardMetrics();
         initTableSorting("leaderboard-table");
     }
@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
             renderSubjectList();
             renderSubjectCards();
 
-            if (document.getElementById("home-view") || document.getElementById("stat-modules-count") || document.getElementById("stat-subjects-count") || document.getElementById("home-top-scores-body")) {
+            if (document.getElementById("dashboard-view") || document.getElementById("stat-modules-count") || document.getElementById("stat-subjects-count") || document.getElementById("dashboard-top-scores-body")) {
                 updateDashboardMetrics();
             }
 

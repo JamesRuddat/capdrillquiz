@@ -2,7 +2,7 @@ import { database, SUPER_UID } from '../config.js';
 import { state } from '../state.js';
 import { showToast, updateUserRole } from '../services/user-service.js';
 import { deleteQuestion, verifyQuestion } from '../services/db-service.js';
-import { showConfirm } from './modal.js';
+import { showConfirm } from '/js/services/modal-service.js';
 
 let cachedUsersData = {};
 
@@ -286,10 +286,10 @@ function renderUserProfile(uid, userData, scores, questions) {
                         <span class="badge-status badge-verified">${q.branchName}</span>
                         <div>
                             ${isVerified
-                                ? `<span class="badge-status badge-verified">VERIFIED</span>`
-                                : `<button data-admin-action="verify-q" data-branch="${q.branchKey}" data-qid="${q.qid}" class="btn-tactical btn-blue btn-sm">Verify</button>`
-                            }
-                            <button data-admin-action="delete-q" data-branch="${q.branchKey}" data-qid="${q.qid}" class="btn-tactical btn-clear btn-sm">Delete</button>
+                    ? `<span class="badge-status badge-verified">VERIFIED</span>`
+                    : `<button data-admin-action="verify-q" data-branch="${q.branchKey}" data-qid="${q.qid}" class="btn-tactical btn-blue btn-sm">Verify</button>`
+                }
+                            <button data-admin-action="delete-q" data-branch="${q.branchKey}" data-qid="${q.qid}" class="btn-tactical btn-red btn-sm">Delete</button>
                         </div>
                     </div>
                     <div class="font-bold margin-top-xs">${q.q}</div>
@@ -416,7 +416,7 @@ export async function renderFlaggedQuestionsTable() {
                                 <button class="btn-tactical btn-blue btn-sm" onclick="window.clearQuestionFlags('${item.branchKey}', '${item.qId}')">
                                     Clear Flags
                                 </button>
-                                <button class="btn-tactical btn-clear btn-sm" onclick="window.deleteAdminQuestion('${item.branchKey}', '${item.qId}')">
+                                <button class="btn-tactical btn-red btn-sm" onclick="window.deleteAdminQuestion('${item.branchKey}', '${item.qId}')">
                                     Delete Question
                                 </button>
                             </div>

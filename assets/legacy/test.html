@@ -10,7 +10,7 @@
 
     <nav id="navbar">
         <div class="nav-links">
-            <a href="/index.html">home</a>
+            <a href="/index.html">dashboard</a>
             <a onclick="showView('setup-view')">Quiz Setup</a>
             <a onclick="showView('leaderboard-view')">Leaderboard</a>
         </div>
@@ -79,7 +79,7 @@
             <tbody id="leaderboard-body"></tbody>
         </table>
         <br>
-        <button onclick="clearScores()" class="btn-clear">Clear Score Log</button>
+        <button onclick="clearScores()" class="btn-red">Clear Score Log</button>
     </div>
 
     <!-- GLOBAL CUSTOM MODAL OVERLAY -->
@@ -89,7 +89,7 @@
             <p id="modal-message">Notification details go here.</p>
             <div id="modal-actions" class="modal-actions">
                 <button id="modal-btn-confirm" class="btn-tactical">OK</button>
-                <button id="modal-btn-cancel" class="btn-tactical btn-clear hidden">Cancel</button>
+                <button id="modal-btn-cancel" class="btn-tactical btn-red hidden">Cancel</button>
             </div>
         </div>
     </div>

@@ -1,7 +1,7 @@
 import { auth, googleProvider, database } from '../config.js';
 import { state } from '../state.js';
 import { showToast } from './user-service.js';
-import { showPrompt, showModal, showConfirm } from '../pages/modal.js';
+import { showPrompt, showModal, showConfirm } from './modal-service.js';
 import { renderLeaderboard } from '../components/leaderboard.js';
 
 // Instantiate Microsoft OAuth Provider

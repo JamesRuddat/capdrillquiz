@@ -34,7 +34,7 @@ const googleProvider = new firebase.auth.GoogleAuthProvider();
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
     // Nav Bar Click Event Handlers
-    document.getElementById("nav-home").addEventListener("click", () => showView('home-view'));
+    document.getElementById("nav-dashboard").addEventListener("click", () => showView('dashboard-view'));
     document.getElementById("nav-setup").addEventListener("click", () => showView('setup-view'));
     document.getElementById("nav-leaderboard").addEventListener("click", () => showView('leaderboard-view'));
     document.getElementById("nav-hub").addEventListener("click", () => { 
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Result View Navigation
     document.getElementById("btn-res-another").addEventListener("click", () => showView('setup-view'));
     document.getElementById("btn-res-leaderboard").addEventListener("click", () => showView('leaderboard-view'));
-    document.getElementById("btn-res-home").addEventListener("click", () => showView('home-view'));
+    document.getElementById("btn-res-dashboard").addEventListener("click", () => showView('dashboard-view'));
 
     // Leaderboard Filter
     document.getElementById("filter-leaderboard").addEventListener("change", renderLeaderboard);
@@ -209,14 +209,14 @@ function renderSubjectList() {
 }
 
 function showView(viewId) {
-    const views = ['home-view', 'setup-view', 'quiz-view', 'results-view', 'leaderboard-view', 'hub-view'];
+    const views = ['dashboard-view', 'setup-view', 'quiz-view', 'results-view', 'leaderboard-view', 'hub-view'];
     views.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.toggle('hidden', id !== viewId);
     });
 
     const navMap = {
-        'home-view': 'nav-home',
+        'dashboard-view': 'nav-dashboard',
         'setup-view': 'nav-setup',
         'leaderboard-view': 'nav-leaderboard',
         'hub-view': 'nav-hub'
@@ -227,7 +227,7 @@ function showView(viewId) {
         document.getElementById(navMap[viewId]).classList.add('active-nav');
     }
 
-    if (viewId === 'home-view') updateDashboardMetrics();
+    if (viewId === 'dashboard-view') updateDashboardMetrics();
     if (viewId === 'leaderboard-view') renderLeaderboard();
     if (viewId === 'hub-view') renderUnifiedHub();
 }
@@ -276,15 +276,15 @@ function updateDashboardMetrics() {
         const subjectsCountEl = document.getElementById("stat-subjects-count");
         if (subjectsCountEl) subjectsCountEl.innerText = Object.keys(QUESTION_REGISTRY).length;
 
-        const homeTopBody = document.getElementById("home-top-scores-body");
-        if (homeTopBody) {
+        const dashboardTopBody = document.getElementById("dashboard-top-scores-body");
+        if (dashboardTopBody) {
             logs.sort((a, b) => b.pct - a.pct);
             const topPerformers = logs.slice(0, 5);
 
             if (topPerformers.length === 0) {
-                homeTopBody.innerHTML = `<tr><td colspan="4" class="text-center" style="color: var(--light-text-color);">No scores logged yet. Be the first!</td></tr>`;
+                dashboardTopBody.innerHTML = `<tr><td colspan="4" class="text-center" style="color: var(--light-text-color);">No scores logged yet. Be the first!</td></tr>`;
             } else {
-                homeTopBody.innerHTML = topPerformers.map((entry, idx) => `
+                dashboardTopBody.innerHTML = topPerformers.map((entry, idx) => `
                     <tr>
                         <td><strong>#${idx + 1} ${entry.name}</strong></td>
                         <td>${entry.branch}</td>
@@ -350,7 +350,7 @@ function loadQuestion() {
 
     q.options.forEach((opt, idx) => {
         const btn = document.createElement("button");
-        btn.className = "option-btn";
+        btn.className = "btn-option";
         btn.innerText = `${idx + 1}. ${opt}`;
         btn.onclick = () => selectOption(idx);
         container.appendChild(btn);
@@ -359,7 +359,7 @@ function loadQuestion() {
 
 function selectOption(selectedIdx) {
     const q = activeQuestions[currentIdx];
-    const buttons = document.querySelectorAll("#options-container .option-btn");
+    const buttons = document.querySelectorAll("#options-container .btn-option");
 
     buttons.forEach(btn => btn.disabled = true);
 
@@ -646,7 +646,7 @@ function renderUnifiedHub() {
                     <div style="padding: 1em; border-radius: 4px; margin-bottom: 0.8em; background: rgba(0,0,0,0.05); border: 1px solid var(--primary-color);">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5em;">
                             <strong>Q${idx + 1} (Owner / Admin Control)</strong>
-                            <button onclick="window.deleteQuestion('${branch}', '${q.id}')" class="btn-tactical btn-clear">Delete</button>
+                            <button onclick="window.deleteQuestion('${branch}', '${q.id}')" class="btn-tactical btn-red">Delete</button>
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 0.4em;">
                             <input type="text" id="edit-q-${q.id}" value="${q.q ? q.q.replace(/"/g, '&quot;') : ''}">

@@ -46,7 +46,7 @@ function formatCallsignDisplay(item, currentUid, currentUserCallsign) {
     if (isLegacy) {
         return `
             <span class="leaderboard-legacy-text" title="Recorded prior to callsign system update">
-                [Limited]
+                [Bata]
             </span>
             <span class="quiz-card-badge leaderboard-legacy-badge">Legacy</span>
         `;
@@ -131,8 +131,8 @@ export function updateDashboardMetrics() {
     }
 
     // 4. Fetch and render top 3 high scores for index page
-    const homeTopBody = document.getElementById("home-top-scores-body");
-    if (!homeTopBody) return;
+    const dashboardTopBody = document.getElementById("dashboard-top-scores-body");
+    if (!dashboardTopBody) return;
 
     database.ref("scores").once("value").then(snapshot => {
         const scores = snapshot.val() || {};
@@ -144,7 +144,7 @@ export function updateDashboardMetrics() {
         }
 
         if (scoreList.length === 0) {
-            homeTopBody.innerHTML = `<tr><td colspan="4" class="text-center text-dim">No scores logged yet. Be the first!</td></tr>`;
+            dashboardTopBody.innerHTML = `<tr><td colspan="4" class="text-center subtext">No scores logged yet. Be the first!</td></tr>`;
             return;
         }
 
@@ -159,7 +159,7 @@ export function updateDashboardMetrics() {
         const currentUid = state.userUid || (state.currentUser && state.currentUser.uid) || null;
         const currentUserCallsign = state.userCallsign || null;
 
-        homeTopBody.innerHTML = top3.map((item, idx) => {
+        dashboardTopBody.innerHTML = top3.map((item, idx) => {
             let rankClass = "";
             if (idx === 0) rankClass = "rank-gold";
             else if (idx === 1) rankClass = "rank-silver";
@@ -172,13 +172,13 @@ export function updateDashboardMetrics() {
                     <td>${nameLabel}</td>
                     <td>${item.branch || 'General'}</td>
                     <td class="font-bold text-alert">${item.score} (${item.pct}%)</td>
-                    <td class="text-dim text-sm">${item.date || 'N/A'}</td>
+                    <td class="subtext text-sm">${item.date || 'N/A'}</td>
                 </tr>
             `;
         }).join('');
     }).catch(err => {
         console.error("Error loading top 3 preview scores:", err);
-        homeTopBody.innerHTML = `<tr><td colspan="4" class="text-center text-dim">Unable to load top scores preview.</td></tr>`;
+        dashboardTopBody.innerHTML = `<tr><td colspan="4" class="text-center subtext">Unable to load top scores preview.</td></tr>`;
     });
 }
 
@@ -187,14 +187,14 @@ export function updateDashboardMetrics() {
  */
 export async function renderLeaderboard() {
     const mainBody = document.getElementById("leaderboard-body");
-    const homeBody = document.getElementById("home-top-scores-body");
-    const tbody = mainBody || homeBody;
+    const dashboardBody = document.getElementById("dashboard-top-scores-body");
+    const tbody = mainBody || dashboardBody;
     const thead = document.getElementById("leaderboard-thead");
 
     if (!tbody || !thead) return;
 
-    const isHomePage = !mainBody && !!homeBody;
-    const limitCount = isHomePage ? 3 : 50;
+    const isDashboardPage = !mainBody && !!dashboardBody;
+    const limitCount = isDashboardPage ? 3 : 50;
 
     const modeSelect = document.getElementById("leaderboard-mode-select");
     const subjectSelect = document.getElementById("filter-leaderboard");
@@ -205,7 +205,7 @@ export async function renderLeaderboard() {
     const currentUid = state.userUid || (state.currentUser && state.currentUser.uid) || null;
     const currentUserCallsign = state.userCallsign || null;
 
-    if (mode === 'user-points' && !isHomePage) {
+    if (mode === 'user-points' && !isDashboardPage) {
         thead.innerHTML = `
             <tr>
                 <th class="sortable" data-sort="name">
@@ -233,7 +233,7 @@ export async function renderLeaderboard() {
                 .sort((a, b) => b.points - a.points);
 
             if (userList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="2" class="text-center text-dim">No points recorded yet. Complete quizzes to earn stars!</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="2" class="text-center subtext">No points recorded yet. Complete quizzes to earn stars!</td></tr>`;
                 initTableSorting("leaderboard-table");
                 return;
             }
@@ -254,7 +254,7 @@ export async function renderLeaderboard() {
 
         } catch (err) {
             console.error("Error loading points leaderboard:", err);
-            tbody.innerHTML = `<tr><td colspan="2" class="text-center text-dim">Unable to load user points.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="2" class="text-center subtext">Unable to load user points.</td></tr>`;
         }
     } else {
         thead.innerHTML = `
@@ -292,7 +292,7 @@ export async function renderLeaderboard() {
             });
 
             if (scoreList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="text-center text-dim">No test scores logged yet. Be the first to complete a quiz!</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center subtext">No test scores logged yet. Be the first to complete a quiz!</td></tr>`;
                 initTableSorting("leaderboard-table");
                 return;
             }
@@ -303,7 +303,7 @@ export async function renderLeaderboard() {
                     (currentUserCallsign && rawName === currentUserCallsign);
 
                 let rankClass = "";
-                if (isHomePage) {
+                if (isDashboardPage) {
                     if (idx === 0) rankClass = "rank-gold";
                     else if (idx === 1) rankClass = "rank-silver";
                     else if (idx === 2) rankClass = "rank-bronze";
@@ -319,14 +319,14 @@ export async function renderLeaderboard() {
                         <td>${nameLabel}</td>
                         <td>${item.branch || 'General'}</td>
                         <td class="font-bold text-alert">${displayScore}</td>
-                        <td class="text-dim text-sm">${item.date || 'N/A'}</td>
+                        <td class="subtext text-sm">${item.date || 'N/A'}</td>
                     </tr>
                 `;
             }).join('');
 
         } catch (err) {
             console.error("Error loading scores:", err);
-            tbody.innerHTML = `<tr><td colspan="4" class="text-center text-dim">Failed to load scores data.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center subtext">Failed to load scores data.</td></tr>`;
         }
     }
 

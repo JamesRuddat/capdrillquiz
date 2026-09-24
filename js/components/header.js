@@ -49,7 +49,7 @@ export class SiteHeader extends HTMLElement {
                 </button>
 
                 <div id="nav-drawer" class="nav-links">
-                    <a href="index.html" class="${currentPath.endsWith("index.html") || currentPath === "/" ? "active-nav" : ""}">Home</a>
+                    <a href="index.html" class="${currentPath.endsWith("index.html") || currentPath === "/" ? "active-nav" : ""}">Dashboard</a>
                     <a href="setup.html" class="${currentPath.endsWith("setup.html") ? "active-nav" : ""}">Practice</a>
                     <a href="leaderboard.html" class="${currentPath.endsWith("leaderboard.html") ? "active-nav" : ""}">Leaderboard</a>
                 </div>

@@ -2239,7 +2239,7 @@
         "q": "Which situation is the best example of Reporting indoors?",
         "imageUrl": "",
         "options": [
-          "A cadet resists checking a phone until homework is finished",
+          "A cadet resists checking a phone until dashboardwork is finished",
           "A squadron issue normally moves upward one level at a time",
           "A C/SSgt is identified as a cadet NCO",
           "A cadet halts two paces away and says they are reporting as ordered"
@@ -2295,7 +2295,7 @@
         "q": "Which situation is the best example of Attitude?",
         "imageUrl": "",
         "options": [
-          "A cadet resists checking a phone until homework is finished",
+          "A cadet resists checking a phone until dashboardwork is finished",
           "A cadet chooses to look for a useful lesson after a setback",
           "A junior initiates the salute outdoors early enough for it to be returned",
           "A cadet first takes a routine issue to the element leader or immediate supervisor"
@@ -2424,7 +2424,7 @@
           "A cadet notices weak math skills and schedules extra study time",
           "A cadet follows a safety instruction but refuses an obviously immoral order",
           "A cadet can be proud because the work submitted is truly their own",
-          "A cadet resists checking a phone until homework is finished"
+          "A cadet resists checking a phone until dashboardwork is finished"
         ],
         "answer": 0,
         "explanation": "Official CAP Learn to Lead preparation question. (Question 173 · Chapter 1 · Cadet Oath · Source pages 15 · Objective(s) 14)",
@@ -2914,7 +2914,7 @@
           "It proves leadership depends entirely on rank.",
           "It matters only because it makes inspections shorter.",
           "It allows a leader to ignore the Core Values when the mission is difficult.",
-          "It supports sound leadership because it helps a cadet a cadet resists checking a phone until homework is finished."
+          "It supports sound leadership because it helps a cadet a cadet resists checking a phone until dashboardwork is finished."
         ],
         "answer": 3,
         "explanation": "Official CAP Learn to Lead preparation question. (Question 208 · Chapter 1 · Personal leadership · Source pages 11–12 · Objective(s) 9)",
@@ -4032,7 +4032,7 @@
         "imageUrl": "",
         "options": [
           "A squadron issue normally moves upward one level at a time",
-          "A cadet resists checking a phone until homework is finished",
+          "A cadet resists checking a phone until dashboardwork is finished",
           "A cadet bypasses the flight staff and emails the national commander about a routine issue",
           "A cadet treats the Cadet Oath as a real commitment, not just words to memorize"
         ],
